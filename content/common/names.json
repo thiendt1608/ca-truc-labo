@@ -1,0 +1,69 @@
+{
+  "family": [
+    "Nguyễn",
+    "Trần",
+    "Lê",
+    "Phạm",
+    "Hoàng",
+    "Vũ",
+    "Đặng",
+    "Bùi",
+    "Đỗ",
+    "Hồ",
+    "Ngô",
+    "Dương",
+    "Lý",
+    "Phan",
+    "Võ"
+  ],
+  "middle": {
+    "M": ["Văn", "Minh", "Đức", "Quốc", "Hữu", "Gia"],
+    "F": ["Thị", "Ngọc", "Thu", "Mai", "Thanh", "Bảo"]
+  },
+  "given": {
+    "M": [
+      "An",
+      "Bình",
+      "Cường",
+      "Dũng",
+      "Hải",
+      "Hùng",
+      "Khang",
+      "Long",
+      "Nam",
+      "Phúc",
+      "Quang",
+      "Sơn",
+      "Tài",
+      "Tuấn",
+      "Vinh"
+    ],
+    "F": [
+      "Anh",
+      "Chi",
+      "Dung",
+      "Hà",
+      "Hằng",
+      "Hoa",
+      "Lan",
+      "Linh",
+      "My",
+      "Ngân",
+      "Nhung",
+      "Phương",
+      "Thảo",
+      "Trang",
+      "Yến"
+    ]
+  },
+  "lookalike": [
+    ["Hùng", "Hưng"],
+    ["Lan", "Lam"],
+    ["Linh", "Lĩnh"],
+    ["Hà", "Hạ"],
+    ["Nam", "Năm"],
+    ["Anh", "Ánh"],
+    ["Tài", "Tại"],
+    ["Long", "Lông"]
+  ]
+}

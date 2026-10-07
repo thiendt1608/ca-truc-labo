@@ -1,0 +1,8 @@
+[
+  { "id": "cc", "name": "Cấp cứu", "statRate": 0.9 },
+  { "id": "noi", "name": "Nội tổng hợp", "statRate": 0.1 },
+  { "id": "ngoai", "name": "Ngoại", "statRate": 0.15 },
+  { "id": "nhi", "name": "Nhi", "statRate": 0.1 },
+  { "id": "tim", "name": "Tim mạch", "statRate": 0.2 },
+  { "id": "pk", "name": "Phòng khám", "statRate": 0 }
+]

@@ -1,0 +1,64 @@
+{
+  "id": "ch1-d1",
+  "chapter": 1,
+  "day": 1,
+  "room": "chem",
+  "title": "Hoá sinh: ly tâm và chạy máy",
+  "mentor": "hanh",
+  "newThings": ["Máy ly tâm và cân bằng ống", "Máy hoá sinh", "Duyệt và gửi kết quả"],
+  "start": 25200,
+  "end": 39600,
+  "startTrust": 70,
+  "unlocks": ["centrifuge", "analyzer", "release"],
+  "tat": { "stat": 3600, "routine": 7200, "reception": 900 },
+  "waves": [
+    { "at": 0, "count": 4, "spread": 300 },
+    { "at": 2400, "count": 4, "spread": 1200 },
+    { "at": 5400, "count": 5, "spread": 1800 },
+    { "at": 9000, "count": 4, "spread": 1800 }
+  ],
+  "orderTypes": { "chemPanel": 6, "glucoseOnly": 1 },
+  "defects": { "labelMismatch": 0.08 },
+  "profiles": {
+    "healthy": 5,
+    "diabetes": 2,
+    "kidney": 1,
+    "liver": 1,
+    "lipid": 1,
+    "inflammation": 1,
+    "dehydration": 1
+  },
+  "scripted": [
+    {
+      "index": 0,
+      "priority": "routine",
+      "orderType": "chemPanel",
+      "tests": ["GLU", "URE", "CRE"],
+      "defects": []
+    },
+    { "index": 1, "priority": "stat", "orderType": "chemPanel", "tests": ["ELEC"], "defects": [] }
+  ],
+  "tips": [
+    {
+      "trigger": "start",
+      "text": "Chào mừng em sang Hoá sinh! Hôm nay em kiểm tra ống, ly tâm, chạy máy rồi duyệt kết quả."
+    },
+    {
+      "trigger": "sampleAccepted",
+      "text": "Ống đã nhận nằm chờ ở Máy ly tâm. Đặt ống vào rổ, ống nào cũng phải có ống đối diện."
+    },
+    {
+      "trigger": "centrifugeShake",
+      "text": "Máy rung vì lệch cân! Ống nào thiếu ống đối diện thì thêm một ống nước."
+    },
+    {
+      "trigger": "centrifugeDone",
+      "text": "Ly tâm xong, huyết thanh đã tách ra. Mở Khay sau ly tâm và nạp ống vào máy hoá sinh."
+    },
+    {
+      "trigger": "resultReady",
+      "text": "Có kết quả rồi! Xem cờ H (cao), L (thấp) rồi bấm Duyệt và gửi cho bác sĩ."
+    }
+  ],
+  "codexOnStart": ["ch-why-spin", "ch-balance"]
+}

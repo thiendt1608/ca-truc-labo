@@ -1,0 +1,47 @@
+[
+  {
+    "id": "purple",
+    "name": "Ống tím",
+    "letter": "E",
+    "additive": "EDTA (chống đông)",
+    "kind": "tube",
+    "color": "#8e44ad",
+    "spin": false
+  },
+  {
+    "id": "lightblue",
+    "name": "Ống xanh dương",
+    "letter": "C",
+    "additive": "Natri citrat 3,2%",
+    "kind": "tube",
+    "color": "#5dade2",
+    "spin": true
+  },
+  {
+    "id": "green",
+    "name": "Ống xanh lá",
+    "letter": "H",
+    "additive": "Lithium heparin",
+    "kind": "tube",
+    "color": "#27ae60",
+    "spin": true
+  },
+  {
+    "id": "red",
+    "name": "Ống đỏ",
+    "letter": "S",
+    "additive": "Chất hoạt hoá đông",
+    "kind": "tube",
+    "color": "#c0392b",
+    "spin": true
+  },
+  {
+    "id": "grey",
+    "name": "Ống xám",
+    "letter": "F",
+    "additive": "Natri fluorid + oxalat",
+    "kind": "tube",
+    "color": "#7f8c8d",
+    "spin": true
+  }
+]

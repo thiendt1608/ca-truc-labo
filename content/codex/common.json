@@ -1,0 +1,114 @@
+[
+  {
+    "id": "rc-identity",
+    "dept": "reception",
+    "title": "Định danh bằng 2 thông tin",
+    "body": "Trước khi nhận mẫu, so nhãn trên ống với phiếu chỉ định. Ít nhất 2 thông tin phải khớp: họ tên và năm sinh hoặc mã bệnh nhân. Lệch một chữ cũng phải từ chối.",
+    "more": "Nhầm mẫu giữa hai người là lỗi nguy hiểm nhất ở phòng xét nghiệm, vì bác sĩ sẽ điều trị dựa trên kết quả của người khác.",
+    "source": ["WHO LQMS", "CLSI GP41"]
+  },
+  {
+    "id": "rc-tubes",
+    "dept": "reception",
+    "title": "Mỗi xét nghiệm một loại ống",
+    "body": "Màu nắp ống cho biết bên trong có chất gì. Mỗi xét nghiệm cần đúng chất đó, dùng sai ống thì kết quả sai.",
+    "more": "Ví dụ ống tím chứa EDTA có Kali, nên nếu đo Kali trong ống tím sẽ ra Kali cao giả.",
+    "source": ["CLSI GP41", "PMC3936985"]
+  },
+  {
+    "id": "rc-tube-purple",
+    "dept": "reception",
+    "title": "Ống tím (E): EDTA",
+    "body": "Ống tím chứa chất chống đông EDTA, giữ tế bào máu nguyên vẹn. Dùng cho công thức máu, HbA1c và định nhóm máu.",
+    "more": "EDTA bắt giữ canxi nên máu không đông được.",
+    "source": ["CLSI GP41"]
+  },
+  {
+    "id": "rc-tube-lightblue",
+    "dept": "reception",
+    "title": "Ống xanh dương (C): Citrat",
+    "body": "Ống xanh dương dùng cho xét nghiệm đông máu. Máu và chất chống đông phải đúng tỉ lệ 9 : 1, nên ống phải đầy tới vạch.",
+    "more": "Thiếu máu thì chất chống đông bị thừa, kết quả đông máu sẽ kéo dài giả.",
+    "source": ["CLSI GP41"]
+  },
+  {
+    "id": "rc-tube-green",
+    "dept": "reception",
+    "title": "Ống xanh lá (H): Heparin",
+    "body": "Ống xanh lá chống đông bằng heparin nên ly tâm được ngay. Ở Labo Xanh, phiếu hoá sinh cấp cứu dùng ống này.",
+    "more": "Đơn giản hoá: nhiều bệnh viện dùng lẫn ống heparin và ống huyết thanh cho hoá sinh.",
+    "source": ["CLSI GP41"]
+  },
+  {
+    "id": "rc-tube-red",
+    "dept": "reception",
+    "title": "Ống đỏ (S): Huyết thanh",
+    "body": "Ống đỏ để máu tự đông, ly tâm xong lấy phần nước trong ở trên gọi là huyết thanh. Dùng cho hoá sinh thường và miễn dịch.",
+    "more": "Phải chờ máu đông hẳn rồi mới ly tâm.",
+    "source": ["CLSI GP41"]
+  },
+  {
+    "id": "rc-tube-grey",
+    "dept": "reception",
+    "title": "Ống xám (F): giữ đường",
+    "body": "Ống xám có natri fluorid, chất ngăn tế bào máu tiêu thụ đường. Nhờ vậy Glucose trong ống xám vẫn đúng dù mẫu tới muộn.",
+    "more": "Trong ống thường, tế bào máu vẫn 'ăn' đường, mỗi giờ Glucose giảm đi một chút.",
+    "source": ["PMC3936985"]
+  },
+  {
+    "id": "rc-order-of-draw",
+    "dept": "reception",
+    "title": "Thứ tự lấy máu",
+    "body": "Khi lấy nhiều ống, điều dưỡng lấy theo thứ tự: chai cấy máu, xanh dương, đỏ/vàng, xanh lá, tím, xám. Làm vậy để chất trong ống trước không dây sang ống sau.",
+    "more": "Thứ tự này theo chuẩn CLSI GP41.",
+    "source": ["CLSI GP41"]
+  },
+  {
+    "id": "rc-irreplaceable",
+    "dept": "reception",
+    "title": "Mẫu không lấy lại được",
+    "body": "Mẫu mô sinh thiết, dịch não tuỷ, mẫu phẫu thuật không thể lấy lại lần hai. Nếu có lỗi, chọn Liên hệ để khoa gửi bổ sung, tuyệt đối không vứt.",
+    "more": "Từ chối loại mẫu này nghĩa là bệnh nhân phải làm thủ thuật lại, có khi không làm lại được.",
+    "source": ["WHO LQMS"]
+  },
+  {
+    "id": "rc-leak",
+    "dept": "reception",
+    "title": "Lọ rò rỉ và an toàn sinh học",
+    "body": "Lọ bị rò có thể làm lây bệnh cho người cầm và mẫu đã bị nhiễm bẩn. Từ chối và dọn theo quy trình an toàn.",
+    "more": "Quy trình dọn: rắc chất khử khuẩn, chờ đủ thời gian, lau từ ngoài vào trong, bỏ vào thùng rác y tế.",
+    "source": ["WHO LQMS"]
+  },
+  {
+    "id": "rc-transport-time",
+    "dept": "reception",
+    "title": "Thời gian vận chuyển",
+    "body": "Mẫu để lâu trước khi ly tâm sẽ bị biến đổi: đường giảm, Kali tăng. Ở Labo Xanh, mẫu có Glucose hoặc điện giải để quá 2 giờ thì từ chối.",
+    "more": "Ngoại lệ: Glucose trong ống xám vẫn dùng được.",
+    "source": ["open-exam-prep ASCP PBT"]
+  },
+  {
+    "id": "rc-volume",
+    "dept": "reception",
+    "title": "Thiếu thể tích",
+    "body": "Ống lấy thiếu máu thì tỉ lệ máu và chất chống đông bị sai, hoặc không đủ mẫu để chạy. Từ chối và xin lấy lại.",
+    "more": "Quan trọng nhất với ống xanh dương (đông máu) vì cần đúng tỉ lệ 9 : 1.",
+    "source": ["CLSI GP41"]
+  },
+  {
+    "id": "rc-stat",
+    "dept": "reception",
+    "title": "Mẫu cấp cứu 🚑",
+    "body": "Mẫu cấp cứu phải trả kết quả trong 60 phút, mẫu thường 120 phút. Luôn làm mẫu cấp cứu trước.",
+    "more": "Đây là giá trị trong game; mỗi bệnh viện tự quy định thời gian trả kết quả.",
+    "source": ["WHO LQMS"]
+  },
+  {
+    "id": "rc-spill",
+    "dept": "reception",
+    "title": "Dọn đổ vỡ",
+    "body": "Ống vỡ có thể chứa mầm bệnh. Rắc chất khử khuẩn, chờ đủ thời gian, lau từ ngoài vào trong, rồi bỏ vào thùng rác y tế.",
+    "more": "Lau từ ngoài vào trong để không kéo chất bẩn ra rộng hơn.",
+    "source": ["WHO LQMS"]
+  }
+]

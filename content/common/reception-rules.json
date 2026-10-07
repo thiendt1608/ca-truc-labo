@@ -1,0 +1,65 @@
+{
+  "source": [
+    "05-noi-dung-chuyen-mon.md mục 1.3",
+    "WHO LQMS",
+    "open-exam-prep ASCP PBT: acceptability-rejection-criteria"
+  ],
+  "maxTransportMinutes": 120,
+  "timeSensitiveTests": ["GLU", "ELEC"],
+  "timeExemptContainers": { "GLU": ["grey"] },
+  "defects": [
+    {
+      "defect": "noLabel",
+      "decision": "reject",
+      "reason": "identity",
+      "explanationKey": "rule.identity",
+      "codex": "rc-identity",
+      "releaseTrust": -30
+    },
+    {
+      "defect": "labelMismatch",
+      "decision": "reject",
+      "reason": "identity",
+      "explanationKey": "rule.identity",
+      "codex": "rc-identity",
+      "releaseTrust": -30
+    },
+    {
+      "defect": "wrongContainer",
+      "decision": "reject",
+      "reason": "container",
+      "explanationKey": "rule.container",
+      "codex": "rc-tubes",
+      "releaseTrust": -15
+    },
+    {
+      "defect": "underfill",
+      "decision": "reject",
+      "reason": "volume",
+      "explanationKey": "rule.volume",
+      "codex": "rc-volume",
+      "releaseTrust": -15
+    },
+    {
+      "defect": "delayed",
+      "decision": "reject",
+      "reason": "time",
+      "explanationKey": "rule.time",
+      "codex": "rc-transport-time",
+      "releaseTrust": -15
+    },
+    {
+      "defect": "leak",
+      "decision": "reject",
+      "reason": "leak",
+      "explanationKey": "rule.leak",
+      "codex": "rc-leak",
+      "releaseTrust": -15
+    }
+  ],
+  "irreplaceable": {
+    "decision": "contact",
+    "explanationKey": "rule.irreplaceable",
+    "codex": "rc-irreplaceable"
+  }
+}

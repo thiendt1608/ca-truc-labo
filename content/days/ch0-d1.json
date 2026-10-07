@@ -1,0 +1,57 @@
+{
+  "id": "ch0-d1",
+  "chapter": 0,
+  "day": 1,
+  "room": "reception",
+  "title": "Ngày đầu ở bàn Tiếp nhận",
+  "mentor": "hanh",
+  "newThings": ["So nhãn ống với phiếu chỉ định (2 thông tin)", "Chuyển mẫu tới Hoá sinh và Huyết học"],
+  "start": 25200,
+  "end": 34200,
+  "startTrust": 70,
+  "unlocks": ["routeChem", "routeHeme"],
+  "tat": { "stat": 3600, "routine": 7200, "reception": 900 },
+  "waves": [
+    { "at": 0, "count": 2, "spread": 240 },
+    { "at": 900, "count": 4, "spread": 1500 },
+    { "at": 3000, "count": 4, "spread": 1800 },
+    { "at": 5400, "count": 4, "spread": 2100 }
+  ],
+  "orderTypes": { "chemPanel": 5, "glucoseOnly": 1, "cbc": 3, "coag": 1 },
+  "defects": { "labelMismatch": 0.14, "noLabel": 0.07 },
+  "profiles": { "healthy": 6, "diabetes": 1, "kidney": 1, "liver": 1, "lipid": 1, "inflammation": 1 },
+  "scripted": [
+    { "index": 0, "priority": "routine", "orderType": "chemPanel", "tests": ["GLU", "URE"], "defects": [] },
+    { "index": 1, "priority": "routine", "orderType": "cbc", "defects": [] },
+    {
+      "index": 2,
+      "priority": "routine",
+      "orderType": "chemPanel",
+      "defects": [{ "kind": "labelMismatch", "field": "birthYear" }]
+    }
+  ],
+  "tips": [
+    {
+      "trigger": "start",
+      "text": "Chào em, chị là Hạnh. Hôm nay em ngồi bàn Tiếp nhận: chạm vào từng ống trong khay để kiểm tra nhé."
+    },
+    {
+      "trigger": "sampleOpened",
+      "text": "So nhãn trên ống với phiếu: họ tên, năm sinh, mã bệnh nhân phải khớp. Khớp thì Nhận và chọn đúng khoa theo xét nghiệm."
+    },
+    {
+      "trigger": "mistake",
+      "text": "Không sao, ai mới vào cũng vậy. Cuối ca em xem lại trong mục Chuyện hôm nay nhé."
+    },
+    { "trigger": "statArrived", "text": "Ống có 🚑 là mẫu cấp cứu, em xử lý trước nhé." }
+  ],
+  "codexOnStart": [
+    "rc-identity",
+    "rc-tubes",
+    "rc-tube-purple",
+    "rc-tube-lightblue",
+    "rc-tube-green",
+    "rc-tube-red",
+    "rc-tube-grey"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "source": [
+    "05-noi-dung-chuyen-mon.md mục 2.2",
+    "open-exam-prep ASCP PBT: acceptability-rejection-criteria"
+  ],
+  "hemolysisAffects": { "1": ["K", "AST"], "2": ["K", "AST", "ALT", "TBIL"], "3": ["*"] },
+  "hemolysisEffect": { "K": 0.6, "AST": 25, "ALT": 8, "TBIL": 4 },
+  "lipemia": { "decision": "highSpeedSpin", "explanationKey": "rule.lipemia", "codex": "ch-lipemia" },
+  "icterus": { "decision": "load", "explanationKey": "rule.icterus", "codex": "ch-icterus" },
+  "hemolysis": {
+    "decision": "reject",
+    "reason": "hemolysis",
+    "explanationKey": "rule.hemolysis",
+    "codex": "ch-hemolysis"
+  },
+  "centrifuge": { "slots": 12, "spinSeconds": 600, "abortAfterSeconds": 60, "breakChance": 0.5 },
+  "analyzer": { "secondsPerSample": 150 },
+  "recollectSeconds": 1800
+}

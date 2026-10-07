@@ -1,0 +1,104 @@
+[
+  {
+    "code": "GLU",
+    "analytes": [
+      {
+        "code": "GLU",
+        "name": "Glucose",
+        "unit": "mmol/L",
+        "decimals": 1,
+        "ref": [3.9, 6.4],
+        "critical": [2.5, 25],
+        "max": 35
+      }
+    ]
+  },
+  {
+    "code": "URE",
+    "analytes": [
+      { "code": "URE", "name": "Urê", "unit": "mmol/L", "decimals": 1, "ref": [2.5, 7.5], "max": 60 }
+    ]
+  },
+  {
+    "code": "CRE",
+    "analytes": [
+      {
+        "code": "CRE",
+        "name": "Creatinin",
+        "unit": "µmol/L",
+        "decimals": 0,
+        "ref": [62, 120],
+        "refF": [53, 100],
+        "max": 2000
+      }
+    ]
+  },
+  {
+    "code": "AST",
+    "analytes": [
+      { "code": "AST", "name": "AST (GOT)", "unit": "U/L", "decimals": 0, "ref": [0, 37], "max": 1000 }
+    ]
+  },
+  {
+    "code": "ALT",
+    "analytes": [
+      { "code": "ALT", "name": "ALT (GPT)", "unit": "U/L", "decimals": 0, "ref": [0, 40], "max": 1000 }
+    ]
+  },
+  {
+    "code": "ELEC",
+    "analytes": [
+      {
+        "code": "NA",
+        "name": "Natri (Na)",
+        "unit": "mmol/L",
+        "decimals": 0,
+        "ref": [135, 145],
+        "critical": [120, 160],
+        "max": 200
+      },
+      {
+        "code": "K",
+        "name": "Kali (K)",
+        "unit": "mmol/L",
+        "decimals": 1,
+        "ref": [3.5, 5.0],
+        "critical": [2.8, 6.2],
+        "max": 10
+      },
+      { "code": "CL", "name": "Clo (Cl)", "unit": "mmol/L", "decimals": 0, "ref": [98, 106], "max": 150 }
+    ]
+  },
+  {
+    "code": "CHOL",
+    "analytes": [
+      { "code": "CHOL", "name": "Cholesterol", "unit": "mmol/L", "decimals": 1, "ref": [0, 5.2], "max": 20 }
+    ]
+  },
+  {
+    "code": "TG",
+    "analytes": [
+      { "code": "TG", "name": "Triglycerid", "unit": "mmol/L", "decimals": 1, "ref": [0, 1.7], "max": 12 }
+    ]
+  },
+  {
+    "code": "TBIL",
+    "analytes": [
+      { "code": "TBIL", "name": "Bilirubin TP", "unit": "µmol/L", "decimals": 0, "ref": [0, 17], "max": 500 }
+    ]
+  },
+  {
+    "code": "URIC",
+    "analytes": [
+      { "code": "URIC", "name": "Acid uric", "unit": "µmol/L", "decimals": 0, "ref": [150, 420], "max": 1200 }
+    ]
+  },
+  {
+    "code": "CRP",
+    "analytes": [{ "code": "CRP", "name": "CRP", "unit": "mg/L", "decimals": 1, "ref": [0, 5], "max": 300 }]
+  },
+  {
+    "code": "A1C",
+    "analytes": [{ "code": "A1C", "name": "HbA1c", "unit": "%", "decimals": 1, "ref": [4.0, 6.0], "max": 18 }]
+  }
+]

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "ch-why-spin",
+    "dept": "chem",
+    "title": "Vì sao phải ly tâm",
+    "body": "Máy ly tâm quay rất nhanh để tế bào máu nặng chìm xuống đáy. Phần nước trong ở trên (huyết thanh hoặc huyết tương) mới là thứ máy hoá sinh đo.",
+    "more": "Ống tím cho HbA1c thì không ly tâm, vì HbA1c nằm ngay trong hồng cầu.",
+    "source": ["WHO LQMS"]
+  },
+  {
+    "id": "ch-balance",
+    "dept": "chem",
+    "title": "Cân bằng máy ly tâm",
+    "body": "Mỗi ống trong máy ly tâm phải có một ống đối diện nặng bằng nó. Thiếu thì thêm ống nước. Lệch cân máy sẽ rung, có thể làm vỡ ống.",
+    "more": "Giống như máy giặt rung mạnh khi quần áo dồn một bên.",
+    "source": ["WHO LQMS"]
+  },
+  {
+    "id": "ch-hemolysis",
+    "dept": "chem",
+    "title": "Tan huyết",
+    "body": "Hồng cầu bị vỡ làm huyết thanh có màu hồng đỏ. Trong hồng cầu có nhiều Kali và AST, nên khi vỡ ra các chỉ số này tăng giả.",
+    "more": "Tan huyết nhẹ chỉ ảnh hưởng Kali và AST; tan huyết nặng ảnh hưởng gần như mọi xét nghiệm.",
+    "source": ["open-exam-prep ASCP PBT"]
+  },
+  {
+    "id": "ch-lipemia",
+    "dept": "chem",
+    "title": "Mẫu đục (mỡ máu)",
+    "body": "Huyết thanh đục như sữa do nhiều mỡ, làm nhiễu ánh sáng của máy. Nhận mẫu rồi ly tâm tốc độ cao để tách mỡ, vì lấy lại máu vẫn đục.",
+    "more": "Hay gặp khi bệnh nhân vừa ăn nhiều đồ béo hoặc có mỡ máu cao.",
+    "source": ["open-exam-prep ASCP PBT"]
+  },
+  {
+    "id": "ch-icterus",
+    "dept": "chem",
+    "title": "Mẫu vàng",
+    "body": "Huyết thanh vàng đậm do bilirubin cao, thường vì bệnh nhân vàng da. Vẫn nhận mẫu, máy sẽ gắn cờ để bác sĩ biết.",
+    "more": "Lấy lại máu thì vẫn vàng, nên từ chối không giúp gì.",
+    "source": ["open-exam-prep ASCP PBT"]
+  },
+  {
+    "id": "ch-flags",
+    "dept": "chem",
+    "title": "Cờ H và L",
+    "body": "H nghĩa là kết quả cao hơn khoảng tham chiếu, L là thấp hơn. Cờ chỉ báo cho bác sĩ chú ý, kỹ thuật viên không kết luận bệnh.",
+    "more": "Khoảng tham chiếu là khoảng giá trị của phần lớn người khoẻ mạnh.",
+    "source": ["WHO LQMS"]
+  },
+  {
+    "id": "ch-wrong-patient",
+    "dept": "chem",
+    "title": "Trả kết quả nhầm người",
+    "body": "Nếu nhận một ống có nhãn lệch phiếu rồi trả kết quả, bác sĩ sẽ đọc kết quả của người khác. Đó là lý do phải kiểm tra nhãn trước khi làm.",
+    "more": "Ở bệnh viện thật, lỗi định danh là nhóm lỗi trước xét nghiệm được theo dõi chặt nhất.",
+    "source": ["WHO LQMS"]
+  }
+]

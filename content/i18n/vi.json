@@ -1,0 +1,48 @@
+{
+  "rule.identity": "Nhãn không khớp phiếu. Không chắc mẫu của ai thì không được làm; nhầm người là lỗi nguy hiểm nhất.",
+  "rule.container": "Sai loại ống. Mỗi xét nghiệm cần đúng chất trong ống; sai thì kết quả sai.",
+  "rule.volume": "Thiếu thể tích. Không đủ mẫu, hoặc tỉ lệ chất chống đông bị sai.",
+  "rule.time": "Mẫu để quá 2 giờ. Đường bị tế bào 'ăn' mất, Kali rò ra ngoài; kết quả không còn đúng.",
+  "rule.leak": "Lọ rò rỉ có thể lây nhiễm và mẫu đã bị nhiễm bẩn.",
+  "rule.irreplaceable": "Mẫu này không lấy lại được. Chọn Liên hệ để khoa gửi bổ sung, tuyệt đối không vứt.",
+  "rule.hemolysis": "Huyết thanh tan huyết làm sai các xét nghiệm trong phiếu này; cần lấy lại mẫu.",
+  "rule.lipemia": "Mẫu đục do mỡ: nhận và ly tâm tốc độ cao, vì lấy lại máu vẫn đục.",
+  "rule.icterus": "Mẫu vàng do bilirubin cao: vẫn nhận, máy sẽ gắn cờ.",
+  "rule.goodSample": "Mẫu này không có lỗi gì, lẽ ra nên nhận. Từ chối nhầm làm bệnh nhân phải lấy máu lại.",
+  "rule.wrongRoute": "Chuyển nhầm khoa. Xem xét nghiệm trên phiếu để biết khoa nào làm.",
+  "rule.wrongReason": "Từ chối đúng nhưng chọn sai lý do; khoa gửi sẽ không biết sửa chỗ nào.",
+  "rule.contactNotNeeded": "Chỉ chọn Liên hệ với mẫu không lấy lại được. Mẫu máu lỗi thì từ chối để lấy lại.",
+  "rule.releaseWrongPatient": "Đã trả kết quả của một ống nhãn lệch phiếu, bác sĩ đang đọc kết quả của người khác.",
+  "rule.releaseBadSample": "Đã trả kết quả của mẫu lẽ ra phải từ chối, kết quả này có thể sai.",
+  "rule.late": "Trả kết quả trễ hẹn. Mẫu cấp cứu cần xong trong 60 phút.",
+  "rule.imbalance": "Máy ly tâm lệch cân nên rung mạnh. Mỗi ống cần một ống đối diện.",
+  "rule.spillWrong": "Dọn đổ vỡ chưa đúng quy trình: rắc khử khuẩn, chờ đủ thời gian, lau từ ngoài vào trong, bỏ thùng rác y tế.",
+  "rule.criticalNotCalled": "Có giá trị nguy hiểm ‼️ mà không gọi báo trong 15 phút.",
+
+  "reason.identity": "Nhãn không khớp / không nhãn",
+  "reason.container": "Sai loại ống",
+  "reason.volume": "Thiếu thể tích",
+  "reason.time": "Để quá giờ",
+  "reason.leak": "Rò rỉ",
+  "reason.hemolysis": "Tan huyết",
+
+  "dept.chem": "Hoá sinh",
+  "dept.heme": "Huyết học",
+  "dept.micro": "Vi sinh",
+  "dept.immuno": "Miễn dịch",
+  "dept.patho": "Giải phẫu bệnh",
+  "room.reception": "Tiếp nhận",
+  "room.chem": "Hoá sinh",
+
+  "mentor.hanh": "Chị Hạnh",
+
+  "criteria.accuracy": "🔍 Chính xác",
+  "criteria.timeliness": "⏱️ Đúng hẹn",
+  "criteria.safety": "🛡️ An toàn người bệnh",
+  "criteria.skill": "✋ Tay nghề",
+
+  "endReason.time": "Hết ca",
+  "endReason.trust": "Trưởng khoa: Em nghỉ ngơi đi, mai làm lại.",
+
+  "disclaimer": "CA TRỰC LABO là game giải trí. Kiến thức trong game được đơn giản hoá từ giáo trình và tài liệu quốc tế, không thay thế quy trình, hướng dẫn chuyên môn hay tư vấn y tế. Mọi nhân vật và bệnh nhân đều là hư cấu."
+}

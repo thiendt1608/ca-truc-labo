@@ -1,0 +1,29 @@
+{
+  "base": {
+    "GLU": [5.0, 0.5],
+    "URE": [5.0, 1.0],
+    "CRE": [85, 12],
+    "AST": [24, 5],
+    "ALT": [24, 7],
+    "NA": [140, 2],
+    "K": [4.2, 0.3],
+    "CL": [102, 2],
+    "CHOL": [4.6, 0.5],
+    "TG": [1.3, 0.3],
+    "TBIL": [10, 3],
+    "URIC": [300, 50],
+    "CRP": [2, 1.2],
+    "A1C": [5.3, 0.3]
+  },
+  "profiles": [
+    { "id": "healthy", "values": {} },
+    { "id": "diabetes", "values": { "GLU": [11, 3], "A1C": [8.5, 1] } },
+    { "id": "kidney", "values": { "URE": [18, 5], "CRE": [320, 80], "K": [5.4, 0.3], "URIC": [520, 60] } },
+    { "id": "liver", "values": { "AST": [180, 60], "ALT": [210, 70], "TBIL": [45, 15] } },
+    { "id": "lipid", "values": { "CHOL": [6.8, 0.6], "TG": [3.5, 1.0] } },
+    { "id": "inflammation", "values": { "CRP": [85, 40] } },
+    { "id": "dehydration", "values": { "NA": [150, 3], "URE": [9, 2] } },
+    { "id": "hyperK", "critical": true, "values": { "K": [6.9, 0.3], "CRE": [450, 60] } },
+    { "id": "hypoglycemia", "critical": true, "values": { "GLU": [2.0, 0.2] } }
+  ]
+}
