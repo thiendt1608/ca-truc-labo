@@ -238,6 +238,13 @@ Every minigame is split cleanly into two halves:
 
 ---
 
+## Design Decisions (open questions)
+
+- **Clock vs. open sheets**: the shift clock is held only for mentor tips, full-screen minigames and the QC sheet (GDD §4: big decision screens pause time). Centrifuge, post-spin tray, results and sample-card sheets keep the clock running on purpose: they are the workspace, and pausing there would remove the time-management pressure (pillar 2). Decided against pausing more. Revisit only if M3-8 playtests show new players losing trust just by reading sheets; preferred remedy then is slowing the clock (about ×0.25) while a sheet is open, not pausing.
+- Minigames pause the clock (GDD §4 says they run it); done because minigame screens show no clock. Revisit if a clock chip is added to the minigame frame.
+
+---
+
 ## Workflow Rules (bắt buộc)
 
 Áp dụng sau mỗi phase hoặc task lớn:
