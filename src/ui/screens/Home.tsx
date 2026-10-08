@@ -18,78 +18,128 @@ const CHAPTERS = [
   'Ca trực đêm',
 ];
 
-/** S1 Mở đầu + S2 Bản đồ chiến dịch (bản hộp xám: chỉ các ngày đã làm). */
+/** S1 Mở đầu + S2 Bản đồ chiến dịch (bản hiện tại: chỉ các ngày đã có nội dung). */
 export function Home() {
   const save = useGame((s) => s.save);
   const difficulty = useGame((s) => s.difficulty);
   const { setDifficulty, openDay, go } = useGame.getState();
-  const days = getContent().days;
+  const content = getContent();
+  const days = content.days;
   const collected = save.codex.length;
-  const totalCards = getContent().codex.length;
+  const totalCards = content.codex.length;
+  // Nhiệm vụ hiện tại: ngày đầu tiên chưa chơi, hoặc ngày cuối nếu đã chơi hết.
+  const current = days.find((d) => !save.days[d.id]) ?? days[days.length - 1]!;
+  const best = save.days[current.id];
+  const startTip = current.tips.find((x) => x.trigger === 'start');
+  const played = days.filter((d) => save.days[d.id]).length;
 
   return (
-    <div className="screen">
-      <div>
-        <h1>🧪 CA TRỰC LABO</h1>
-        <p className="muted">Năm đầu đi làm của một kỹ thuật viên xét nghiệm. Bản thử nghiệm hộp xám.</p>
-      </div>
+    <>
+      <div className="screen">
+        <header className="row home-head">
+          <span className="logo" aria-hidden>
+            🔬
+          </span>
+          <div className="grow">
+            <h1>CA TRỰC LABO</h1>
+            <span className="muted">
+              Năm đầu đi làm · {played}/{days.length} ngày đã chơi
+            </span>
+          </div>
+        </header>
 
-      <div className="card stack">
-        <h2>Chiến dịch "Năm đầu đi làm"</h2>
-        {CHAPTERS.map((name, chapter) => {
-          const chapterDays = days.filter((d) => d.chapter === chapter);
-          return (
-            <div key={chapter} className="stack">
-              <b>
-                Chương {chapter} · {name}
-              </b>
-              {chapterDays.length === 0 ? (
-                <span className="muted">Chưa có trong bản này</span>
-              ) : (
-                chapterDays.map((d) => {
-                  const best = save.days[d.id];
-                  return (
-                    <button
-                      key={d.id}
-                      className="row"
-                      style={{ justifyContent: 'space-between' }}
-                      onClick={() => openDay(d.id)}
-                    >
-                      <span>
-                        Ngày {d.chapter}.{d.day} · {d.title}
-                      </span>
-                      <span>{best ? '⭐'.repeat(best.stars) : '▶'}</span>
-                    </button>
-                  );
-                })
-              )}
+        <section className="card mission stack" aria-label="Nhiệm vụ hiện tại">
+          <span className="eyebrow">Nhiệm vụ hiện tại</span>
+          <h2>
+            Ngày {current.chapter}.{current.day}: {current.title}
+          </h2>
+          <div className="stars-row" aria-label={`${best?.stars ?? 0} trên 5 sao`}>
+            {[1, 2, 3, 4, 5].map((n) => (
+              <span key={n} className={n <= (best?.stars ?? 0) ? 'star on' : 'star'}>
+                ★
+              </span>
+            ))}
+          </div>
+          {startTip && (
+            <div className="mentor-quote row">
+              <span className="avatar" aria-hidden>
+                👩‍⚕️
+              </span>
+              <div>
+                <b>{t(`mentor.${current.mentor}`)}</b>
+                <p>“{startTip.text}”</p>
+              </div>
             </div>
-          );
-        })}
-      </div>
+          )}
+          <div className="goals">
+            <b>🎯 Hôm nay có gì mới</b>
+            {current.newThings.map((x) => (
+              <span key={x} className="goal">
+                {x}
+              </span>
+            ))}
+          </div>
+        </section>
 
-      <div className="card stack">
-        <b>Độ khó</b>
-        <div className="row">
-          {DIFFICULTIES.map((d) => (
-            <button
-              key={d.id}
-              className={`grow ${difficulty === d.id ? 'primary' : ''}`}
-              onClick={() => setDifficulty(d.id)}
-            >
-              {d.name}
-            </button>
-          ))}
-        </div>
-        <span className="muted">{DIFFICULTIES.find((d) => d.id === difficulty)?.note}</span>
-      </div>
+        <button className="primary cta" onClick={() => openDay(current.id)}>
+          ▶ VÀO CA TRỰC NGAY
+        </button>
 
-      <button onClick={() => go('codex')}>
-        📖 Sổ tay KTV ({collected}/{totalCards} thẻ)
-      </button>
-      <p className="muted" style={{ fontSize: 12 }}>
-        {t('disclaimer')}
-      </p>
-    </div>
+        <section className="card stack">
+          <h3>Chiến dịch "Năm đầu đi làm"</h3>
+          {CHAPTERS.map((name, chapter) => {
+            const chapterDays = days.filter((d) => d.chapter === chapter);
+            return (
+              <div key={chapter} className="stack">
+                <b>
+                  Chương {chapter} · {name}
+                </b>
+                {chapterDays.length === 0 ? (
+                  <span className="chip-locked">🔒 Sắp có</span>
+                ) : (
+                  chapterDays.map((d) => {
+                    const r = save.days[d.id];
+                    return (
+                      <button key={d.id} className="day-btn row" onClick={() => openDay(d.id)}>
+                        <span className="grow">
+                          Ngày {d.chapter}.{d.day} · {d.title}
+                        </span>
+                        <span>{r ? `${r.stars}★` : '▶'}</span>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            );
+          })}
+        </section>
+
+        <section className="card stack">
+          <b>Độ khó</b>
+          <div className="row">
+            {DIFFICULTIES.map((d) => (
+              <button
+                key={d.id}
+                className={`grow ${difficulty === d.id ? 'primary' : ''}`}
+                onClick={() => setDifficulty(d.id)}
+              >
+                {d.name}
+              </button>
+            ))}
+          </div>
+          <span className="muted">{DIFFICULTIES.find((d) => d.id === difficulty)?.note}</span>
+        </section>
+
+        <p className="muted">{t('disclaimer')}</p>
+      </div>
+      <nav className="bottombar" aria-label="Điều hướng">
+        <button className="primary" onClick={() => openDay(current.id)}>
+          🏥 Ca trực
+        </button>
+        <button onClick={() => go('codex')}>
+          📖 Sổ tay {collected}/{totalCards}
+        </button>
+      </nav>
+    </>
   );
 }

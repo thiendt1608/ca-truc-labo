@@ -9,12 +9,13 @@ import { Room } from './screens/Room';
 
 export function App() {
   const screen = useGame((s) => s.screen);
+  const room = useGame((s) => s.shift?.room);
   useGameLoop();
   useEffect(() => {
     void useGame.getState().init();
   }, []);
   return (
-    <div className="app">
+    <div className="app" data-room={screen === 'room' || screen === 'report' ? room : 'reception'}>
       {screen === 'home' && <Home />}
       {screen === 'briefing' && <Briefing />}
       {screen === 'room' && <Room />}

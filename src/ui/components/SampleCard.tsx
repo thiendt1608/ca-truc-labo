@@ -122,7 +122,8 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
             {depts.map((d) => (
               <button
                 key={d}
-                className="primary"
+                data-room={d}
+                className="dept-btn"
                 onClick={() => act(() => dispatch({ type: 'acceptSample', sampleId, target: d }))}
               >
                 {t(`dept.${d}`)}
