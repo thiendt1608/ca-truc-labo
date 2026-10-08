@@ -49,7 +49,7 @@ export function CentrifugeSheet() {
       ) : (
         <p className="muted">Chọn ống ở dưới rồi chạm vào ô trong rổ. Chạm ô có ống để lấy ra.</p>
       )}
-      <div className="rotor" aria-label="Rổ máy ly tâm">
+      <div className={`rotor ${c.running ? 'running' : ''}`} aria-label="Rổ máy ly tâm">
         <div className="hub" />
         {c.slots.map((content, i) => {
           const angle = (i / n) * Math.PI * 2 - Math.PI / 2;

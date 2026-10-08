@@ -47,56 +47,50 @@ function OrderCard({ order }: { order: Order }) {
         <b className="grow">
           {patient.name} · {patient.birthYear}
         </b>
-        {order.priority === 'stat' && <span className="pill stat">🚑</span>}
+        {order.priority === 'stat' && <span className="pill stat">🚑 KHẨN</span>}
       </div>
       <div className="muted">
         {patient.code} · {order.ward} · hẹn trả {clockText(shift, order.deadline)} {late ? '⚠️ trễ' : ''}
       </div>
-      <table className="results">
-        <thead>
-          <tr>
-            <th>Xét nghiệm</th>
-            <th>Kết quả</th>
-            <th>Đơn vị</th>
-            <th>Tham chiếu</th>
-          </tr>
-        </thead>
-        <tbody>
-          {order.results?.map((r) => {
-            const a = content.chemTests.flatMap((x) => x.analytes).find((x) => x.code === r.code)!;
-            const [lo, hi] = patient.sex === 'F' && a.refF ? a.refF : a.ref;
-            return (
-              <tr key={r.code}>
-                <td>{a.name}</td>
-                <td className={`flag-${r.flag}`}>
-                  {r.display} {r.flag} {r.critical && <span className="crit">‼️</span>}
-                </td>
-                <td className="muted">{a.unit}</td>
-                <td className="muted">{lo === 0 ? `≤ ${hi}` : `${lo}–${hi}`}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <div className="result-grid">
+        {order.results?.map((r) => {
+          const a = content.chemTests.flatMap((x) => x.analytes).find((x) => x.code === r.code)!;
+          const [lo, hi] = patient.sex === 'F' && a.refF ? a.refF : a.ref;
+          const verdict = r.critical
+            ? '‼️ Nguy hiểm'
+            : r.flag === 'H'
+              ? '▲ Cao'
+              : r.flag === 'L'
+                ? '▼ Thấp'
+                : 'Chuẩn';
+          return (
+            <div key={r.code} className={`result-cell ${r.critical ? 'crit' : r.flag ? 'abn' : 'ok'}`}>
+              <span className="rname">{a.name}</span>
+              <span className="rverdict">{verdict}</span>
+              <span>
+                <b className="rval">{r.display}</b> <span className="muted">{a.unit}</span>
+              </span>
+              <span className="muted">Chuẩn: {lo === 0 ? `≤ ${hi}` : `${lo}–${hi}`}</span>
+            </div>
+          );
+        })}
+      </div>
+      <button className="primary" onClick={() => dispatch({ type: 'releaseOrder', orderId: order.id })}>
+        ✅ Duyệt và gửi
+      </button>
       <div className="row wrap">
-        <button
-          className="primary small"
-          onClick={() => dispatch({ type: 'releaseOrder', orderId: order.id })}
-        >
-          ✅ Duyệt và gửi
-        </button>
-        <button className="small" onClick={() => dispatch({ type: 'rerunOrder', orderId: order.id })}>
+        <button className="small grow" onClick={() => dispatch({ type: 'rerunOrder', orderId: order.id })}>
           🔁 Làm lại
         </button>
         <button
-          className="small danger"
+          className="small danger grow"
           onClick={() => dispatch({ type: 'cancelOrderRecollect', orderId: order.id })}
         >
           Huỷ, lấy mẫu mới
         </button>
         {critical && day.unlocks.includes('critical') && !order.criticalCalled && (
           <button
-            className="small danger"
+            className="small danger grow"
             onClick={() => dispatch({ type: 'callCritical', orderId: order.id })}
           >
             📞 Gọi báo ‼️

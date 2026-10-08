@@ -21,6 +21,7 @@ export function MinigameHost() {
   return (
     <div className="mg" role="dialog" aria-label={spec.title}>
       <div className="mg-head">
+        <span className="eyebrow">Thao tác kỹ thuật</span>
         <h2>🧽 {spec.title}</h2>
         <p className="muted">Một ống vỡ! Chạm các bước theo đúng thứ tự để dọn an toàn.</p>
       </div>

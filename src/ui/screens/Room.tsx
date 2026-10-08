@@ -36,10 +36,12 @@ export function Room() {
   return (
     <>
       <Hud />
+      <RoomBanner day={day} />
       <div className="tray" aria-label="Khay mẫu">
         {tray.length === 0 && <span className="tray-empty">Khay trống, chờ mẫu tới...</span>}
         {tray.map((s) => {
           const o = shift.orders[s.orderId]!;
+          const who = shift.patients[o.patientId]?.name.split(' ').slice(-2).join(' ') ?? s.id;
           const waited = Math.floor((shift.clock - s.arrivedAt) / 60);
           return (
             <button
@@ -47,31 +49,34 @@ export function Room() {
               className={`tray-item ${s.lateCharged ? 'late' : ''}`}
               onClick={() => openSample(s.id)}
             >
-              {o.priority === 'stat' && <span className="stat">🚑</span>}
+              {o.priority === 'stat' && <span className="stat">🚑 KHẨN</span>}
               <Tube
                 container={s.container}
-                size={26}
+                size={30}
                 underfill={s.defects.some((d) => d.kind === 'underfill')}
               />
-              <span className="age">{waited}′</span>
+              <span className="who">{who}</span>
+              <span className="age">
+                {s.id.toUpperCase()} · {waited}′
+              </span>
             </button>
           );
         })}
       </div>
-      <div className="stations">
-        {shift.room === 'reception' ? <ReceptionStations /> : <ChemStations />}
-        <div className="card muted" style={{ gridColumn: '1 / -1' }}>
-          📅 Ngày {day.chapter}.{day.day} · {t(`room.${day.room}`)} · Chạm vào ống trong khay để kiểm tra.
-        </div>
-      </div>
-      <div className="bottombar">
+      <div className="stations">{shift.room === 'reception' ? <ReceptionStations /> : <ChemStations />}</div>
+      <nav className="bottombar navbar" aria-label="Thanh lệnh">
         {shift.room !== 'reception' && (
           <button onClick={() => setOverlay({ kind: 'results' })}>
-            📋 Kết quả{resulted > 0 && <span className="dot">{resulted}</span>}
+            <span aria-hidden>📋</span>
+            <span>Kết quả</span>
+            {resulted > 0 && <span className="dot">{resulted}</span>}
           </button>
         )}
-        <button onClick={() => setPaused(true)}>☰ Menu</button>
-      </div>
+        <button onClick={() => setPaused(true)}>
+          <span aria-hidden>☰</span>
+          <span>Menu</span>
+        </button>
+      </nav>
 
       {overlay?.kind === 'sample' && <SampleCard sampleId={overlay.sampleId} />}
       {overlay?.kind === 'centrifuge' && <CentrifugeSheet />}
@@ -103,6 +108,29 @@ export function Room() {
     </>
   );
 }
+/** Biển hiệu của phòng: màu khoa, tên phòng, tiến độ ca. */
+function RoomBanner({ day }: { day: { chapter: number; day: number; title: string; room: string } }) {
+  const shift = useGame((s) => s.shift)!;
+  const waiting = Object.values(shift.samples).filter((s) => s.status === 'tray').length;
+  const pct = Math.min(100, Math.round((shift.clock / shift.duration) * 100));
+  return (
+    <section className="banner" aria-label="Thông tin phòng">
+      <h2>{t(`room.${day.room}`)}</h2>
+      <span>
+        Ngày {day.chapter}.{day.day} · {waiting} ống đang chờ · {shift.decisions.total} quyết định
+      </span>
+      <div className="banner-progress" aria-label={`Ca đã qua ${pct}%`}>
+        <div style={{ width: `${pct}%` }} />
+      </div>
+      <span className="banner-hint">Chạm vào ống trong khay để kiểm tra</span>
+    </section>
+  );
+}
+
+function Orb({ state }: { state: 'ready' | 'busy' | 'error' }) {
+  const label = state === 'ready' ? 'Sẵn sàng' : state === 'busy' ? 'Đang chạy' : 'Cảnh báo';
+  return <span className={`orb ${state}`} role="img" aria-label={label} title={label} />;
+}
 
 function ReceptionStations() {
   const shift = useGame((s) => s.shift)!;
@@ -111,18 +139,24 @@ function ReceptionStations() {
   return (
     <>
       {(['chem', 'heme'] as const).map((d) => (
-        <div key={d} className="station card">
-          <span className="name">🧺 Giỏ {t(`dept.${d}`)}</span>
-          <span className="muted">{count((s) => s.status === 'routed' && s.routedTo === d)} ống</span>
+        <div key={d} data-room={d} className="station card">
+          <span className="station-head">
+            <span className="name">🧺 Giỏ {t(`dept.${d}`)}</span>
+          </span>
+          <span className="status">{count((s) => s.status === 'routed' && s.routedTo === d)} ống</span>
         </div>
       ))}
       <div className="station card">
-        <span className="name">🚫 Đã từ chối</span>
-        <span className="muted">{count((s) => s.status === 'rejected')} ống</span>
+        <span className="station-head">
+          <span className="name">🚫 Đã từ chối</span>
+        </span>
+        <span className="status">{count((s) => s.status === 'rejected')} ống</span>
       </div>
       <div className="station card">
-        <span className="name">✔️ Đã xử lý</span>
-        <span className="muted">{shift.decisions.total} quyết định</span>
+        <span className="station-head">
+          <span className="name">✔️ Đã xử lý</span>
+        </span>
+        <span className="status">{shift.decisions.total} quyết định</span>
       </div>
     </>
   );
@@ -135,16 +169,21 @@ function ChemStations() {
   const samples = Object.values(shift.samples);
   const bench = samples.filter((s) => s.status === 'bench').length;
   const spun = samples.filter((s) => s.status === 'spun').length;
+  const resulted = Object.values(shift.orders).filter((o) => o.status === 'resulted').length;
   const c = chem.centrifuge;
   const spin = getContent().chemRules.centrifuge.spinSeconds;
   const per = getContent().chemRules.analyzer.secondsPerSample;
   const a = chem.analyzer;
+  const cState = c.contaminated || c.unbalanced ? 'error' : c.running ? 'busy' : 'ready';
   return (
     <>
       <button className="station card" onClick={() => setOverlay({ kind: 'centrifuge' })}>
-        <span className="name">🌀 Máy ly tâm</span>
+        <span className="station-head">
+          <span className="name">🌀 Máy ly tâm</span>
+          <Orb state={cState} />
+        </span>
         {bench > 0 && <span className="badge">{bench}</span>}
-        <span className="muted">
+        <span className="status">
           {c.contaminated
             ? '⚠️ Cần dọn'
             : c.running
@@ -160,13 +199,19 @@ function ChemStations() {
         )}
       </button>
       <button className="station card" onClick={() => setOverlay({ kind: 'postspin' })}>
-        <span className="name">🧫 Khay sau ly tâm</span>
+        <span className="station-head">
+          <span className="name">🧫 Khay sau ly tâm</span>
+          <Orb state={spun > 0 ? 'busy' : 'ready'} />
+        </span>
         {spun > 0 && <span className="badge">{spun}</span>}
-        <span className="muted">{spun} ống chờ nạp máy</span>
+        <span className="status">{spun} ống chờ nạp máy</span>
       </button>
       <button className="station card" onClick={() => setOverlay({ kind: 'analyzer' })}>
-        <span className="name">⚗️ Máy hoá sinh</span>
-        <span className="muted">{a.current ? `Đang chạy · chờ ${a.queue.length}` : 'Rảnh'}</span>
+        <span className="station-head">
+          <span className="name">⚗️ Máy hoá sinh</span>
+          <Orb state={a.current ? 'busy' : 'ready'} />
+        </span>
+        <span className="status">{a.current ? `Đang chạy · chờ ${a.queue.length}` : 'Rảnh'}</span>
         {a.current && (
           <div className="progress">
             <div style={{ width: `${100 - ((a.current.endsAt - shift.clock) / per) * 100}%` }} />
@@ -174,8 +219,12 @@ function ChemStations() {
         )}
       </button>
       <button className="station card" onClick={() => setOverlay({ kind: 'results' })}>
-        <span className="name">📋 Kết quả</span>
-        <span className="muted">
+        <span className="station-head">
+          <span className="name">📋 Kết quả</span>
+          <Orb state={resulted > 0 ? 'busy' : 'ready'} />
+        </span>
+        {resulted > 0 && <span className="badge">{resulted}</span>}
+        <span className="status">
           {Object.values(shift.orders).filter((o) => o.status === 'released').length} phiếu đã gửi
         </span>
       </button>

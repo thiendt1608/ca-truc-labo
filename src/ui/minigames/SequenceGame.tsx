@@ -55,9 +55,15 @@ export function SequenceGame({
 
   return (
     <div className="stack">
-      <b>
-        Bước {Math.min(state.index + 1, input.correct.length)}/{input.correct.length}
-      </b>
+      <div className="row">
+        <b className="grow">
+          Bước {Math.min(state.index + 1, input.correct.length)}/{input.correct.length}
+        </b>
+        <span className="dept-chip neutral">⏸ Giờ ca đang dừng</span>
+      </div>
+      <div className="progress" aria-hidden>
+        <div style={{ width: `${(state.index / input.correct.length) * 100}%` }} />
+      </div>
       <div className={`mg-msg ${message ? 'toast mistake' : ''}`} aria-live="polite">
         {message}
       </div>
