@@ -5,6 +5,7 @@ import {
   expectedPostSpin,
   handleChem,
   initChem,
+  onDilutionDone,
   onSpillCleaned,
   onUrineRead,
   onTrayDecision,
@@ -14,6 +15,7 @@ import {
 import { finishCtx, makeCtx, recordMistake, tip, unlockCodex, type Ctx } from './context';
 import { buildSchedule } from './generator';
 import { finishMinigame, startMinigame } from './minigameHost';
+import type { DilutionScore } from '../minigames/dilution';
 import type { UrineScore } from '../minigames/urineStrip';
 import { hashSeed } from './rng';
 import type { Command, Difficulty, ShiftState, StepResult } from './types';
@@ -119,6 +121,7 @@ function handle(ctx: Ctx, cmd: Command) {
       const mg = s.minigame;
       const r = finishMinigame(ctx, cmd.taskId, cmd.actions);
       if (r && mg?.context === 'spill') onSpillCleaned(ctx);
+      if (r && mg?.context === 'dilution') onDilutionDone(ctx, mg.orderId, r.detail as DilutionScore);
       if (r && mg?.context === 'urine') onUrineRead(ctx, mg.sampleId, r.detail as UrineScore);
       return;
     }

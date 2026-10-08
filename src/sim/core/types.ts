@@ -99,7 +99,7 @@ export interface Order {
   /** Kết quả đo khi QC đang hỏng (lệch thật so với giá trị đúng). */
   qcFault?: boolean;
   /** Đang chạy lại pha loãng cho các chất vượt dải. */
-  dilution?: { ratio: number; codes: string[] };
+  dilution?: { ratio: number; codes: string[]; extraSeconds: number };
   /** Đã làm lại để kiểm tra Δ. */
   deltaChecked?: boolean;
 }
@@ -174,9 +174,11 @@ export interface ActiveMinigame {
   minigameId: string;
   seed: string;
   startedAt: number;
-  context: 'spill' | 'urine';
+  context: 'spill' | 'urine' | 'dilution';
   /** Mẫu đang được làm mini-game (nước tiểu). */
   sampleId?: string;
+  /** Phiếu đang được pha loãng. */
+  orderId?: string;
 }
 
 export interface SkillEntry {
@@ -236,7 +238,7 @@ export type Command =
   | { t: number; type: 'startCentrifuge'; centrifugeId: 'c1' }
   | { t: number; type: 'chem/loadAnalyzer'; sampleId: string }
   | { t: number; type: 'chem/highSpeedSpin'; sampleId: string }
-  | { t: number; type: 'chem/dilute'; orderId: string; ratio: number }
+  | { t: number; type: 'chem/startDilution'; orderId: string }
   | { t: number; type: 'chem/startUrine'; sampleId: string }
   | { t: number; type: 'chem/runQC' }
   | { t: number; type: 'chem/judgeQC'; verdict: QcVerdict }

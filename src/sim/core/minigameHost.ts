@@ -8,8 +8,8 @@ export function startMinigame(
   ctx: Ctx,
   minigameId: string,
   context: ActiveMinigame['context'],
-  /** Đề bài gắn với một mẫu cụ thể (nước tiểu): hạt giống và mẫu. */
-  bound?: { seed: string; sampleId: string },
+  /** Đề bài gắn với một mẫu hoặc phiếu cụ thể (nước tiểu, pha loãng): hạt giống và đối tượng. */
+  bound?: { seed: string; sampleId?: string; orderId?: string },
 ) {
   const taskId = newId(ctx, 'mg');
   const mg: ActiveMinigame = {
@@ -18,7 +18,8 @@ export function startMinigame(
     seed: bound?.seed ?? `${ctx.s.seed}:${taskId}`,
     startedAt: ctx.s.clock,
     context,
-    ...(bound ? { sampleId: bound.sampleId } : {}),
+    ...(bound?.sampleId ? { sampleId: bound.sampleId } : {}),
+    ...(bound?.orderId ? { orderId: bound.orderId } : {}),
   };
   ctx.s.minigame = mg;
   ctx.events.push({ type: 'minigameStarted', minigame: mg });

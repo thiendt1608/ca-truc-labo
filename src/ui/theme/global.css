@@ -1048,9 +1048,6 @@ button.small {
 }
 
 /* Toast khi đang làm mini-game: xuống dưới tiêu đề khung để không che tên và bước. */
-.toasts.in-mg {
-  top: 190px;
-}
 .tip-inline {
   flex-shrink: 0;
   text-align: left;
@@ -1117,4 +1114,46 @@ button.small {
   padding: 10px 12px;
   background: var(--bg);
   border-bottom: 2px solid var(--line);
+}
+
+/* Thước đo của mini-game pha loãng */
+.gauge {
+  position: relative;
+  height: 34px;
+  border-radius: 9999px;
+  background: var(--well);
+  box-shadow: inset 0 3px 3px rgba(93, 83, 74, 0.25);
+  margin-bottom: 22px;
+}
+.gauge-ok {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 9999px;
+  background: rgba(39, 174, 96, 0.35);
+}
+.gauge-needle {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 6px;
+  margin-left: -3px;
+  border-radius: 3px;
+  background: var(--ink);
+}
+.gauge-needle.over {
+  background: var(--bad-strong);
+}
+.gauge-limit {
+  position: absolute;
+  top: 38px;
+  transform: translateX(-100%);
+  font-size: 14px;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+/* Mini-game toàn màn: thông báo nằm đáy để không che nội dung phía trên */
+.toasts.in-mg {
+  top: auto;
+  bottom: 16px;
 }

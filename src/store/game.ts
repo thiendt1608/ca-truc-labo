@@ -215,8 +215,8 @@ export const useGame = create<GameStore>((set, getState) => {
     tickReal(ms) {
       const { shift, paused, speed, difficulty, carry, screen, overlay, tips } = getState();
       if (!shift || shift.ended || paused || screen !== 'room') return;
-      // Dừng giờ khi người chơi đang đọc lời hướng dẫn hoặc làm mini-game toàn màn (không có đồng hồ để nhìn).
-      if (shift.minigame || (overlay === null && tips.length > 0)) return;
+      // Dừng giờ khi đọc lời hướng dẫn, làm mini-game toàn màn, hoặc xem biểu đồ QC (04-GDD mục 4: màn quyết định lớn dừng giờ).
+      if (shift.minigame || overlay?.kind === 'qc' || (overlay === null && tips.length > 0)) return;
       const total = carry + (ms / 1000) * timeScale(shift.duration) * DIFFICULTY_SPEED[difficulty] * speed;
       const whole = Math.floor(total);
       set({ carry: total - whole });

@@ -40,7 +40,8 @@ export function measure(
     for (const a of test.analytes) {
       if (dilution && !dilution.codes.includes(a.code)) continue;
       const truth = sample.hidden.truth[a.code] ?? 0;
-      let value = truth * (1 + ctx.rng.normal(0, 0.02) + qcBias(ctx));
+      // Mẫu pha loãng đo lại không thêm nhiễu: số máy đọc phải khớp số người chơi đã thấy ở mini-game pha loãng.
+      let value = truth * (1 + (dilution ? 0 : ctx.rng.normal(0, 0.02)) + qcBias(ctx));
       if (hemolysis) value += (effects[a.code] ?? 0) * hemolysis.level;
       const factor = 10 ** a.decimals;
       let reading: number | undefined;

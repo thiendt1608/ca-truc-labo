@@ -54,5 +54,6 @@
   "rule.releaseOverRange": "Đã trả kết quả vượt dải đo mà chưa pha loãng: bác sĩ chỉ thấy dấu \">\" chứ không biết giá trị thật.",
   "rule.releaseUnverifiedDelta": "Kết quả có Δ (khác nhiều so với lần trước) mà chưa làm lại để kiểm tra: có thể nhầm người hoặc lỗi đo.",
   "rule.releaseWrongUrine": "Đọc sai ô màu của que thử: kết quả nước tiểu đã trả không đúng với mẫu. Mỗi ô phải so đúng bảng màu và đúng thời điểm đọc.",
-  "urine.wrongPads": "Các ô đọc nhầm giữa bình thường và bất thường: {pads}."
+  "urine.wrongPads": "Các ô đọc nhầm giữa bình thường và bất thường: {pads}.",
+  "rule.dilutionMultiplyWrong": "Nhân sai hệ số pha loãng: số đọc phải nhân với hệ số rồi mới là kết quả thật, trả sai thì bác sĩ đọc nhầm."
 }

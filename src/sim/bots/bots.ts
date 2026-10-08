@@ -2,11 +2,18 @@ import type { Content } from '../content/load';
 import { applyCommand, advance, createShift } from '../core/engine';
 import { createRng, hashSeed, type Rng } from '../core/rng';
 import type { Command, Difficulty, PlayerAction, ShiftState } from '../core/types';
-import { expectedPostSpin, isBalanced, smallestDilution } from '../departments/chem';
+import { expectedPostSpin, isBalanced } from '../departments/chem';
 import { expectedVerdict } from '../departments/chemQc';
 import type { QcRemedy } from '../content/schema';
 import { expectedReception } from '../departments/reception';
 import { spillCleanup } from '../minigames';
+import {
+  correctAnswer,
+  generateDilution,
+  isInRange,
+  multiplyOptions,
+  smallestRatio,
+} from '../minigames/dilution';
 import { generateUrine } from '../minigames/urineStrip';
 
 /**
@@ -51,6 +58,21 @@ export function perfectSpillActions(seed: string, difficulty: Difficulty): Playe
 export function botCommands(state: ShiftState, content: Content, p: BotProfile, rng: Rng): Command[] {
   const t = state.clock;
   const cmds: Command[] = [];
+  if (state.minigame?.context === 'dilution') {
+    const input = generateDilution(state.minigame.seed, state.difficulty);
+    const smallest = smallestRatio(input);
+    const first = rng.chance(p.spotOther) ? smallest : rng.pick(input.ratios);
+    const final = isInRange(input, first) ? first : smallest;
+    const answers = multiplyOptions(input, final);
+    const right = correctAnswer(input, final);
+    const answer = rng.chance(p.spotOther) ? right : (answers.find((a) => a !== right) ?? right);
+    const actions: PlayerAction[] = [{ t: 0, type: 'tap', id: `ratio:${first}` }];
+    if (final !== first) actions.push({ t: 400, type: 'tap', id: `ratio:${final}` });
+    actions.push({ t: 900, type: 'tap', id: `answer:${answer}` });
+    if (answer !== right) actions.push({ t: 1300, type: 'tap', id: `answer:${right}` });
+    actions.push({ t: 1500, type: 'done' });
+    return [{ t, type: 'minigameResult', taskId: state.minigame.taskId, actions }];
+  }
   if (state.minigame?.context === 'urine') {
     const input = generateUrine(state.minigame.seed, state.difficulty);
     const actions: PlayerAction[] = [{ t: 0, type: 'tap', id: 'dip' }];
@@ -179,16 +201,10 @@ export function botCommands(state: ShiftState, content: Content, p: BotProfile, 
   for (const order of Object.values(state.orders).filter((o) => o.status === 'resulted')) {
     if (budget-- <= 0) break;
     const sample = state.samples[order.sampleId]!;
-    const over = order.results?.filter((r) => r.overRange).map((r) => r.code) ?? [];
-    if (over.length > 0 && content.days.find((d) => d.id === state.dayId)?.unlocks.includes('dilution')) {
-      const right = smallestDilution(content, sample, over);
-      cmds.push({
-        t,
-        type: 'chem/dilute',
-        orderId: order.id,
-        ratio: rng.chance(p.spotOther) ? right : rng.pick(content.chemRules.dilution.ratios),
-      });
-      continue;
+    const over = order.results?.some((r) => r.overRange) ?? false;
+    if (over && content.days.find((d) => d.id === state.dayId)?.unlocks.includes('dilution')) {
+      cmds.push({ t, type: 'chem/startDilution', orderId: order.id });
+      break;
     }
     if (order.results?.some((r) => r.delta) && rng.chance(p.spotOther)) {
       if (sample.hidden.wrongPatient) cmds.push({ t, type: 'cancelOrderRecollect', orderId: order.id });

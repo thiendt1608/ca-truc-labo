@@ -3,8 +3,16 @@ import { MINIGAMES, type PlayerAction } from '../../sim';
 import type { SpillInput } from '../../sim/minigames/spillCleanup';
 import { useGame } from '../../store/game';
 import type { UrineInput } from '../../sim/minigames/urineStrip';
+import type { DilutionInput } from '../../sim/minigames/dilution';
+import { MeasureGame } from './MeasureGame';
 import { SequenceGame } from './SequenceGame';
 import { UrineStripGame } from './UrineStripGame';
+
+const INTRO: Record<string, { icon: string; text: string }> = {
+  spillCleanup: { icon: '🧽', text: 'Một ống vỡ! Chạm các bước theo đúng thứ tự để dọn an toàn.' },
+  urineStrip: { icon: '🧪', text: 'Chọn mức khớp bảng màu cho từng ô, đúng thời điểm đọc.' },
+  dilution: { icon: '💧', text: 'Chọn tỉ lệ pha loãng nhỏ nhất đưa kết quả vào dải đo, rồi nhân lại hệ số.' },
+};
 
 /** S6 Mini-game toàn màn hình. Đồng hồ ca vẫn chạy (04-GDD mục 4). */
 export function MinigameHost() {
@@ -25,15 +33,12 @@ export function MinigameHost() {
       <div className="mg-head">
         <span className="eyebrow">Thao tác kỹ thuật</span>
         <h2>
-          {spec.id === 'urineStrip' ? '🧪' : '🧽'} {spec.title}
+          {INTRO[spec.id]?.icon} {spec.title}
         </h2>
-        <p className="muted">
-          {spec.id === 'urineStrip'
-            ? 'Chọn mức khớp bảng màu cho từng ô, đúng thời điểm đọc.'
-            : 'Một ống vỡ! Chạm các bước theo đúng thứ tự để dọn an toàn.'}
-        </p>
+        <p className="muted">{INTRO[spec.id]?.text}</p>
       </div>
       <div className="mg-body">
+        {spec.id === 'dilution' && <MeasureGame input={input as DilutionInput} onDone={finish} />}
         {spec.id === 'urineStrip' && <UrineStripGame input={input as UrineInput} onDone={finish} />}
         {spec.id === 'spillCleanup' && (
           <SequenceGame input={input as SpillInput} hint={difficulty === 'easy'} onDone={finish} />

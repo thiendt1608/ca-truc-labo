@@ -3,9 +3,17 @@ import { runBot } from '../bots/bots';
 import { getContent } from '../content/bundled';
 import { advance, applyCommand, createShift } from '../core/engine';
 import { computeReport } from '../core/scoring';
-import type { Command, Sample, ShiftState } from '../core/types';
+import type { Command, PlayerAction, Sample, ShiftState } from '../core/types';
+import {
+  correctAnswer,
+  dilutionSeed,
+  generateDilution,
+  multiplyOptions,
+  readingAt,
+  scoreDilution,
+  smallestRatio,
+} from '../minigames/dilution';
 import { generateUrine, scoreUrine } from '../minigames/urineStrip';
-import { smallestDilution } from './chem';
 
 const content = getContent();
 type CommandInput = Command extends infer C ? (C extends Command ? Omit<C, 't'> : never) : never;
@@ -50,64 +58,141 @@ function arrived(state: ShiftState, pick: (s: Sample, st: ShiftState) => boolean
 }
 
 describe('pha loãng (ngày 1.4)', () => {
-  it('chọn tỉ lệ nhỏ nhất đủ đưa kết quả vào dải đo', () => {
-    const base = { hidden: { truth: { GLU: 60 }, wrongPatient: false } } as unknown as Sample;
-    expect(smallestDilution(content, base, ['GLU'])).toBe(2); // 60/2 = 30 ≤ 35
-    const high = { hidden: { truth: { GLU: 80 }, wrongPatient: false } } as unknown as Sample;
-    expect(smallestDilution(content, high, ['GLU'])).toBe(5); // 80/2 = 40 > 35
+  const input = (truth: number) => generateDilution(dilutionSeed('GLU', truth), 'normal');
+  const tap = (t: number, id: string): PlayerAction => ({ t, type: 'tap', id });
+
+  it('chọn tỉ lệ nhỏ nhất đủ đưa kết quả vào dải đo, tính số máy đọc và đáp án', () => {
+    expect(smallestRatio(input(60))).toBe(2); // 60/2 = 30 ≤ 35
+    expect(smallestRatio(input(80))).toBe(5); // 80/2 = 40 > 35
+    expect(readingAt(input(62.4), 2)).toBe(31.2);
+    expect(correctAnswer(input(62.4), 2)).toBe('62.4');
+    expect(multiplyOptions(input(62.4), 2)).toContain('62.4');
+    expect(multiplyOptions(input(62.4), 2)).toHaveLength(3);
   });
 
-  it('kết quả vượt dải hiện ">", pha loãng đúng tỉ lệ thì ra số thật, trả sớm bị trừ', () => {
-    const s0 = passQc(start('ch1-d4', 'dil'));
+  it('hạt giống giữ nguyên giá trị thật, nên số mini-game luôn khớp số máy kể cả sát biên làm tròn', () => {
+    const edge = 78.49954321;
+    expect(generateDilution(dilutionSeed('GLU', edge), 'normal').truth).toBe(edge);
+    expect(readingAt(input(edge), 10)).toBe(Math.round((edge / 10) * 10) / 10);
+  });
+
+  it('chấm điểm: đúng cả hai bước 100; chọn nhỏ quá mất điểm và ghi lần chạy hụt; nhân sai mất điểm', () => {
+    const i = input(80);
+    const perfect = scoreDilution(i, [tap(0, 'ratio:5'), tap(1, `answer:${correctAnswer(i, 5)}`)]);
+    expect(perfect).toMatchObject({ skill: 100, ok: true, wasted: 0, ratio: 5, firstRatio: 5 });
+
+    const tooSmall = scoreDilution(i, [
+      tap(0, 'ratio:2'),
+      tap(1, 'ratio:5'),
+      tap(2, `answer:${correctAnswer(i, 5)}`),
+    ]);
+    expect(tooSmall).toMatchObject({ wasted: 1, ratio: 5, ok: false });
+    expect(tooSmall.skill).toBeLessThan(perfect.skill);
+
+    const bigger = scoreDilution(i, [tap(0, 'ratio:10'), tap(1, `answer:${correctAnswer(i, 10)}`)]);
+    expect(bigger.skill).toBeLessThan(100);
+    expect(bigger.skill).toBeGreaterThan(tooSmall.skill);
+
+    const wrongMul = scoreDilution(i, [
+      tap(0, 'ratio:5'),
+      tap(1, 'answer:1.0'),
+      tap(2, `answer:${correctAnswer(i, 5)}`),
+    ]);
+    expect(wrongMul.multiplyWrong).toBe(1);
+    expect(wrongMul.skill).toBeLessThan(100);
+
+    expect(scoreDilution(i, []).skill).toBe(0);
+  });
+
+  /** Đưa phiếu hyperglycemia tới kết quả vượt dải và mở mini-game pha loãng. */
+  function openDilution(seed: string) {
+    const s0 = passQc(start('ch1-d4', seed));
     const { s, sample } = arrived(
       s0,
       (x, st) => st.patients[st.orders[x.orderId]!.patientId]!.profileId === 'hyperglycemia',
     );
-    let st = toResult(s, sample);
+    const st = toResult(s, sample);
     const order = st.orders[sample.orderId]!;
+    return { st, order, sample, over: order.results!.filter((r) => r.overRange) };
+  }
+
+  it('kết quả vượt dải hiện ">", trả luôn khi chưa pha loãng bị trừ', () => {
+    const { st, order, over } = openDilution('dil');
     expect(order.status).toBe('resulted');
-    const over = order.results!.filter((r) => r.overRange);
     expect(over.length).toBeGreaterThan(0);
     expect(over[0]!.display).toMatch(/^>/);
-
-    // Trả luôn khi chưa pha loãng → lỗi.
     const early = run(st, { type: 'releaseOrder', orderId: order.id });
     expect(early.ledger.some((m) => m.kind === 'releaseOverRange')).toBe(true);
+  });
 
-    const ratio = smallestDilution(
-      content,
-      sample,
-      over.map((r) => r.code),
-    );
-    st = run(st, { type: 'chem/dilute', orderId: order.id, ratio });
-    expect(st.skills.at(-1)).toEqual({ source: 'dilution', skill: 100 });
-    st = advance(st, 400, content).state;
-    const after = st.orders[sample.orderId]!;
-    expect(after.status).toBe('resulted');
-    const fixed = after.results!.find((r) => r.code === over[0]!.code)!;
+  it('pha loãng đúng: mini-game mở, máy chạy lại ra số thật nhân hệ số, điểm Tay nghề 100', () => {
+    const { st, order, over } = openDilution('dil');
+    let s = run(st, { type: 'chem/startDilution', orderId: order.id });
+    expect(s.minigame?.context).toBe('dilution');
+    const i = generateDilution(s.minigame!.seed, 'normal');
+    const ratio = smallestRatio(i);
+    s = run(s, {
+      type: 'minigameResult',
+      taskId: s.minigame!.taskId,
+      actions: [
+        tap(0, `ratio:${ratio}`),
+        tap(1, `answer:${correctAnswer(i, ratio)}`),
+        { t: 2, type: 'done' },
+      ],
+    });
+    expect(s.skills.at(-1)).toEqual({ source: 'dilution', skill: 100 });
+    expect(s.orders[order.id]!.status).toBe('running');
+    s = advance(s, 400, content).state;
+    const fixed = s.orders[order.id]!.results!.find((r) => r.code === over[0]!.code)!;
     expect(fixed.overRange).toBe(false);
     expect(fixed.dilution?.ratio).toBe(ratio);
     expect(fixed.value).toBeGreaterThan(35);
-    st = run(st, { type: 'releaseOrder', orderId: order.id });
-    expect(st.ledger.some((m) => m.kind === 'releaseOverRange')).toBe(false);
+    // Số máy báo phải khớp đúng số người chơi đã thấy và nhân ở mini-game.
+    expect(fixed.value).toBe(Number(correctAnswer(i, ratio)));
+    s = run(s, { type: 'releaseOrder', orderId: order.id });
+    expect(s.ledger.some((m) => m.kind === 'releaseOverRange')).toBe(false);
   });
 
-  it('pha loãng chưa đủ: vẫn vượt dải, ghi lỗi, mất một lượt chạy máy', () => {
+  it('nhân sai hệ số bị ghi lỗi và trừ Niềm tin', () => {
+    const { st, order } = openDilution('dil');
+    let s = run(st, { type: 'chem/startDilution', orderId: order.id });
+    const i = generateDilution(s.minigame!.seed, 'normal');
+    const ratio = smallestRatio(i);
+    const trust = s.trust;
+    s = run(s, {
+      type: 'minigameResult',
+      taskId: s.minigame!.taskId,
+      actions: [
+        tap(0, `ratio:${ratio}`),
+        tap(1, 'answer:1.0'),
+        tap(2, `answer:${correctAnswer(i, ratio)}`),
+        { t: 3, type: 'done' },
+      ],
+    });
+    expect(s.ledger.at(-1)?.kind).toBe('dilutionMultiplyWrong');
+    expect(s.trust).toBe(trust - 5);
+  });
+
+  it('pha loãng chưa đủ: ghi lỗi và máy chạy lâu hơn một lượt', () => {
     let tested = false;
     for (let n = 0; n < 12 && !tested; n++) {
-      const s0 = passQc(start('ch1-d4', `dil2-${n}`));
-      const { s, sample } = arrived(
-        s0,
-        (x, st) => st.patients[st.orders[x.orderId]!.patientId]!.profileId === 'hyperglycemia',
-      );
-      let st = toResult(s, sample);
-      const order = st.orders[sample.orderId]!;
-      const over = order.results!.filter((r) => r.overRange).map((r) => r.code);
-      if (over.length === 0 || smallestDilution(content, sample, over) === 2) continue;
-      st = run(st, { type: 'chem/dilute', orderId: order.id, ratio: 2 });
-      expect(st.ledger.at(-1)?.kind).toBe('dilutionTooSmall');
-      st = advance(st, 400, content).state;
-      expect(st.orders[sample.orderId]!.results!.some((r) => r.overRange)).toBe(true);
+      const { st, order } = openDilution(`dil2-${n}`);
+      const base = run(st, { type: 'chem/startDilution', orderId: order.id });
+      const i = generateDilution(base.minigame!.seed, 'normal');
+      const ratio = smallestRatio(i);
+      if (ratio === 2) continue;
+      const s = run(base, {
+        type: 'minigameResult',
+        taskId: base.minigame!.taskId,
+        actions: [
+          tap(0, 'ratio:2'),
+          tap(1, `ratio:${ratio}`),
+          tap(2, `answer:${correctAnswer(i, ratio)}`),
+          { t: 3, type: 'done' },
+        ],
+      });
+      expect(s.ledger.some((m) => m.kind === 'dilutionTooSmall')).toBe(true);
+      expect(s.orders[order.id]!.dilution?.extraSeconds).toBe(content.chemRules.analyzer.secondsPerSample);
       tested = true;
     }
     expect(tested).toBe(true);

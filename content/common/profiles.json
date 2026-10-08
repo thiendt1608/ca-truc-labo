@@ -82,14 +82,14 @@
     {
       "id": "hyperglycemia",
       "values": {
-        "GLU": [60, 15],
+        "GLU": [70, 20],
         "A1C": [11, 1]
       }
     },
     {
       "id": "severeLipid",
       "values": {
-        "TG": [20, 5],
+        "TG": [26, 6],
         "CHOL": [9, 1]
       }
     }

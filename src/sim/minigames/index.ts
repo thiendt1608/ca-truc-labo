@@ -1,3 +1,4 @@
+import { dilution } from './dilution';
 import { holdTimer } from './holdTimer';
 import { spillCleanup } from './spillCleanup';
 import { urineStrip } from './urineStrip';
@@ -8,7 +9,8 @@ export const MINIGAMES: Record<string, MinigameSpec<any>> = {
   [spillCleanup.id]: spillCleanup,
   [holdTimer.id]: holdTimer,
   [urineStrip.id]: urineStrip,
+  [dilution.id]: dilution,
 };
 
-export { holdTimer, spillCleanup, urineStrip };
+export { dilution, holdTimer, spillCleanup, urineStrip };
 export type { MinigameSpec } from './types';

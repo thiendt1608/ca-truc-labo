@@ -1,6 +1,8 @@
 import type { Content } from '../content/load';
 import type { RejectReason } from '../content/schema';
 import { changeTrust, newId, recordMistake, tip, unlocked, type Ctx } from '../core/context';
+import type { DilutionScore } from '../minigames/dilution';
+import { dilutionSeed } from '../minigames/dilution';
 import type { UrineScore } from '../minigames/urineStrip';
 import { generateUrine } from '../minigames/urineStrip';
 import { makeSample } from '../core/generator';
@@ -231,40 +233,26 @@ export function handleChem(ctx: Ctx, cmd: Command): boolean {
       startMinigame(ctx, 'urineStrip', 'urine', { seed: sample.urineSeed, sampleId: sample.id });
       return true;
     }
-    case 'chem/dilute': {
+    case 'chem/startDilution': {
       const order = s.orders[cmd.orderId];
-      const rules = ctx.content.chemRules.dilution;
       if (!unlocked(ctx, 'dilution')) return invalid(ctx, 'Hôm nay chưa dùng pha loãng.');
       if (!order || order.status !== 'resulted') return invalid(ctx, 'Phiếu chưa có kết quả.');
-      if (!rules.ratios.includes(cmd.ratio)) return invalid(ctx, 'Tỉ lệ pha loãng không hợp lệ.');
-      const over = (order.results ?? []).filter((r) => r.overRange);
-      if (over.length === 0) return invalid(ctx, 'Không có kết quả nào vượt dải đo.');
+      if (s.minigame) return invalid(ctx, 'Đang làm một thao tác khác.');
       const sample = s.samples[order.sampleId]!;
-      const smallest = smallestDilution(
-        ctx.content,
-        sample,
-        over.map((r) => r.code),
-      );
-      s.decisions.total++;
-      if (cmd.ratio === smallest) {
-        s.decisions.correct++;
-        s.skills.push({ source: 'dilution', skill: 100 });
-      } else if (cmd.ratio > smallest) {
-        s.skills.push({ source: 'dilution', skill: 70 });
-      } else {
-        s.skills.push({ source: 'dilution', skill: 40 });
-        recordMistake(ctx, {
-          kind: 'dilutionTooSmall',
-          explanationKey: rules.explanationKey,
-          codex: rules.codex,
-          trustDelta: 0,
-          safetyPenalty: 0,
-          orderId: order.id,
-        });
-      }
-      order.dilution = { ratio: cmd.ratio, codes: over.map((r) => r.code) };
-      order.status = 'running';
-      chem(ctx).analyzer.queue.push(order.id);
+      const analytes = ctx.content.chemTests.flatMap((t) => t.analytes);
+      // Mini-game xoay quanh chất vượt dải nặng nhất; các chất vượt dải khác dùng cùng tỉ lệ.
+      const worst = (order.results ?? [])
+        .filter((r) => r.overRange)
+        .map((r) => ({
+          code: r.code,
+          ratio: (sample.hidden.truth[r.code] ?? 0) / analytes.find((a) => a.code === r.code)!.max,
+        }))
+        .sort((a, b) => b.ratio - a.ratio)[0];
+      if (!worst) return invalid(ctx, 'Không có kết quả nào vượt dải đo.');
+      startMinigame(ctx, 'dilution', 'dilution', {
+        seed: dilutionSeed(worst.code, sample.hidden.truth[worst.code] ?? 0),
+        orderId: order.id,
+      });
       return true;
     }
     case 'cancelOrderRecollect': {
@@ -418,16 +406,6 @@ function releaseOrder(ctx: Ctx, orderId: string) {
     changeTrust(ctx, 2);
 }
 
-/** Tỉ lệ pha loãng nhỏ nhất đưa mọi chất vượt dải (`codes`) của mẫu vào dải đo. */
-export function smallestDilution(content: Content, sample: Sample, codes: string[]): number {
-  const analytes = content.chemTests.flatMap((t) => t.analytes);
-  const needed = Math.max(
-    ...codes.map((code) => (sample.hidden.truth[code] ?? 0) / analytes.find((a) => a.code === code)!.max),
-  );
-  const { ratios } = content.chemRules.dilution;
-  return ratios.find((x) => x >= needed) ?? ratios[ratios.length - 1]!;
-}
-
 /** Một giây game của phòng Hoá sinh. */
 export function tickChem(ctx: Ctx) {
   const { s } = ctx;
@@ -460,7 +438,8 @@ export function tickChem(ctx: Ctx) {
   }
   if (!a.current && a.queue.length > 0 && !qcBlocksAnalyzer(ctx)) {
     const orderId = a.queue.shift()!;
-    a.current = { orderId, endsAt: s.clock + ctx.content.chemRules.analyzer.secondsPerSample };
+    const extra = s.orders[orderId]?.dilution?.extraSeconds ?? 0;
+    a.current = { orderId, endsAt: s.clock + ctx.content.chemRules.analyzer.secondsPerSample + extra };
   }
 }
 
@@ -503,6 +482,42 @@ function finishSpin(ctx: Ctx, st: ChemState) {
   for (const id of sampleIds) moveSample(ctx, s.samples[id]!, 'spun');
   ctx.events.push({ type: 'centrifugeDone' });
   tip(ctx, 'centrifugeDone');
+}
+
+/** Sau mini-game pha loãng: phiếu quay lại máy với tỉ lệ người chơi chọn (mỗi lần chạy hụt tốn thêm thời gian máy). */
+export function onDilutionDone(ctx: Ctx, orderId: string | undefined, score: DilutionScore) {
+  const order = orderId ? ctx.s.orders[orderId] : undefined;
+  if (!order) return;
+  const rules = ctx.content.chemRules.dilution;
+  const over = (order.results ?? []).filter((r) => r.overRange).map((r) => r.code);
+  const per = ctx.content.chemRules.analyzer.secondsPerSample;
+  ctx.s.decisions.total++;
+  if (score.firstRatio === score.smallest) ctx.s.decisions.correct++;
+  if (score.wasted > 0)
+    recordMistake(ctx, {
+      kind: 'dilutionTooSmall',
+      explanationKey: rules.explanationKey,
+      codex: rules.codex,
+      trustDelta: 0,
+      safetyPenalty: 0,
+      orderId: order.id,
+    });
+  if (score.multiplyWrong > 0)
+    recordMistake(ctx, {
+      kind: 'dilutionMultiplyWrong',
+      explanationKey: 'rule.dilutionMultiplyWrong',
+      codex: rules.codex,
+      trustDelta: -5,
+      safetyPenalty: 5,
+      orderId: order.id,
+    });
+  order.dilution = {
+    ratio: score.ratio ?? rules.ratios[rules.ratios.length - 1]!,
+    codes: over,
+    extraSeconds: score.wasted * per,
+  };
+  order.status = 'running';
+  chem(ctx).analyzer.queue.push(order.id);
 }
 
 /** Sau mini-game que thử: mức người chơi đọc thành kết quả của phiếu. */

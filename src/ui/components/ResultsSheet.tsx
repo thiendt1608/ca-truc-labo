@@ -111,17 +111,15 @@ function OrderCard({ order }: { order: Order }) {
           <span className="muted">
             Pha loãng mẫu, chạy lại rồi nhân với hệ số. Chọn tỉ lệ nhỏ nhất đưa kết quả vào dải đo.
           </span>
-          <div className="row wrap">
-            {content.chemRules.dilution.ratios.map((ratio) => (
-              <button
-                key={ratio}
-                className="grow"
-                onClick={() => dispatch({ type: 'chem/dilute', orderId: order.id, ratio })}
-              >
-                1:{ratio}
-              </button>
-            ))}
-          </div>
+          <button
+            className="primary"
+            onClick={() => {
+              dispatch({ type: 'chem/startDilution', orderId: order.id });
+              useGame.getState().setOverlay(null);
+            }}
+          >
+            🧪 Pha loãng mẫu
+          </button>
         </div>
       )}
       {hasDelta && (
