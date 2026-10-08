@@ -15,6 +15,7 @@ export function Hud() {
   const alerts = [
     stat > 0 ? `🚑 ${stat} mẫu cấp cứu ở khay` : '',
     statResults > 0 ? `🚑 ${statResults} kết quả cấp cứu chờ duyệt` : '',
+    shift.chem?.qc && shift.chem.qc.status !== 'passed' ? '🧪 QC chưa đạt: máy chưa chạy mẫu' : '',
     shift.chem?.centrifuge.contaminated ? '⚠️ Máy ly tâm cần dọn' : '',
     left < 1800 ? `⏳ Còn ${Math.ceil(left / 60)} phút hết ca` : '',
   ].filter(Boolean);

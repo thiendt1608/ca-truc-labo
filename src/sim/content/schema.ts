@@ -125,6 +125,30 @@ export const ChemRulesSchema = z.object({
   recollectSeconds: z.number().positive(),
 });
 
+export const QcRemedySchema = z.enum(['rerun', 'newControl', 'newReagent', 'calibrate', 'callEngineer']);
+const QcPoint = z.tuple([z.number(), z.number().min(0)]);
+
+export const QcRulesSchema = z.object({
+  source: z.array(z.string()),
+  historyRuns: z.number().int().min(0),
+  normal: z.object({ mean: z.number(), sd: z.number().positive(), clamp: z.number().positive() }),
+  remedies: z.record(QcRemedySchema, z.object({ label: z.string(), seconds: z.number().positive() })),
+  scenarios: z.record(
+    z.string(),
+    z.object({
+      remedy: QcRemedySchema,
+      /** Độ lệch tương đối của kết quả bệnh nhân khi lỗi còn tồn tại (nhân với dấu của lỗi). */
+      bias: z.number().min(0),
+      history: z.enum(['flat', 'trend']),
+      /** Lỗi còn lại ở các lần chạy sau (false: chỉ xuất hiện đúng một lần). */
+      persists: z.boolean(),
+      run: z.object({ z1: QcPoint, z2: QcPoint }),
+      explanationKey: z.string(),
+      codex: z.string(),
+    }),
+  ),
+});
+
 export const UnlockSchema = z.enum([
   'routeChem',
   'routeHeme',
@@ -151,6 +175,8 @@ export const TipTriggerSchema = z.enum([
   'centrifugeDone',
   'resultReady',
   'spill',
+  'qcRun',
+  'qcFailed',
 ]);
 
 export const DayConfigSchema = z.object({
@@ -185,6 +211,8 @@ export const DayConfigSchema = z.object({
       defects: z.array(DefectSchema).optional(),
     }),
   ),
+  /** Có thì máy hoá sinh chỉ chạy mẫu bệnh nhân sau khi QC đạt; `scenario` là lỗi ẩn của ngày. */
+  qc: z.object({ scenario: z.string() }).optional(),
   tips: z.array(z.object({ trigger: TipTriggerSchema, text: z.string().max(200) })),
   codexOnStart: z.array(z.string()),
 });
@@ -210,6 +238,7 @@ export const RawContentSchema = z.object({
   receptionRules: ReceptionRulesSchema,
   chemTests: z.array(ChemTestSchema),
   chemRules: ChemRulesSchema,
+  chemQc: QcRulesSchema,
   days: z.array(DayConfigSchema),
   codex: z.array(CodexCardSchema),
   i18n: I18nSchema,
@@ -232,6 +261,8 @@ export type Analyte = z.infer<typeof AnalyteSchema>;
 export type ChemTest = z.infer<typeof ChemTestSchema>;
 export type ReceptionRules = z.infer<typeof ReceptionRulesSchema>;
 export type ChemRules = z.infer<typeof ChemRulesSchema>;
+export type QcRules = z.infer<typeof QcRulesSchema>;
+export type QcRemedy = z.infer<typeof QcRemedySchema>;
 export type Unlock = z.infer<typeof UnlockSchema>;
 export type TipTrigger = z.infer<typeof TipTriggerSchema>;
 export type DayConfig = z.infer<typeof DayConfigSchema>;

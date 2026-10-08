@@ -913,6 +913,7 @@ button.small {
   padding-right: 28px;
 }
 .station .status {
+  padding-right: 34px;
   font-size: 14px;
   color: var(--ink-2);
 }
@@ -1028,4 +1029,20 @@ button.small {
 .result-cell.crit .rverdict {
   background: var(--bad-strong);
   color: #fff;
+}
+
+/* Biểu đồ QC (Levey-Jennings) */
+.ljchart {
+  flex-shrink: 0;
+  min-height: 180px;
+  width: 100%;
+  height: auto;
+  background: var(--panel-2);
+  border-radius: var(--radius);
+  box-shadow: inset 0 3px 3px rgba(93, 83, 74, 0.15);
+}
+.ljlabel {
+  font-size: 14px;
+  fill: var(--ink-2);
+  font-family: var(--font-body);
 }

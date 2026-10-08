@@ -177,6 +177,8 @@ export function AnalyzerSheet() {
   const close = () => useGame.getState().setOverlay(null);
   const a = shift.chem!.analyzer;
   const per = getContent().chemRules.analyzer.secondsPerSample;
+  const qc = shift.chem!.qc;
+  const qcWaiting = a.queue.length > 0 && !!qc && (qc.status !== 'passed' || shift.clock < qc.blockedUntil);
   const label = (orderId: string) => {
     const o = shift.orders[orderId]!;
     return `${o.sampleId.toUpperCase()} ${o.priority === 'stat' ? '🚑' : ''} · ${o.tests.join(', ')}`;
@@ -191,7 +193,18 @@ export function AnalyzerSheet() {
           </div>
         </div>
       ) : (
-        <p className="muted">Máy đang rảnh.</p>
+        <div className="stack">
+          {qcWaiting ? (
+            <>
+              <p>⏳ Máy chưa chạy mẫu bệnh nhân vì QC chưa đạt.</p>
+              <button className="primary" onClick={() => useGame.getState().setOverlay({ kind: 'qc' })}>
+                🧪 Mở QC
+              </button>
+            </>
+          ) : (
+            <p className="muted">Máy đang rảnh.</p>
+          )}
+        </div>
       )}
       <b>Hàng chờ ({a.queue.length})</b>
       {a.queue.map((id, i) => (

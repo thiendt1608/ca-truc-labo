@@ -5,6 +5,7 @@ import { AnalyzerSheet, CentrifugeSheet, PostSpinSheet } from '../components/Che
 import { DebugPanel } from '../components/DebugPanel';
 import { Hud } from '../components/Hud';
 import { Notices } from '../components/Notices';
+import { QcSheet } from '../components/QcSheet';
 import { ResultsSheet } from '../components/ResultsSheet';
 import { SampleCard } from '../components/SampleCard';
 import { Tube } from '../components/Tube';
@@ -83,6 +84,7 @@ export function Room() {
       {overlay?.kind === 'postspin' && <PostSpinSheet />}
       {overlay?.kind === 'analyzer' && <AnalyzerSheet />}
       {overlay?.kind === 'results' && <ResultsSheet />}
+      {overlay?.kind === 'qc' && <QcSheet />}
       {paused && (
         <div className="overlay" style={{ alignItems: 'center', background: 'var(--bg)' }}>
           <div className="sheet stack" style={{ borderRadius: 16, margin: 16 }}>
@@ -174,9 +176,32 @@ function ChemStations() {
   const spin = getContent().chemRules.centrifuge.spinSeconds;
   const per = getContent().chemRules.analyzer.secondsPerSample;
   const a = chem.analyzer;
+  const qc = chem.qc;
+  const qcBusy = !!qc && shift.clock < qc.blockedUntil;
   const cState = c.contaminated || c.unbalanced ? 'error' : c.running ? 'busy' : 'ready';
   return (
     <>
+      {qc && (
+        <button className="station card" onClick={() => setOverlay({ kind: 'qc' })}>
+          <span className="station-head">
+            <span className="name">🧪 QC đầu ca</span>
+            <Orb
+              state={qc.status === 'passed' && !qcBusy ? 'ready' : qc.status === 'failed' ? 'error' : 'busy'}
+            />
+          </span>
+          <span className="status">
+            {qcBusy
+              ? 'Máy đang bận'
+              : qc.status === 'passed'
+                ? 'Đạt'
+                : qc.status === 'judging'
+                  ? 'Chờ em phán quyết'
+                  : qc.status === 'failed'
+                    ? 'Không đạt: cần khắc phục'
+                    : 'Chưa chạy control'}
+          </span>
+        </button>
+      )}
       <button className="station card" onClick={() => setOverlay({ kind: 'centrifuge' })}>
         <span className="station-head">
           <span className="name">🌀 Máy ly tâm</span>
@@ -211,7 +236,13 @@ function ChemStations() {
           <span className="name">⚗️ Máy hoá sinh</span>
           <Orb state={a.current ? 'busy' : 'ready'} />
         </span>
-        <span className="status">{a.current ? `Đang chạy · chờ ${a.queue.length}` : 'Rảnh'}</span>
+        <span className="status">
+          {a.current
+            ? `Đang chạy · chờ ${a.queue.length}`
+            : a.queue.length > 0 && qc && (qc.status !== 'passed' || qcBusy)
+              ? `⏳ ${a.queue.length} ống chờ QC đạt`
+              : 'Rảnh'}
+        </span>
         {a.current && (
           <div className="progress">
             <div style={{ width: `${100 - ((a.current.endsAt - shift.clock) / per) * 100}%` }} />

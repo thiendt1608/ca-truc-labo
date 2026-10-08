@@ -1,4 +1,5 @@
 import type { Content } from '../content/load';
+import { initQc } from '../departments/chemQc';
 import { applyTrayDecision, type Decision } from '../departments/reception';
 import {
   expectedPostSpin,
@@ -59,6 +60,7 @@ export function createShift({ content, dayId, seed, difficulty }: NewShiftOption
     ended: null,
   };
   const ctx = makeCtx(initial, content);
+  if (ctx.s.chem) ctx.s.chem.qc = initQc(ctx);
   ctx.s.scheduled = buildSchedule(ctx);
   for (const id of day.codexOnStart) unlockCodex(ctx, id);
   tip(ctx, 'start');

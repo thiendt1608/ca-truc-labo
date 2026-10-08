@@ -26,6 +26,7 @@ export type Overlay =
   | { kind: 'postspin' }
   | { kind: 'analyzer' }
   | { kind: 'results' }
+  | { kind: 'qc' }
   | { kind: 'baskets' };
 
 export interface Toast {

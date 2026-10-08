@@ -100,6 +100,10 @@ export function crossCheck(c: Content): ContentProblem[] {
     ),
     ['reception-rules/irreplaceable', c.receptionRules.irreplaceable.explanationKey],
     ['chem/rules/hemolysis', c.chemRules.hemolysis.explanationKey],
+    ...Object.entries(c.chemQc.scenarios).flatMap(([id, sc]) => {
+      codexRefs.push([`chem/qc/${id}`, sc.codex]);
+      return [[`chem/qc/${id}`, sc.explanationKey]] as [string, string][];
+    }),
   ];
   for (const d of c.days) {
     const where = `days/${d.id}`;
@@ -109,6 +113,10 @@ export function crossCheck(c: Content): ContentProblem[] {
     for (const id of Object.keys(d.profiles))
       if (!profileIds.has(id)) add(where, `hồ sơ không tồn tại: ${id}`);
     for (const id of d.codexOnStart) codexRefs.push([where, id]);
+    if (d.qc && !(d.qc.scenario in c.chemQc.scenarios))
+      add(where, `kịch bản QC không tồn tại: ${d.qc.scenario}`);
+    if (!!d.qc !== d.unlocks.includes('qc')) add(where, 'qc và unlocks "qc" phải đi cùng nhau');
+    if (d.qc && d.room !== 'chem') add(where, 'QC chỉ dùng cho phòng Hoá sinh');
     for (const s of d.scripted) {
       if (s.orderType && !c.orderTypeById.has(s.orderType))
         add(where, `kịch bản #${s.index}: loại phiếu ${s.orderType} không tồn tại`);

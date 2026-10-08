@@ -54,5 +54,29 @@
     "body": "Nếu nhận một ống có nhãn lệch phiếu rồi trả kết quả, bác sĩ sẽ đọc kết quả của người khác. Đó là lý do phải kiểm tra nhãn trước khi làm.",
     "more": "Ở bệnh viện thật, lỗi định danh là nhóm lỗi trước xét nghiệm được theo dõi chặt nhất.",
     "source": ["WHO LQMS"]
+  },
+  {
+    "id": "ch-qc",
+    "dept": "chem",
+    "title": "QC: kiểm tra máy trước khi tin kết quả",
+    "body": "Trước khi chạy mẫu bệnh nhân, ta chạy control: mẫu đã biết trước giá trị. Nếu máy đo control đúng thì mới tin kết quả bệnh nhân.",
+    "more": "Mỗi ngày chạy control 2 mức (thấp và cao). Kết quả vẽ lên biểu đồ Levey-Jennings để nhìn xu hướng.",
+    "source": ["WHO LQMS", "05-noi-dung-chuyen-mon.md mục 2.5"]
+  },
+  {
+    "id": "ch-westgard",
+    "dept": "chem",
+    "title": "Luật Westgard",
+    "body": "1-2s: một điểm vượt 2SD, chỉ là cảnh báo. 1-3s: một điểm vượt 3SD, loại. 2-2s: hai điểm liên tiếp cùng vượt 2SD một phía, loại. R-4s: hai mức lệch ngược chiều trên 4SD, loại.",
+    "more": "Mức Khó thêm 4-1s (4 điểm liên tiếp cùng phía vượt 1SD) và 10x (10 điểm cùng một phía của trung bình).",
+    "source": ["Westgard rules (westgard.com)"]
+  },
+  {
+    "id": "ch-qc-causes",
+    "dept": "chem",
+    "title": "Đọc hình dạng biểu đồ để tìm nguyên nhân",
+    "body": "Một điểm lệch rồi hết: ngẫu nhiên, chạy lại control. Chỉ một mức lệch: lọ control hỏng. Cả hai mức lệch cùng hướng và vượt 3SD: hoá chất. Trôi dần: hiệu chuẩn. Hai mức lệch ngược chiều: phần cứng.",
+    "more": "Trong thực tế nhiều nguyên nhân có thể chồng nhau; game đơn giản hoá thành một nguyên nhân cho mỗi hình dạng.",
+    "source": ["05-noi-dung-chuyen-mon.md mục 2.5"]
   }
 ]

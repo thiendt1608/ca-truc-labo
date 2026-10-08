@@ -4,6 +4,7 @@ import type {
   Defect,
   DeptId,
   Priority,
+  QcRemedy,
   RejectReason,
   RoomId,
   TipTrigger,
@@ -86,6 +87,8 @@ export interface Order {
   hil?: ('H' | 'I' | 'L')[];
   criticalCalled?: boolean;
   lateCharged?: boolean;
+  /** Kết quả đo khi QC đang hỏng (lệch thật so với giá trị đúng). */
+  qcFault?: boolean;
 }
 
 export interface MistakeEntry {
@@ -116,7 +119,26 @@ export type ScheduledItem = ScheduledArrival | ScheduledCheck;
 
 export type SlotContent = string | 'water' | null;
 
+/** QC của máy hoá sinh: lỗi ẩn, các lần chạy control (z-score) và trạng thái chờ người chơi quyết định. */
+export interface QcState {
+  scenario: string;
+  /** Hướng lệch của lỗi (+1 hoặc −1), chọn bằng rng lúc tạo ca. */
+  sign: 1 | -1;
+  /** Lỗi đang tồn tại (ẩn với người chơi); null khi đã sửa. */
+  fault: string | null;
+  runs: { z1: number; z2: number }[];
+  /** unchecked: chưa chạy control · judging: chờ phán quyết · passed: máy chạy mẫu được · failed: chờ khắc phục. */
+  status: 'unchecked' | 'judging' | 'passed' | 'failed';
+  /** Máy bận (chạy lại control, thay hoá chất...) tới giây này. */
+  blockedUntil: number;
+  /** Số phiếu đã trả khi QC hỏng, để giới hạn mức trừ Niềm tin. */
+  badReleases: number;
+}
+
+export type QcVerdict = 'pass' | 'rerun' | 'fail';
+
 export interface ChemState {
+  qc: QcState | null;
   centrifuge: {
     slots: SlotContent[];
     running: boolean;
@@ -193,6 +215,9 @@ export type Command =
   | { t: number; type: 'startCentrifuge'; centrifugeId: 'c1' }
   | { t: number; type: 'chem/loadAnalyzer'; sampleId: string }
   | { t: number; type: 'chem/highSpeedSpin'; sampleId: string }
+  | { t: number; type: 'chem/runQC' }
+  | { t: number; type: 'chem/judgeQC'; verdict: QcVerdict }
+  | { t: number; type: 'chem/qcAction'; action: QcRemedy }
   | { t: number; type: 'prioritize'; orderId: string }
   | { t: number; type: 'releaseOrder'; orderId: string }
   | { t: number; type: 'rerunOrder'; orderId: string }

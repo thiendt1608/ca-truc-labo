@@ -3,6 +3,8 @@ import { applyCommand, advance, createShift } from '../core/engine';
 import { createRng, hashSeed, type Rng } from '../core/rng';
 import type { Command, Difficulty, PlayerAction, ShiftState } from '../core/types';
 import { expectedPostSpin, isBalanced } from '../departments/chem';
+import { expectedVerdict } from '../departments/chemQc';
+import type { QcRemedy } from '../content/schema';
 import { expectedReception } from '../departments/reception';
 import { spillCleanup } from '../minigames';
 
@@ -91,6 +93,24 @@ export function botCommands(state: ShiftState, content: Content, p: BotProfile, 
     else cmds.push({ t, type: 'contactWard', sampleId: id });
   }
   if (!state.chem) return cmds;
+
+  // 1b) QC: chạy control → phán quyết theo Westgard → khắc phục đúng hình dạng biểu đồ.
+  const qc = state.chem.qc;
+  if (qc && budget > 0) {
+    if (qc.status === 'unchecked' && t >= qc.blockedUntil) {
+      budget--;
+      cmds.push({ t, type: 'chem/runQC' });
+    } else if (qc.status === 'judging') {
+      budget--;
+      const exp = expectedVerdict(qc, state.difficulty);
+      cmds.push({ t, type: 'chem/judgeQC', verdict: rng.chance(p.spotOther) ? exp : 'pass' });
+    } else if (qc.status === 'failed') {
+      budget--;
+      const remedies = Object.keys(content.chemQc.remedies) as QcRemedy[];
+      const right = qc.fault ? content.chemQc.scenarios[qc.fault]!.remedy : 'rerun';
+      cmds.push({ t, type: 'chem/qcAction', action: rng.chance(p.spotOther) ? right : rng.pick(remedies) });
+    }
+  }
 
   // 2) Máy ly tâm.
   const c = state.chem.centrifuge;

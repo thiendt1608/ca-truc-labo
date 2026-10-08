@@ -5,6 +5,7 @@ import { makeSample } from '../core/generator';
 import { measure } from '../core/results';
 import type { ChemState, Command, Order, Sample } from '../core/types';
 import { startMinigame } from '../core/minigameHost';
+import { handleQc, qcBias, qcBlocksAnalyzer } from './chemQc';
 import { expectedReception } from './reception';
 
 /**
@@ -21,6 +22,7 @@ export function initChem(content: Content): ChemState {
       contaminated: false,
     },
     analyzer: { queue: [], current: null },
+    qc: null,
   };
 }
 
@@ -236,7 +238,7 @@ export function handleChem(ctx: Ctx, cmd: Command): boolean {
       return true;
     }
     default:
-      return false;
+      return handleQc(ctx, cmd);
   }
 }
 
@@ -282,12 +284,26 @@ function releaseOrder(ctx: Ctx, orderId: string) {
       orderId,
       sampleId: sample.id,
     });
-  } else {
+  } else if (!order.qcFault) {
     s.releases.correct++;
+  }
+  if (order.qcFault) {
+    // Hậu quả trễ của việc báo QC đạt nhầm: mỗi phiếu trừ 5 Niềm tin, tối đa 30 (04-GDD mục 6.1).
+    const qc = chem(ctx).qc!;
+    qc.badReleases++;
+    recordMistake(ctx, {
+      kind: 'releaseQcFailed',
+      explanationKey: 'rule.releaseQcFailed',
+      codex: 'ch-qc',
+      trustDelta: qc.badReleases <= 6 ? -5 : 0,
+      safetyPenalty: 5,
+      orderId,
+      sampleId: sample.id,
+    });
   }
   const onTime = s.clock <= order.deadline;
   s.timeliness.push({ id: order.id, onTime, weight: order.priority === 'stat' ? 2 : 1 });
-  if (onTime && order.priority === 'stat' && !problem) changeTrust(ctx, 2);
+  if (onTime && order.priority === 'stat' && !problem && !order.qcFault) changeTrust(ctx, 2);
 }
 
 /** Một giây game của phòng Hoá sinh. */
@@ -303,6 +319,7 @@ export function tickChem(ctx: Ctx) {
     const sample = s.samples[order.sampleId]!;
     const patient = s.patients[order.patientId]!;
     order.results = measure(ctx, order, sample, patient);
+    if (qcBias(ctx) !== 0) order.qcFault = true;
     order.status = 'resulted';
     order.resultedAt = s.clock;
     if (sample.status !== 'done') moveSample(ctx, sample, 'done');
@@ -314,7 +331,7 @@ export function tickChem(ctx: Ctx) {
       s.scheduled.sort((x, y) => x.at - y.at);
     }
   }
-  if (!a.current && a.queue.length > 0) {
+  if (!a.current && a.queue.length > 0 && !qcBlocksAnalyzer(ctx)) {
     const orderId = a.queue.shift()!;
     a.current = { orderId, endsAt: s.clock + ctx.content.chemRules.analyzer.secondsPerSample };
   }

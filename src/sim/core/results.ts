@@ -1,4 +1,5 @@
 import type { Analyte } from '../content/schema';
+import { qcBias } from '../departments/chemQc';
 import type { Ctx } from './context';
 import type { AnalyteResult, Order, Patient, Sample } from './types';
 
@@ -31,7 +32,7 @@ export function measure(ctx: Ctx, order: Order, sample: Sample, patient: Patient
     if (!test) continue;
     for (const a of test.analytes) {
       const truth = sample.hidden.truth[a.code] ?? 0;
-      let value = truth * (1 + ctx.rng.normal(0, 0.02));
+      let value = truth * (1 + ctx.rng.normal(0, 0.02) + qcBias(ctx));
       if (hemolysis) value += (effects[a.code] ?? 0) * hemolysis.level;
       const factor = 10 ** a.decimals;
       value = Math.max(0, Math.round(value * factor) / factor);

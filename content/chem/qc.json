@@ -1,0 +1,59 @@
+{
+  "source": ["05-noi-dung-chuyen-mon.md mục 2.5", "Westgard rules (westgard.com)"],
+  "historyRuns": 8,
+  "normal": { "mean": 0, "sd": 0.45, "clamp": 1.5 },
+  "remedies": {
+    "rerun": { "label": "Chạy lại control", "seconds": 120 },
+    "newControl": { "label": "Mở lọ control mới", "seconds": 300 },
+    "newReagent": { "label": "Thay hoá chất", "seconds": 900 },
+    "calibrate": { "label": "Hiệu chuẩn lại máy", "seconds": 1200 },
+    "callEngineer": { "label": "Gọi kỹ sư", "seconds": 1800 }
+  },
+  "scenarios": {
+    "random": {
+      "remedy": "rerun",
+      "bias": 0,
+      "history": "flat",
+      "persists": false,
+      "run": { "z1": [2.4, 0.15], "z2": [0.2, 0.3] },
+      "explanationKey": "qc.cause.random",
+      "codex": "ch-qc-causes"
+    },
+    "badControl": {
+      "remedy": "newControl",
+      "bias": 0,
+      "history": "flat",
+      "persists": true,
+      "run": { "z1": [0.3, 0.3], "z2": [3.3, 0.15] },
+      "explanationKey": "qc.cause.badControl",
+      "codex": "ch-qc-causes"
+    },
+    "reagent": {
+      "remedy": "newReagent",
+      "bias": 0.12,
+      "history": "flat",
+      "persists": true,
+      "run": { "z1": [3.4, 0.15], "z2": [2.6, 0.2] },
+      "explanationKey": "qc.cause.reagent",
+      "codex": "ch-qc-causes"
+    },
+    "calibration": {
+      "remedy": "calibrate",
+      "bias": 0.08,
+      "history": "trend",
+      "persists": true,
+      "run": { "z1": [2.3, 0.1], "z2": [2.5, 0.1] },
+      "explanationKey": "qc.cause.calibration",
+      "codex": "ch-qc-causes"
+    },
+    "hardware": {
+      "remedy": "callEngineer",
+      "bias": 0,
+      "history": "flat",
+      "persists": true,
+      "run": { "z1": [2.5, 0.15], "z2": [-2.4, 0.15] },
+      "explanationKey": "qc.cause.hardware",
+      "codex": "ch-qc-causes"
+    }
+  }
+}

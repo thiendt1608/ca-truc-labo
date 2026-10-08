@@ -7,8 +7,10 @@ import profiles from '../../../content/common/profiles.json';
 import receptionRules from '../../../content/common/reception-rules.json';
 import chemTests from '../../../content/chem/tests.json';
 import chemRules from '../../../content/chem/rules.json';
+import chemQc from '../../../content/chem/qc.json';
 import ch0d1 from '../../../content/days/ch0-d1.json';
 import ch1d1 from '../../../content/days/ch1-d1.json';
+import ch1d3 from '../../../content/days/ch1-d3.json';
 import codexCommon from '../../../content/codex/common.json';
 import codexChem from '../../../content/codex/chem.json';
 import i18n from '../../../content/i18n/vi.json';
@@ -25,7 +27,8 @@ export const rawContent = {
   receptionRules,
   chemTests,
   chemRules,
-  days: [ch0d1, ch1d1],
+  chemQc,
+  days: [ch0d1, ch1d1, ch1d3],
   codex: [...codexCommon, ...codexChem],
   i18n,
 };
