@@ -1,5 +1,5 @@
 import type { EventId } from '../content/schema';
-import { changeTrust, newId, recordMistake, unlockCodex, type Ctx } from './context';
+import { changeTrust, newId, recordMistake, tip, unlockCodex, type Ctx } from './context';
 import { makeArrival } from './generator';
 import { startMinigame } from './minigameHost';
 import type { Command, PhoneCall, ScheduledEvent } from './types';
@@ -108,6 +108,7 @@ export function fireEvent(ctx: Ctx, id: EventId) {
     case 'machineFault':
       s.effects.analyzerDownUntil = UNTIL_RESOLVED;
       s.pending.push({ id: newId(ctx, 'ev'), eventId: id, startedAt: s.clock, expiresAt: null });
+      tip(ctx, 'eventDecision');
       return announce(def.text, true);
     case 'quiz': {
       const quizzes = ctx.content.events.quizzes;
@@ -119,6 +120,7 @@ export function fireEvent(ctx: Ctx, id: EventId) {
         expiresAt: s.clock + def.expireSeconds!,
         quizId: quiz.id,
       });
+      tip(ctx, 'eventDecision');
       return announce(quiz.question, true);
     }
     case 'call': {
@@ -138,6 +140,7 @@ export function fireEvent(ctx: Ctx, id: EventId) {
       };
       s.phone.calls.push(call);
       ctx.events.push({ type: 'phoneRing', callId: call.id });
+      tip(ctx, 'phoneRing');
       return announce(`${call.from} đang gọi tới.`);
     }
   }

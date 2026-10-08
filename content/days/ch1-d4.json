@@ -111,7 +111,11 @@
     },
     {
       "trigger": "resultReady",
-      "text": "Thấy dấu > thì kết quả vượt dải: bấm tỉ lệ pha loãng nhỏ nhất đưa được về dải đo. Thấy ‼️ thì gọi báo bác sĩ trong 15 phút."
+      "text": "Có kết quả rồi! Xem cờ H (cao), L (thấp), ‼️ rồi bấm Duyệt và gửi cho bác sĩ."
+    },
+    {
+      "trigger": "overRange",
+      "text": "Thấy dấu > nghĩa là kết quả vượt dải đo: bấm Pha loãng mẫu rồi chọn tỉ lệ nhỏ nhất đưa được về dải đo."
     }
   ],
   "codexOnStart": ["ch-qc", "ch-westgard", "ch-dilution"],

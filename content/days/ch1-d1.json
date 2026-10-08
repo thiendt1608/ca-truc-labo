@@ -89,6 +89,14 @@
     {
       "trigger": "resultReady",
       "text": "Có kết quả rồi! Xem cờ H (cao), L (thấp) rồi bấm Duyệt và gửi cho bác sĩ."
+    },
+    {
+      "trigger": "phoneRing",
+      "text": "Điện thoại đổ chuông! Bấm nút 📞: phiếu xong rồi thì báo kết quả, chưa xong thì cho biết giờ dự kiến."
+    },
+    {
+      "trigger": "eventDecision",
+      "text": "Việc này cần em quyết định. Giờ ca tạm dừng trong lúc em chọn, đọc kỹ rồi trả lời nhé."
     }
   ],
   "codexOnStart": ["ch-why-spin", "ch-balance"],

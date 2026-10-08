@@ -279,6 +279,10 @@ export const TipTriggerSchema = z.enum([
   'spill',
   'qcRun',
   'qcFailed',
+  'overRange',
+  'deltaFlag',
+  'phoneRing',
+  'eventDecision',
 ]);
 
 export const DayConfigSchema = z.object({

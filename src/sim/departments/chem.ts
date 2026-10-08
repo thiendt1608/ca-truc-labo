@@ -219,6 +219,11 @@ export function handleChem(ctx: Ctx, cmd: Command): boolean {
         // Nước tiểu làm lại = nhúng que mới (cùng mẫu nên cùng mức thật).
         order.status = 'waiting';
         moveSample(ctx, s.samples[order.sampleId]!, 'urine');
+        ctx.events.push({
+          type: 'notice',
+          tone: 'info',
+          text: 'Lọ nước tiểu quay lại Bàn nước tiểu để nhúng que lại.',
+        });
         return true;
       }
       order.status = 'running';
@@ -432,6 +437,8 @@ export function tickChem(ctx: Ctx) {
     a.current = null;
     ctx.events.push({ type: 'resultReady', orderId: order.id });
     tip(ctx, 'resultReady');
+    if (order.results.some((r) => r.overRange)) tip(ctx, 'overRange');
+    if (order.results.some((r) => r.delta)) tip(ctx, 'deltaFlag');
     if (unlocked(ctx, 'critical') && order.results.some((r) => r.critical) && !order.criticalCalled) {
       s.scheduled.push({ at: s.clock + 900, kind: 'criticalCheck', orderId: order.id });
       s.scheduled.sort((x, y) => x.at - y.at);

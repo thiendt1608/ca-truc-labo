@@ -5,7 +5,7 @@ import { AnalyzerSheet, CentrifugeSheet, PostSpinSheet, UrineSheet } from '../co
 import { DebugPanel } from '../components/DebugPanel';
 import { Hud } from '../components/Hud';
 import { Notices } from '../components/Notices';
-import { EventSheet, PhoneSheet } from '../components/EventSheets';
+import { CodexSheet, EventSheet, PhoneSheet } from '../components/EventSheets';
 import { QcSheet } from '../components/QcSheet';
 import { ResultsSheet } from '../components/ResultsSheet';
 import { SampleCard } from '../components/SampleCard';
@@ -61,6 +61,9 @@ export function Room() {
               />
               <span className="who">{who}</span>
               <span className="age">
+                <span className="letter-chip">
+                  {getContent().containers.find((c) => c.id === s.container)?.letter}
+                </span>{' '}
                 {s.id.toUpperCase()} · {waited}′
               </span>
             </button>
@@ -90,6 +93,10 @@ export function Room() {
             <span className="dot">{shift.pending.length}</span>
           </button>
         )}
+        <button onClick={() => setOverlay({ kind: 'codex' })}>
+          <span aria-hidden>📖</span>
+          <span>Sổ tay</span>
+        </button>
         <button onClick={() => setPaused(true)}>
           <span aria-hidden>☰</span>
           <span>Menu</span>
@@ -104,6 +111,7 @@ export function Room() {
       {overlay?.kind === 'qc' && <QcSheet />}
       {overlay?.kind === 'phone' && <PhoneSheet />}
       {overlay?.kind === 'event' && <EventSheet />}
+      {overlay?.kind === 'codex' && <CodexSheet />}
       {overlay?.kind === 'urine' && <UrineSheet />}
       {paused && (
         <div className="overlay" style={{ alignItems: 'center', background: 'var(--bg)' }}>

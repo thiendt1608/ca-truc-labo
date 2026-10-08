@@ -127,6 +127,8 @@ describe('pha loãng (ngày 1.4)', () => {
     expect(order.status).toBe('resulted');
     expect(over.length).toBeGreaterThan(0);
     expect(over[0]!.display).toMatch(/^>/);
+    expect(st.tipsShown).toContain('overRange');
+    expect(st.tipsShown).not.toContain('deltaFlag');
     const early = run(st, { type: 'releaseOrder', orderId: order.id });
     expect(early.ledger.some((m) => m.kind === 'releaseOverRange')).toBe(true);
   });
@@ -224,6 +226,7 @@ describe('Δ delta check (ngày 1.5)', () => {
     const { st, order } = withDelta();
     const results = st.orders[order.id]!.results!;
     expect(results.some((r) => r.delta?.previous !== undefined)).toBe(true);
+    expect(st.tipsShown).toContain('deltaFlag');
   });
 
   it('trả phiếu có Δ mà chưa làm lại bị trừ; làm lại để kiểm tra rồi trả thì không', () => {

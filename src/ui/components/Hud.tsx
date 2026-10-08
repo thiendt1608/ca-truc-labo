@@ -42,7 +42,10 @@ export function Hud() {
           {paused ? '▶' : '⏸'}
         </button>
       </div>
-      <div className="alertline">{alerts.join(' · ')}</div>
+      <div className="alertline">
+        {alerts.slice(0, 2).join(' · ')}
+        {alerts.length > 2 ? ` · +${alerts.length - 2} việc khác` : ''}
+      </div>
     </>
   );
 }

@@ -101,6 +101,10 @@
     {
       "trigger": "qcFailed",
       "text": "QC không đạt! Nhìn hình dạng biểu đồ để chọn cách khắc phục, đừng thử bừa vì mỗi cách tốn thời gian."
+    },
+    {
+      "trigger": "eventDecision",
+      "text": "Máy gặp sự cố, cần em quyết định. Tự sửa thì nhanh nhưng có thể không hết lỗi; gọi kỹ sư thì lâu nhưng chắc chắn."
     }
   ],
   "codexOnStart": ["ch-why-spin", "ch-balance", "ch-qc", "ch-westgard"],

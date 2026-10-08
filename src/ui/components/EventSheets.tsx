@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { getContent } from '../../sim';
 import { clockText, useGame } from '../../store/game';
+import { CodexCardView } from '../screens/Codex';
 import { Sheet } from './Overlay';
 
 /** S9 Cuộc gọi (lớp phủ, dừng giờ): khoa lâm sàng hỏi về một phiếu; chọn câu trả lời có sẵn. */
@@ -42,12 +43,38 @@ export function PhoneSheet() {
   );
 }
 
+/** Sổ tay trong ca (dừng giờ): các thẻ đã mở, chạm để đọc. Không rời phòng làm việc. */
+export function CodexSheet() {
+  const shift = useGame((s) => s.shift)!;
+  const saved = useGame((s) => s.save.codex);
+  const close = () => useGame.getState().setOverlay(null);
+  const [open, setOpen] = useState<string | null>(null);
+  const content = getContent();
+  const unlocked = new Set([...saved, ...shift.codexUnlocked]);
+  const cards = content.codex.filter((c) => unlocked.has(c.id));
+  return (
+    <Sheet title="📖 Sổ tay" onClose={close}>
+      <p className="muted">
+        Đã mở {cards.length}/{content.codex.length} thẻ. Giờ ca tạm dừng khi em đọc.
+      </p>
+      {cards.map((c) => (
+        <button key={c.id} style={{ textAlign: 'left' }} onClick={() => setOpen(c.id)}>
+          {c.title}
+        </button>
+      ))}
+      {open && <CodexCardView id={open} onClose={() => setOpen(null)} />}
+    </Sheet>
+  );
+}
+
 /** S9 Sự kiện (lớp phủ, dừng giờ): máy lỗi hoặc câu hỏi của sinh viên thực tập. */
 export function EventSheet() {
   const shift = useGame((s) => s.shift)!;
   const dispatch = useGame((s) => s.dispatch);
   const close = () => useGame.getState().setOverlay(null);
   const content = getContent();
+  const inlineTips = useGame((s) => s.inlineTips);
+  const dismissTip = useGame((s) => s.dismissTip);
   const ev = shift.pending[0];
   // Hết việc cần quyết định thì tự đóng, không để lại sheet trống.
   useEffect(() => {
@@ -58,6 +85,13 @@ export function EventSheet() {
   const quiz = ev.quizId ? content.events.quizzes.find((q) => q.id === ev.quizId) : undefined;
   return (
     <Sheet title={def.title} onClose={close}>
+      {inlineTips.map((tp) => (
+        <button key={tp.id} className="tip-inline" onClick={() => dismissTip(tp.id)}>
+          <b>💬 Chị Hạnh</b>
+          {tp.text}
+          <span className="muted"> (chạm để đóng)</span>
+        </button>
+      ))}
       <p>{quiz ? quiz.question : def.text}</p>
       <div className="stack">
         {quiz

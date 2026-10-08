@@ -30,6 +30,7 @@ export type Overlay =
   | { kind: 'urine' }
   | { kind: 'phone' }
   | { kind: 'event' }
+  | { kind: 'codex' }
   | { kind: 'baskets' };
 
 export interface Toast {
@@ -49,9 +50,9 @@ export function timeScale(durationSeconds: number): number {
 const DIFFICULTY_SPEED: Record<Difficulty, number> = { easy: 0.6, normal: 1, hard: 1.2 };
 const MAX_TOASTS = 2;
 /** Màn quyết định lớn: dừng giờ khi đang mở (04-GDD mục 4). */
-const DECISION_SCREENS: readonly string[] = ['qc', 'phone', 'event'];
+const DECISION_SCREENS: readonly string[] = ['qc', 'phone', 'event', 'codex'];
 /** Mẹo chỉ có nghĩa khi đang mở QC sheet, nên không xếp hàng chung với mẹo của phòng. */
-const INLINE_TIPS: readonly string[] = ['qcRun', 'qcFailed'];
+const INLINE_TIPS: readonly string[] = ['qcRun', 'qcFailed', 'eventDecision'];
 
 /** Thêm thông báo; thông báo trùng nội dung được gộp thành "×n" thay vì xếp chồng. */
 export function pushToasts(current: Toast[], incoming: Omit<Toast, 'count'>[]): Toast[] {
@@ -250,7 +251,7 @@ export const useGame = create<GameStore>((set, getState) => {
       set({ speed });
     },
     setOverlay(overlay) {
-      set(overlay?.kind === 'qc' ? { overlay } : { overlay, inlineTips: [] });
+      set(overlay?.kind === 'qc' || overlay?.kind === 'event' ? { overlay } : { overlay, inlineTips: [] });
     },
     dismissTip(id) {
       set((st) => ({

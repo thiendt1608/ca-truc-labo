@@ -530,16 +530,27 @@ button.small {
 }
 
 /* Thông báo */
-.toasts {
+.floaters {
   position: absolute;
   left: 8px;
   right: 8px;
-  top: 96px;
+  bottom: 84px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   z-index: 60;
   pointer-events: none;
+}
+.floaters.in-mg {
+  bottom: 16px;
+}
+.floaters .tip {
+  pointer-events: auto;
+}
+.toasts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 .toast {
   pointer-events: none;
@@ -559,11 +570,6 @@ button.small {
   border-left: 6px solid var(--good);
 }
 .tip {
-  position: absolute;
-  left: 8px;
-  right: 8px;
-  bottom: 84px;
-  z-index: 30;
   padding: 12px 14px;
   border-radius: var(--radius-lg);
   background: #dfeafb;
@@ -813,7 +819,8 @@ button.small {
   position: absolute;
   right: 8px;
   top: 64px;
-  z-index: 70;
+  /* Thấp hơn lớp phủ (20) để không đè header sheet; đóng sheet là dùng lại được. */
+  z-index: 15;
 }
 .debug .panel {
   position: absolute;
@@ -1152,13 +1159,31 @@ button.small {
   white-space: nowrap;
 }
 
-/* Mini-game toàn màn: thông báo nằm đáy để không che nội dung phía trên */
-.toasts.in-mg {
-  top: auto;
-  bottom: 16px;
-}
-
 /* Điện thoại đổ chuông */
 .dot.ring {
   animation: bob 0.6s ease-in-out infinite;
+}
+
+/* Chữ cái nắp ống đủ lớn để đọc (chữ trong hình ống quá nhỏ ở khay) */
+.letter-chip {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  padding: 0 6px;
+  border-radius: 9999px;
+  background: var(--panel-2);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.chip.selected::before {
+  content: '✓ ';
+  font-weight: 700;
+}
+
+/* Thanh lệnh 5 nút ở 360px: bỏ lề thừa để chữ không xuống dòng quá nhiều */
+.navbar button {
+  padding-left: 4px;
+  padding-right: 4px;
+  min-width: 0;
 }

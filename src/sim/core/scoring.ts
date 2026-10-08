@@ -59,7 +59,6 @@ export function computeReport(s: ShiftState, _content?: Content): ShiftReport {
     })
     .slice(0, 5);
 
-  const statOrders = Object.values(s.orders).filter((o) => o.priority === 'stat');
   const statDone = s.timeliness.filter((t) => t.weight === 2);
   return {
     accuracy,
@@ -77,7 +76,8 @@ export function computeReport(s: ShiftState, _content?: Content): ShiftReport {
       decisions: s.decisions.total,
       releases: s.releases.total,
       mistakes: s.ledger.length,
-      statOnTime: `${statDone.filter((t) => t.onTime).length}/${Math.max(statDone.length, statOrders.length)}`,
+      // Chỉ tính các phiếu cấp cứu đã có kết quả (hoặc đã trễ): phiếu chưa tới hạn khi hết ca không phải là trễ.
+      statOnTime: `${statDone.filter((t) => t.onTime).length}/${statDone.length}`,
     },
   };
 }

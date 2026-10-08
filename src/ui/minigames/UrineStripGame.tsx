@@ -33,28 +33,39 @@ export function UrineStripGame({
   const dipAt = useRef<number | null>(null);
   const [started, setStarted] = useState(false);
   const [elapsed, setElapsed] = useState(0);
-  const [actions, setActions] = useState<PlayerAction[]>([]);
   const [answers, setAnswers] = useState<Record<string, number>>({});
+  const actionsRef = useRef<PlayerAction[]>([]);
+  const doneRef = useRef(false);
 
   useEffect(() => {
     if (!started) return;
-    const id = window.setInterval(() => setElapsed(sinceDip(dipAt)), 80);
+    const id = window.setInterval(() => {
+      const e = sinceDip(dipAt);
+      setElapsed(e);
+      // Hết thời gian: nộp những ô đã chọn, ô bỏ trống tính là mức 0.
+      if (e >= input.timeLimitMs && !doneRef.current) {
+        doneRef.current = true;
+        onDone([...actionsRef.current, { t: e, type: 'done' }]);
+      }
+    }, 80);
     return () => window.clearInterval(id);
-  }, [started]);
+  }, [started, input.timeLimitMs, onDone]);
 
   const dip = () => {
     dipAt.current = performance.now();
     setStarted(true);
-    setActions([{ t: 0, type: 'tap', id: 'dip' }]);
+    actionsRef.current = [{ t: 0, type: 'tap', id: 'dip' }];
   };
   const answer = (padId: string, level: number) => {
     const t = sinceDip(dipAt);
-    setActions((a) => [...a, { t, type: 'tap', id: `${padId}:${level}` }]);
+    actionsRef.current = [...actionsRef.current, { t, type: 'tap', id: `${padId}:${level}` }];
     setAnswers((a) => ({ ...a, [padId]: level }));
   };
   const finish = () => {
+    if (doneRef.current) return;
+    doneRef.current = true;
     const t = sinceDip(dipAt);
-    onDone([...actions, { t, type: 'done' }]);
+    onDone([...actionsRef.current, { t, type: 'done' }]);
   };
 
   if (!started) {
@@ -76,7 +87,9 @@ export function UrineStripGame({
   return (
     <div className="stack">
       <div className="row sticky-bar">
-        <b className="grow">⏱ {simSeconds} giây</b>
+        <b className="grow">
+          ⏱ {simSeconds} giây · còn {Math.max(0, Math.ceil((input.timeLimitMs - elapsed) / 1000))} giây thật
+        </b>
         <button className="primary small" disabled={!answered} onClick={finish}>
           ✅ Xong
         </button>

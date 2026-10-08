@@ -126,7 +126,15 @@
     },
     {
       "trigger": "resultReady",
-      "text": "Có kết quả! Thấy cờ Δ thì bấm Làm lại để kiểm tra; vẫn lệch mà nghi nhầm người thì Huỷ, lấy mẫu mới."
+      "text": "Có kết quả rồi! Xem cờ rồi bấm Duyệt và gửi cho bác sĩ."
+    },
+    {
+      "trigger": "deltaFlag",
+      "text": "Có cờ Δ: kết quả khác nhiều so với lần trước. Bấm Làm lại để kiểm tra; vẫn lệch mà nghi nhầm người thì Huỷ, lấy mẫu mới."
+    },
+    {
+      "trigger": "overRange",
+      "text": "Thấy dấu > nghĩa là kết quả vượt dải đo: bấm Pha loãng mẫu rồi chọn tỉ lệ nhỏ nhất đưa được về dải đo."
     }
   ],
   "codexOnStart": ["ch-urine", "ch-delta"],
@@ -165,6 +173,14 @@
     {
       "id": "E10",
       "at": 13000
+    },
+    {
+      "id": "E2",
+      "at": 7200
+    },
+    {
+      "id": "E2",
+      "at": 10800
     }
   ]
 }

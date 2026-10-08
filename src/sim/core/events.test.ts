@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { runBot } from '../bots/bots';
 import { getContent } from '../content/bundled';
 import type { Content } from '../content/load';
+import { computeReport } from './scoring';
 import type { EventId } from '../content/schema';
 import { advance, applyCommand, createShift, hashState, replay } from './engine';
 import type { Command, ShiftState } from './types';
@@ -157,6 +158,22 @@ describe('điện thoại', () => {
     const s = go(c, start(c, 'ch1-d1'), 1400);
     expect(s.phone.missed).toBe(3);
     expect(s.ledger.some((m) => m.kind === 'phoneMissed')).toBe(true);
+  });
+});
+
+describe('ngày 1.5 với nội dung thật', () => {
+  it('không bắt máy 3 cuộc gọi trong ngày thì bị tính bỏ lỡ nhiều cuộc gọi', () => {
+    const { state } = runBot(getContent(), 'ch1-d5', 'idle-calls', 'idle');
+    expect(state.phone.missed).toBe(3);
+    expect(state.ledger.some((m) => m.kind === 'phoneMissed')).toBe(true);
+  });
+
+  it('báo cáo không coi phiếu cấp cứu chưa tới hạn khi hết ca là trễ hẹn', () => {
+    const c = only('ch1-d1', []);
+    const s = go(c, start(c, 'ch1-d1'), 200);
+    expect(computeReport(s).counts.statOnTime).toMatch(/^0\/\d+$/);
+    const pending = computeReport(s).counts.statOnTime;
+    expect(pending).toBe('0/0'); // chưa có phiếu cấp cứu nào hoàn tất hay trễ
   });
 });
 

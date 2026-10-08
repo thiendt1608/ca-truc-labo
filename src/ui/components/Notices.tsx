@@ -49,9 +49,17 @@ export function Notices() {
   }, []);
 
   const tip = busy ? undefined : tips[0];
+  // Mẹo và thông báo cùng nằm ở đáy (trên thanh lệnh) để không che HUD và khay mẫu.
   return (
-    <>
-      <div className={`toasts ${inMinigame ? 'in-mg' : ''}`} aria-live="polite">
+    <div className={`floaters ${inMinigame ? 'in-mg' : ''}`}>
+      {tip && (
+        <button className="tip" onClick={() => dismissTip(tip.id)}>
+          <b>💬 {mentor ? t(`mentor.${mentor}`) : 'Người hướng dẫn'}</b>
+          {tip.text}
+          <span className="muted"> (chạm để đóng)</span>
+        </button>
+      )}
+      <div className="toasts" aria-live="polite">
         {toasts.map((x) => (
           <div key={x.id} className={`toast ${x.kind}`}>
             {x.kind === 'mistake' ? '❌ ' : x.kind === 'good' ? '✅ ' : 'ℹ️ '}
@@ -60,13 +68,6 @@ export function Notices() {
           </div>
         ))}
       </div>
-      {tip && (
-        <button className="tip" onClick={() => dismissTip(tip.id)}>
-          <b>💬 {mentor ? t(`mentor.${mentor}`) : 'Người hướng dẫn'}</b>
-          {tip.text}
-          <span className="muted"> (chạm để đóng)</span>
-        </button>
-      )}
-    </>
+    </div>
   );
 }
