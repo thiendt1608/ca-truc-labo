@@ -63,7 +63,7 @@ export function crossCheck(c: Content): ContentProblem[] {
   for (const t of c.tests) {
     for (const ct of t.containers)
       if (!containerIds.has(ct)) add(`tests/${t.code}`, `ống không tồn tại: ${ct}`);
-    if (t.dept === 'chem' && !c.chemTestByCode.has(t.code))
+    if (t.dept === 'chem' && !t.manual && !c.chemTestByCode.has(t.code))
       add(`tests/${t.code}`, 'xét nghiệm hoá sinh chưa có trong chem/tests.json');
   }
   for (const ct of c.chemTests) {
@@ -71,6 +71,17 @@ export function crossCheck(c: Content): ContentProblem[] {
       if (!(a.code in c.profiles.base))
         add(`chem/tests/${ct.code}`, `thiếu giá trị nền cho ${a.code} trong profiles.json`);
     }
+  }
+  const padIds = new Set(c.chemUrine.pads.map((p) => p.id));
+  for (const pad of c.chemUrine.pads) {
+    if (pad.colors.length !== pad.levels.length) add(`chem/urine/${pad.id}`, 'số màu phải bằng số mức');
+    if (pad.normal.some((n) => n >= pad.levels.length))
+      add(`chem/urine/${pad.id}`, 'mức bình thường vượt số mức');
+  }
+  for (const [prof, pads] of Object.entries(c.chemUrine.profiles)) {
+    if (!profileIds.has(prof)) add(`chem/urine/profiles/${prof}`, 'hồ sơ không tồn tại');
+    for (const id of Object.keys(pads))
+      if (!padIds.has(id)) add(`chem/urine/profiles/${prof}`, `ô không tồn tại: ${id}`);
   }
   for (const o of c.orderTypes) {
     for (const code of o.testsFrom) {
@@ -88,6 +99,8 @@ export function crossCheck(c: Content): ContentProblem[] {
     }
   }
   const codexRefs: [string, string][] = [
+    ['chem/rules/dilution', c.chemRules.dilution.codex],
+    ['chem/rules/delta', c.chemRules.delta.codex],
     ...c.receptionRules.defects.map((d) => [`reception-rules/${d.defect}`, d.codex] as [string, string]),
     ['reception-rules/irreplaceable', c.receptionRules.irreplaceable.codex],
     ['chem/rules/hemolysis', c.chemRules.hemolysis.codex],
@@ -100,6 +113,7 @@ export function crossCheck(c: Content): ContentProblem[] {
     ),
     ['reception-rules/irreplaceable', c.receptionRules.irreplaceable.explanationKey],
     ['chem/rules/hemolysis', c.chemRules.hemolysis.explanationKey],
+    ['chem/rules/dilution', c.chemRules.dilution.explanationKey],
     ...Object.entries(c.chemQc.scenarios).flatMap(([id, sc]) => {
       codexRefs.push([`chem/qc/${id}`, sc.codex]);
       return [[`chem/qc/${id}`, sc.explanationKey]] as [string, string][];
@@ -120,6 +134,8 @@ export function crossCheck(c: Content): ContentProblem[] {
     for (const s of d.scripted) {
       if (s.orderType && !c.orderTypeById.has(s.orderType))
         add(where, `kịch bản #${s.index}: loại phiếu ${s.orderType} không tồn tại`);
+      if (s.profile && !profileIds.has(s.profile))
+        add(where, `kịch bản #${s.index}: hồ sơ ${s.profile} không tồn tại`);
       const ot = s.orderType ? c.orderTypeById.get(s.orderType) : undefined;
       for (const code of s.tests ?? []) {
         if (ot && !ot.testsFrom.includes(code))

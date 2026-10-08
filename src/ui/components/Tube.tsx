@@ -24,6 +24,24 @@ export function Tube({
   underfill?: boolean;
 }) {
   const c = getContent().containers.find((x) => x.id === container)!;
+  if (c.kind === 'cup') {
+    return (
+      <svg
+        width={size}
+        height={size * 1.2}
+        viewBox="0 0 40 48"
+        role="img"
+        aria-label={`${c.name} (${c.letter})`}
+      >
+        <path d="M8 12 L12 44 H28 L32 12 Z" fill="#fff8dc" stroke="#8a96a3" strokeWidth="1.5" />
+        <path d="M10 24 L12 44 H28 L30 24 Z" fill="#f1cf4a" />
+        <rect x="6" y="4" width="28" height="9" rx="3" fill={c.color} stroke="#00000033" />
+        <text x="20" y="36" textAnchor="middle" fontSize="11" fontWeight="700" fill="#5d534a">
+          {c.letter}
+        </text>
+      </svg>
+    );
+  }
   const h = size * 1.6;
   const fillTop = underfill ? 0.62 : 0.32;
   return (

@@ -1,6 +1,8 @@
 import type { Content } from '../content/load';
 import type { RejectReason } from '../content/schema';
 import { changeTrust, newId, recordMistake, tip, unlocked, type Ctx } from '../core/context';
+import type { UrineScore } from '../minigames/urineStrip';
+import { generateUrine } from '../minigames/urineStrip';
 import { makeSample } from '../core/generator';
 import { measure } from '../core/results';
 import type { ChemState, Command, Order, Sample } from '../core/types';
@@ -106,7 +108,8 @@ export function onTrayDecision(ctx: Ctx, sample: Sample, decision: 'accept' | 'r
   const order = ctx.s.orders[sample.orderId]!;
   if (decision === 'accept') {
     const container = ctx.content.containers.find((c) => c.id === sample.container);
-    moveSample(ctx, sample, container?.spin === false ? 'spun' : 'bench');
+    const urine = order.tests.includes('UA');
+    moveSample(ctx, sample, urine ? 'urine' : container?.spin === false ? 'spun' : 'bench');
   } else if (decision === 'reject') {
     moveSample(ctx, sample, 'rejected');
     scheduleRecollect(ctx, order);
@@ -207,8 +210,60 @@ export function handleChem(ctx: Ctx, cmd: Command): boolean {
     case 'rerunOrder': {
       const order = s.orders[cmd.orderId];
       if (!order || order.status !== 'resulted') return invalid(ctx, 'Phiếu chưa có kết quả.');
-      order.status = 'running';
       order.results = undefined;
+      order.deltaChecked = true;
+      if (order.tests.includes('UA')) {
+        // Nước tiểu làm lại = nhúng que mới (cùng mẫu nên cùng mức thật).
+        order.status = 'waiting';
+        moveSample(ctx, s.samples[order.sampleId]!, 'urine');
+        return true;
+      }
+      order.status = 'running';
+      chem(ctx).analyzer.queue.push(order.id);
+      return true;
+    }
+    case 'chem/startUrine': {
+      const sample = s.samples[cmd.sampleId];
+      if (!unlocked(ctx, 'urine')) return invalid(ctx, 'Hôm nay chưa dùng que thử nước tiểu.');
+      if (!sample || sample.status !== 'urine' || !sample.urineSeed)
+        return invalid(ctx, 'Lọ này chưa sẵn sàng để nhúng que.');
+      if (s.minigame) return invalid(ctx, 'Đang làm một thao tác khác.');
+      startMinigame(ctx, 'urineStrip', 'urine', { seed: sample.urineSeed, sampleId: sample.id });
+      return true;
+    }
+    case 'chem/dilute': {
+      const order = s.orders[cmd.orderId];
+      const rules = ctx.content.chemRules.dilution;
+      if (!unlocked(ctx, 'dilution')) return invalid(ctx, 'Hôm nay chưa dùng pha loãng.');
+      if (!order || order.status !== 'resulted') return invalid(ctx, 'Phiếu chưa có kết quả.');
+      if (!rules.ratios.includes(cmd.ratio)) return invalid(ctx, 'Tỉ lệ pha loãng không hợp lệ.');
+      const over = (order.results ?? []).filter((r) => r.overRange);
+      if (over.length === 0) return invalid(ctx, 'Không có kết quả nào vượt dải đo.');
+      const sample = s.samples[order.sampleId]!;
+      const smallest = smallestDilution(
+        ctx.content,
+        sample,
+        over.map((r) => r.code),
+      );
+      s.decisions.total++;
+      if (cmd.ratio === smallest) {
+        s.decisions.correct++;
+        s.skills.push({ source: 'dilution', skill: 100 });
+      } else if (cmd.ratio > smallest) {
+        s.skills.push({ source: 'dilution', skill: 70 });
+      } else {
+        s.skills.push({ source: 'dilution', skill: 40 });
+        recordMistake(ctx, {
+          kind: 'dilutionTooSmall',
+          explanationKey: rules.explanationKey,
+          codex: rules.codex,
+          trustDelta: 0,
+          safetyPenalty: 0,
+          orderId: order.id,
+        });
+      }
+      order.dilution = { ratio: cmd.ratio, codes: over.map((r) => r.code) };
+      order.status = 'running';
       chem(ctx).analyzer.queue.push(order.id);
       return true;
     }
@@ -284,8 +339,55 @@ function releaseOrder(ctx: Ctx, orderId: string) {
       orderId,
       sampleId: sample.id,
     });
-  } else if (!order.qcFault) {
-    s.releases.correct++;
+  }
+  // Chỉ tính là sai nghiêm trọng khi đọc nhầm giữa bình thường và bất thường (lệch một mức cùng loại chỉ trừ điểm Tay nghề).
+  const wrongPads =
+    order.tests.includes('UA') && sample.urineSeed
+      ? (order.results ?? []).filter((r) => {
+          const pad = ctx.content.chemUrine.pads.find((p) => p.id === r.code)!;
+          const truth = generateUrine(sample.urineSeed!, s.difficulty).truth[r.code] ?? 0;
+          return pad.normal.includes(r.value) !== pad.normal.includes(truth);
+        })
+      : [];
+  const wrongUrine = wrongPads.length > 0;
+  const overRange = order.results?.some((r) => r.overRange) ?? false;
+  const unverifiedDelta = !order.deltaChecked && (order.results?.some((r) => r.delta) ?? false);
+  if (!problem && !order.qcFault && !overRange && !unverifiedDelta && !wrongUrine) s.releases.correct++;
+  if (!problem && wrongUrine) {
+    recordMistake(ctx, {
+      kind: 'releaseWrongUrine',
+      explanationKey: 'rule.releaseWrongUrine',
+      detail: ctx.content.i18n['urine.wrongPads']!.replace(
+        '{pads}',
+        wrongPads.map((r) => ctx.content.chemUrine.pads.find((p) => p.id === r.code)!.name).join(', '),
+      ),
+      codex: 'ch-urine',
+      trustDelta: -5,
+      safetyPenalty: 5,
+      orderId,
+      sampleId: sample.id,
+    });
+  }
+  if (!problem && overRange) {
+    recordMistake(ctx, {
+      kind: 'releaseOverRange',
+      explanationKey: 'rule.releaseOverRange',
+      codex: 'ch-dilution',
+      trustDelta: -5,
+      safetyPenalty: 5,
+      orderId,
+      sampleId: sample.id,
+    });
+  } else if (!problem && unverifiedDelta) {
+    recordMistake(ctx, {
+      kind: 'releaseUnverifiedDelta',
+      explanationKey: 'rule.releaseUnverifiedDelta',
+      codex: 'ch-delta',
+      trustDelta: -3,
+      safetyPenalty: 3,
+      orderId,
+      sampleId: sample.id,
+    });
   }
   if (order.qcFault) {
     // Hậu quả trễ của việc báo QC đạt nhầm: mỗi phiếu trừ 5 Niềm tin, tối đa 30 (04-GDD mục 6.1).
@@ -304,7 +406,26 @@ function releaseOrder(ctx: Ctx, orderId: string) {
   }
   const onTime = s.clock <= order.deadline;
   s.timeliness.push({ id: order.id, onTime, weight: order.priority === 'stat' ? 2 : 1 });
-  if (onTime && order.priority === 'stat' && !problem && !order.qcFault) changeTrust(ctx, 2);
+  if (
+    onTime &&
+    order.priority === 'stat' &&
+    !problem &&
+    !order.qcFault &&
+    !overRange &&
+    !unverifiedDelta &&
+    !wrongUrine
+  )
+    changeTrust(ctx, 2);
+}
+
+/** Tỉ lệ pha loãng nhỏ nhất đưa mọi chất vượt dải (`codes`) của mẫu vào dải đo. */
+export function smallestDilution(content: Content, sample: Sample, codes: string[]): number {
+  const analytes = content.chemTests.flatMap((t) => t.analytes);
+  const needed = Math.max(
+    ...codes.map((code) => (sample.hidden.truth[code] ?? 0) / analytes.find((a) => a.code === code)!.max),
+  );
+  const { ratios } = content.chemRules.dilution;
+  return ratios.find((x) => x >= needed) ?? ratios[ratios.length - 1]!;
 }
 
 /** Một giây game của phòng Hoá sinh. */
@@ -319,7 +440,12 @@ export function tickChem(ctx: Ctx) {
     const order = s.orders[a.current.orderId]!;
     const sample = s.samples[order.sampleId]!;
     const patient = s.patients[order.patientId]!;
-    order.results = measure(ctx, order, sample, patient);
+    const diluted = order.dilution;
+    const fresh = measure(ctx, order, sample, patient, diluted);
+    order.results = diluted
+      ? (order.results ?? []).map((r) => fresh.find((f) => f.code === r.code) ?? r)
+      : fresh;
+    order.dilution = undefined;
     if (qcBias(ctx) !== 0) order.qcFault = true;
     order.status = 'resulted';
     order.resultedAt = s.clock;
@@ -377,6 +503,29 @@ function finishSpin(ctx: Ctx, st: ChemState) {
   for (const id of sampleIds) moveSample(ctx, s.samples[id]!, 'spun');
   ctx.events.push({ type: 'centrifugeDone' });
   tip(ctx, 'centrifugeDone');
+}
+
+/** Sau mini-game que thử: mức người chơi đọc thành kết quả của phiếu. */
+export function onUrineRead(ctx: Ctx, sampleId: string | undefined, score: UrineScore) {
+  const sample = sampleId ? ctx.s.samples[sampleId] : undefined;
+  const order = sample ? ctx.s.orders[sample.orderId] : undefined;
+  if (!sample || !order) return;
+  order.results = ctx.content.chemUrine.pads.map((pad) => {
+    const level = score.reported[pad.id] ?? 0;
+    return {
+      code: pad.id,
+      value: level,
+      display: pad.levels[level]!,
+      flag: pad.normal.includes(level) ? '' : 'H',
+      critical: false,
+      overRange: false,
+    };
+  });
+  order.status = 'resulted';
+  order.resultedAt = ctx.s.clock;
+  moveSample(ctx, sample, 'done');
+  ctx.events.push({ type: 'resultReady', orderId: order.id });
+  tip(ctx, 'resultReady');
 }
 
 /** Sau mini-game dọn đổ vỡ: máy ly tâm dùng lại được. */

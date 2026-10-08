@@ -1071,3 +1071,50 @@ button.small {
   margin: 0;
   font-weight: 700;
 }
+
+/* Pha loãng, Δ */
+.dilute-box {
+  background: #fdf0d5;
+  border-color: var(--warn);
+}
+.delta-chip {
+  align-self: flex-start;
+  padding: 0 10px;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 14px;
+  background: var(--info);
+  color: #fff;
+}
+
+/* Que thử nước tiểu */
+.swatch {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 28px;
+  border-radius: 9999px;
+  box-shadow:
+    inset 0 2px 3px rgba(255, 255, 255, 0.5),
+    0 0 0 2px var(--edge);
+}
+.swatch.sm {
+  width: 22px;
+  height: 18px;
+}
+.chip.level {
+  gap: 6px;
+}
+.urine-pad {
+  padding: 10px 12px;
+}
+
+/* Thanh đồng hồ + nút Xong của mini-game que thử luôn thấy khi cuộn danh sách ô */
+.sticky-bar {
+  position: sticky;
+  top: -12px;
+  z-index: 5;
+  margin: -12px -12px 0;
+  padding: 10px 12px;
+  background: var(--bg);
+  border-bottom: 2px solid var(--line);
+}

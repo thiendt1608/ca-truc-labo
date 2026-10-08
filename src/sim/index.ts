@@ -8,4 +8,4 @@ export type { Content } from './content/load';
 export type * from './content/schema';
 export { expectedReception, evaluateDecision, isTimeSensitive } from './departments/reception';
 export { isBalanced, balanceSkill, expectedPostSpin } from './departments/chem';
-export { MINIGAMES, spillCleanup, holdTimer } from './minigames';
+export { MINIGAMES, spillCleanup, holdTimer, urineStrip } from './minigames';

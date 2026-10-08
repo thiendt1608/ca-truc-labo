@@ -43,5 +43,14 @@
     "kind": "tube",
     "color": "#7f8c8d",
     "spin": true
+  },
+  {
+    "id": "urine",
+    "name": "Lọ nước tiểu",
+    "letter": "U",
+    "additive": "Không có (lọ sạch)",
+    "kind": "cup",
+    "color": "#e0b422",
+    "spin": false
   }
 ]

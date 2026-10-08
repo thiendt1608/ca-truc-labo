@@ -2,11 +2,12 @@ import type { Content } from '../content/load';
 import { applyCommand, advance, createShift } from '../core/engine';
 import { createRng, hashSeed, type Rng } from '../core/rng';
 import type { Command, Difficulty, PlayerAction, ShiftState } from '../core/types';
-import { expectedPostSpin, isBalanced } from '../departments/chem';
+import { expectedPostSpin, isBalanced, smallestDilution } from '../departments/chem';
 import { expectedVerdict } from '../departments/chemQc';
 import type { QcRemedy } from '../content/schema';
 import { expectedReception } from '../departments/reception';
 import { spillCleanup } from '../minigames';
+import { generateUrine } from '../minigames/urineStrip';
 
 /**
  * Bot chơi headless để kiểm thử và cân bằng (07-TDD mục 6).
@@ -50,6 +51,19 @@ export function perfectSpillActions(seed: string, difficulty: Difficulty): Playe
 export function botCommands(state: ShiftState, content: Content, p: BotProfile, rng: Rng): Command[] {
   const t = state.clock;
   const cmds: Command[] = [];
+  if (state.minigame?.context === 'urine') {
+    const input = generateUrine(state.minigame.seed, state.difficulty);
+    const actions: PlayerAction[] = [{ t: 0, type: 'tap', id: 'dip' }];
+    for (const pad of input.pads) {
+      const truth = input.truth[pad.id]!;
+      const level = rng.chance(1 - (1 - p.spotOther) * 0.4) ? truth : rng.int(0, pad.levels.length - 1);
+      // Bot thành thạo chờ đủ thời điểm đọc; bot mới đôi khi đọc sớm.
+      const at = rng.chance(p.spotOther) ? pad.readAtMs + 200 : Math.round(pad.readAtMs * 0.4);
+      actions.push({ t: at, type: 'tap', id: `${pad.id}:${level}` });
+    }
+    actions.push({ t: 13000, type: 'done' });
+    return [{ t, type: 'minigameResult', taskId: state.minigame.taskId, actions }];
+  }
   if (state.minigame) {
     const actions = perfectSpillActions(state.minigame.seed, state.difficulty);
     if (p.spotOther < 1 && rng.chance(0.3))
@@ -112,6 +126,13 @@ export function botCommands(state: ShiftState, content: Content, p: BotProfile, 
     }
   }
 
+  // 1c) Bàn nước tiểu: nhúng que cho từng lọ đã nhận.
+  for (const id of byPriority(samples.filter((s) => s.status === 'urine').map((s) => s.id))) {
+    if (budget-- <= 0) break;
+    cmds.push({ t, type: 'chem/startUrine', sampleId: id });
+    break;
+  }
+
   // 2) Máy ly tâm.
   const c = state.chem.centrifuge;
   const bench = samples.filter((s) => s.status === 'bench').map((s) => s.id);
@@ -157,6 +178,24 @@ export function botCommands(state: ShiftState, content: Content, p: BotProfile, 
   // 5) Kết quả.
   for (const order of Object.values(state.orders).filter((o) => o.status === 'resulted')) {
     if (budget-- <= 0) break;
+    const sample = state.samples[order.sampleId]!;
+    const over = order.results?.filter((r) => r.overRange).map((r) => r.code) ?? [];
+    if (over.length > 0 && content.days.find((d) => d.id === state.dayId)?.unlocks.includes('dilution')) {
+      const right = smallestDilution(content, sample, over);
+      cmds.push({
+        t,
+        type: 'chem/dilute',
+        orderId: order.id,
+        ratio: rng.chance(p.spotOther) ? right : rng.pick(content.chemRules.dilution.ratios),
+      });
+      continue;
+    }
+    if (order.results?.some((r) => r.delta) && rng.chance(p.spotOther)) {
+      if (sample.hidden.wrongPatient) cmds.push({ t, type: 'cancelOrderRecollect', orderId: order.id });
+      else if (!order.deltaChecked) cmds.push({ t, type: 'rerunOrder', orderId: order.id });
+      else cmds.push({ t, type: 'releaseOrder', orderId: order.id });
+      continue;
+    }
     if (order.results?.some((r) => r.critical) && !order.criticalCalled)
       cmds.push({ t, type: 'callCritical', orderId: order.id });
     cmds.push({ t, type: 'releaseOrder', orderId: order.id });

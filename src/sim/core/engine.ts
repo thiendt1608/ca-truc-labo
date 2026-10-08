@@ -6,6 +6,7 @@ import {
   handleChem,
   initChem,
   onSpillCleaned,
+  onUrineRead,
   onTrayDecision,
   scheduleRecollect,
   tickChem,
@@ -13,6 +14,7 @@ import {
 import { finishCtx, makeCtx, recordMistake, tip, unlockCodex, type Ctx } from './context';
 import { buildSchedule } from './generator';
 import { finishMinigame, startMinigame } from './minigameHost';
+import type { UrineScore } from '../minigames/urineStrip';
 import { hashSeed } from './rng';
 import type { Command, Difficulty, ShiftState, StepResult } from './types';
 
@@ -117,6 +119,7 @@ function handle(ctx: Ctx, cmd: Command) {
       const mg = s.minigame;
       const r = finishMinigame(ctx, cmd.taskId, cmd.actions);
       if (r && mg?.context === 'spill') onSpillCleaned(ctx);
+      if (r && mg?.context === 'urine') onUrineRead(ctx, mg.sampleId, r.detail as UrineScore);
       return;
     }
     case 'debug/forceSpill':

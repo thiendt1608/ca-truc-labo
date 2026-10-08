@@ -4,34 +4,59 @@
     "dept": "chem",
     "count": [1, 3],
     "testsFrom": ["GLU", "URE", "CRE", "AST", "ALT", "ELEC", "CHOL", "TG", "TBIL", "URIC", "CRP"],
-    "container": { "stat": "green", "routine": "red" }
+    "container": {
+      "stat": "green",
+      "routine": "red"
+    }
   },
   {
     "id": "glucoseOnly",
     "dept": "chem",
     "count": [1, 1],
     "testsFrom": ["GLU"],
-    "container": { "stat": "grey", "routine": "grey" }
+    "container": {
+      "stat": "grey",
+      "routine": "grey"
+    }
   },
   {
     "id": "a1c",
     "dept": "chem",
     "count": [1, 1],
     "testsFrom": ["A1C"],
-    "container": { "stat": "purple", "routine": "purple" }
+    "container": {
+      "stat": "purple",
+      "routine": "purple"
+    }
   },
   {
     "id": "cbc",
     "dept": "heme",
     "count": [1, 1],
     "testsFrom": ["CBC"],
-    "container": { "stat": "purple", "routine": "purple" }
+    "container": {
+      "stat": "purple",
+      "routine": "purple"
+    }
   },
   {
     "id": "coag",
     "dept": "heme",
     "count": [1, 1],
     "testsFrom": ["COAG"],
-    "container": { "stat": "lightblue", "routine": "lightblue" }
+    "container": {
+      "stat": "lightblue",
+      "routine": "lightblue"
+    }
+  },
+  {
+    "id": "urine",
+    "dept": "chem",
+    "count": [1, 1],
+    "testsFrom": ["UA"],
+    "container": {
+      "stat": "urine",
+      "routine": "urine"
+    }
   }
 ]

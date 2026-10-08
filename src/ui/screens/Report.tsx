@@ -106,7 +106,7 @@ export function Report() {
         <button onClick={() => go('home')}>↩ Về sảnh</button>
         {nextDay && (
           <button className="primary grow2" onClick={() => openDay(nextDay.id)}>
-            ▶ Ngày tiếp theo
+            ▶ Ngày tiếp
           </button>
         )}
       </div>

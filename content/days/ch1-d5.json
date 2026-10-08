@@ -1,0 +1,136 @@
+{
+  "id": "ch1-d5",
+  "chapter": 1,
+  "day": 5,
+  "room": "chem",
+  "title": "Hoá sinh: nước tiểu, Δ và ngày bận nhất",
+  "mentor": "hanh",
+  "newThings": [
+    "Que thử nước tiểu 10 ô: so màu đúng thời điểm",
+    "Δ (delta check): kết quả khác nhiều so với lần trước",
+    "Ngày bận nhất của chương"
+  ],
+  "start": 25200,
+  "end": 39600,
+  "startTrust": 70,
+  "unlocks": [
+    "centrifuge",
+    "analyzer",
+    "release",
+    "postSpinCheck",
+    "qc",
+    "critical",
+    "dilution",
+    "delta",
+    "urine",
+    "releaseAllUnflagged"
+  ],
+  "tat": {
+    "stat": 3600,
+    "routine": 7200,
+    "reception": 900
+  },
+  "waves": [
+    {
+      "at": 0,
+      "count": 5,
+      "spread": 300
+    },
+    {
+      "at": 2400,
+      "count": 5,
+      "spread": 1200
+    },
+    {
+      "at": 5400,
+      "count": 6,
+      "spread": 1800
+    },
+    {
+      "at": 9000,
+      "count": 5,
+      "spread": 1800
+    }
+  ],
+  "orderTypes": {
+    "chemPanel": 5,
+    "glucoseOnly": 1,
+    "urine": 4
+  },
+  "defects": {
+    "labelMismatch": 0.1,
+    "hemolysis": 0.08,
+    "lipemia": 0.04
+  },
+  "profiles": {
+    "healthy": 5,
+    "diabetes": 2,
+    "kidney": 2,
+    "liver": 1,
+    "inflammation": 1,
+    "dehydration": 1,
+    "hyperglycemia": 1
+  },
+  "scripted": [
+    {
+      "index": 0,
+      "priority": "routine",
+      "orderType": "urine",
+      "profile": "diabetes",
+      "defects": []
+    },
+    {
+      "index": 1,
+      "priority": "routine",
+      "orderType": "chemPanel",
+      "tests": ["GLU", "CRE"],
+      "defects": [
+        {
+          "kind": "labelMismatch",
+          "field": "birthYear"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "priority": "routine",
+      "orderType": "urine",
+      "profile": "inflammation",
+      "defects": []
+    }
+  ],
+  "tips": [
+    {
+      "trigger": "sampleAccepted",
+      "text": "Ống máu đã nhận nằm chờ ở Máy ly tâm. Lọ nước tiểu thì sang Bàn nước tiểu để nhúng que."
+    },
+    {
+      "trigger": "centrifugeShake",
+      "text": "Máy rung vì lệch cân! Ống nào thiếu ống đối diện thì thêm một ống nước."
+    },
+    {
+      "trigger": "centrifugeDone",
+      "text": "Ly tâm xong, huyết thanh đã tách ra. Mở Khay sau ly tâm và nạp ống vào máy hoá sinh."
+    },
+    {
+      "trigger": "qcRun",
+      "text": "Mỗi chấm là một lần chạy control. Chấm nào vượt vạch ±2SD thì phải để ý, vượt ±3SD là loại."
+    },
+    {
+      "trigger": "qcFailed",
+      "text": "QC không đạt! Nhìn hình dạng biểu đồ để chọn cách khắc phục, đừng thử bừa vì mỗi cách tốn thời gian."
+    },
+    {
+      "trigger": "start",
+      "text": "Hôm nay có lọ nước tiểu và cờ Δ. Mẫu nước tiểu không cần ly tâm: nhận rồi ra Bàn nước tiểu nhúng que, so màu."
+    },
+    {
+      "trigger": "resultReady",
+      "text": "Có kết quả! Thấy cờ Δ thì bấm Làm lại để kiểm tra; vẫn lệch mà nghi nhầm người thì Huỷ, lấy mẫu mới."
+    }
+  ],
+  "codexOnStart": ["ch-urine", "ch-delta"],
+  "qc": {
+    "scenario": "badControl"
+  }
+}

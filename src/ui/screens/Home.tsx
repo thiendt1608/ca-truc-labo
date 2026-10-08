@@ -43,7 +43,7 @@ export function Home() {
           <div className="grow">
             <h1>CA TRỰC LABO</h1>
             <span className="muted">
-              Năm đầu đi làm · {played}/{days.length} ngày đã chơi
+              Năm đầu đi làm · {played}/{days.length} ngày trong bản này đã chơi
             </span>
           </div>
         </header>

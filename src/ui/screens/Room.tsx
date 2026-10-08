@@ -1,7 +1,7 @@
 import { getContent } from '../../sim';
 import { t } from '../../i18n';
 import { useGame } from '../../store/game';
-import { AnalyzerSheet, CentrifugeSheet, PostSpinSheet } from '../components/ChemStations';
+import { AnalyzerSheet, CentrifugeSheet, PostSpinSheet, UrineSheet } from '../components/ChemStations';
 import { DebugPanel } from '../components/DebugPanel';
 import { Hud } from '../components/Hud';
 import { Notices } from '../components/Notices';
@@ -85,6 +85,7 @@ export function Room() {
       {overlay?.kind === 'analyzer' && <AnalyzerSheet />}
       {overlay?.kind === 'results' && <ResultsSheet />}
       {overlay?.kind === 'qc' && <QcSheet />}
+      {overlay?.kind === 'urine' && <UrineSheet />}
       {paused && (
         <div className="overlay" style={{ alignItems: 'center', background: 'var(--bg)' }}>
           <div className="sheet stack" style={{ borderRadius: 16, margin: 16 }}>
@@ -171,12 +172,14 @@ function ChemStations() {
   const samples = Object.values(shift.samples);
   const bench = samples.filter((s) => s.status === 'bench').length;
   const spun = samples.filter((s) => s.status === 'spun').length;
+  const urineCount = samples.filter((s) => s.status === 'urine').length;
   const resulted = Object.values(shift.orders).filter((o) => o.status === 'resulted').length;
   const c = chem.centrifuge;
   const spin = getContent().chemRules.centrifuge.spinSeconds;
   const per = getContent().chemRules.analyzer.secondsPerSample;
   const a = chem.analyzer;
   const qc = chem.qc;
+  const unlocked = getContent().dayById.get(shift.dayId)!.unlocks;
   const qcBusy = !!qc && shift.clock < qc.blockedUntil;
   const cState = c.contaminated || c.unbalanced ? 'error' : c.running ? 'busy' : 'ready';
   return (
@@ -231,6 +234,16 @@ function ChemStations() {
         {spun > 0 && <span className="badge">{spun}</span>}
         <span className="status">{spun} ống chờ nạp máy</span>
       </button>
+      {unlocked.includes('urine') && (
+        <button className="station card" onClick={() => setOverlay({ kind: 'urine' })}>
+          <span className="station-head">
+            <span className="name">🧪 Bàn nước tiểu</span>
+            <Orb state={urineCount > 0 ? 'busy' : 'ready'} />
+          </span>
+          {urineCount > 0 && <span className="badge">{urineCount}</span>}
+          <span className="status">{urineCount} lọ chờ nhúng que</span>
+        </button>
+      )}
       <button className="station card" onClick={() => setOverlay({ kind: 'analyzer' })}>
         <span className="station-head">
           <span className="name">⚗️ Máy hoá sinh</span>

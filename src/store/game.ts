@@ -27,6 +27,7 @@ export type Overlay =
   | { kind: 'analyzer' }
   | { kind: 'results' }
   | { kind: 'qc' }
+  | { kind: 'urine' }
   | { kind: 'baskets' };
 
 export interface Toast {

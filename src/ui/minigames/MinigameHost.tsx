@@ -2,7 +2,9 @@ import { useMemo } from 'react';
 import { MINIGAMES, type PlayerAction } from '../../sim';
 import type { SpillInput } from '../../sim/minigames/spillCleanup';
 import { useGame } from '../../store/game';
+import type { UrineInput } from '../../sim/minigames/urineStrip';
 import { SequenceGame } from './SequenceGame';
+import { UrineStripGame } from './UrineStripGame';
 
 /** S6 Mini-game toàn màn hình. Đồng hồ ca vẫn chạy (04-GDD mục 4). */
 export function MinigameHost() {
@@ -22,10 +24,17 @@ export function MinigameHost() {
     <div className="mg" role="dialog" aria-label={spec.title}>
       <div className="mg-head">
         <span className="eyebrow">Thao tác kỹ thuật</span>
-        <h2>🧽 {spec.title}</h2>
-        <p className="muted">Một ống vỡ! Chạm các bước theo đúng thứ tự để dọn an toàn.</p>
+        <h2>
+          {spec.id === 'urineStrip' ? '🧪' : '🧽'} {spec.title}
+        </h2>
+        <p className="muted">
+          {spec.id === 'urineStrip'
+            ? 'Chọn mức khớp bảng màu cho từng ô, đúng thời điểm đọc.'
+            : 'Một ống vỡ! Chạm các bước theo đúng thứ tự để dọn an toàn.'}
+        </p>
       </div>
       <div className="mg-body">
+        {spec.id === 'urineStrip' && <UrineStripGame input={input as UrineInput} onDone={finish} />}
         {spec.id === 'spillCleanup' && (
           <SequenceGame input={input as SpillInput} hint={difficulty === 'easy'} onDone={finish} />
         )}

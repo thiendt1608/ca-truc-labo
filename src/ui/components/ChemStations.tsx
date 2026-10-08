@@ -225,3 +225,37 @@ export function AnalyzerSheet() {
     </Sheet>
   );
 }
+
+/** Bàn nước tiểu: lọ đã nhận chờ nhúng que (mini-game so màu). */
+export function UrineSheet() {
+  const shift = useGame((s) => s.shift)!;
+  const dispatch = useGame((s) => s.dispatch);
+  const close = () => useGame.getState().setOverlay(null);
+  const cups = Object.values(shift.samples).filter((s) => s.status === 'urine');
+  return (
+    <Sheet title="🧪 Bàn nước tiểu" onClose={close}>
+      {cups.length === 0 && <p className="muted">Chưa có lọ nước tiểu nào chờ. Nhận lọ ở khay trước.</p>}
+      {cups.map((s) => {
+        const o = shift.orders[s.orderId]!;
+        const who = shift.patients[o.patientId]?.name ?? s.id;
+        return (
+          <div key={s.id} className="row card">
+            <Tube container={s.container} size={26} />
+            <span className="grow">
+              {s.id.toUpperCase()} {o.priority === 'stat' ? '🚑' : ''} · {who}
+            </span>
+            <button
+              className="primary small"
+              onClick={() => {
+                dispatch({ type: 'chem/startUrine', sampleId: s.id });
+                close();
+              }}
+            >
+              Nhúng que
+            </button>
+          </div>
+        );
+      })}
+    </Sheet>
+  );
+}

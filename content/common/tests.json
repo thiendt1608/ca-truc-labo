@@ -1,16 +1,93 @@
 [
-  { "code": "GLU", "name": "Glucose", "dept": "chem", "containers": ["grey", "red", "green"] },
-  { "code": "URE", "name": "Urê", "dept": "chem", "containers": ["red", "green"] },
-  { "code": "CRE", "name": "Creatinin", "dept": "chem", "containers": ["red", "green"] },
-  { "code": "AST", "name": "AST (GOT)", "dept": "chem", "containers": ["red", "green"] },
-  { "code": "ALT", "name": "ALT (GPT)", "dept": "chem", "containers": ["red", "green"] },
-  { "code": "ELEC", "name": "Điện giải đồ", "dept": "chem", "containers": ["red", "green"] },
-  { "code": "CHOL", "name": "Cholesterol", "dept": "chem", "containers": ["red", "green"] },
-  { "code": "TG", "name": "Triglycerid", "dept": "chem", "containers": ["red", "green"] },
-  { "code": "TBIL", "name": "Bilirubin toàn phần", "dept": "chem", "containers": ["red", "green"] },
-  { "code": "URIC", "name": "Acid uric", "dept": "chem", "containers": ["red", "green"] },
-  { "code": "CRP", "name": "CRP", "dept": "chem", "containers": ["red", "green"] },
-  { "code": "A1C", "name": "HbA1c", "dept": "chem", "containers": ["purple"] },
-  { "code": "CBC", "name": "Công thức máu", "dept": "heme", "containers": ["purple"] },
-  { "code": "COAG", "name": "Đông máu (PT, APTT)", "dept": "heme", "containers": ["lightblue"] }
+  {
+    "code": "GLU",
+    "name": "Glucose",
+    "dept": "chem",
+    "containers": ["grey", "red", "green"]
+  },
+  {
+    "code": "URE",
+    "name": "Urê",
+    "dept": "chem",
+    "containers": ["red", "green"]
+  },
+  {
+    "code": "CRE",
+    "name": "Creatinin",
+    "dept": "chem",
+    "containers": ["red", "green"]
+  },
+  {
+    "code": "AST",
+    "name": "AST (GOT)",
+    "dept": "chem",
+    "containers": ["red", "green"]
+  },
+  {
+    "code": "ALT",
+    "name": "ALT (GPT)",
+    "dept": "chem",
+    "containers": ["red", "green"]
+  },
+  {
+    "code": "ELEC",
+    "name": "Điện giải đồ",
+    "dept": "chem",
+    "containers": ["red", "green"]
+  },
+  {
+    "code": "CHOL",
+    "name": "Cholesterol",
+    "dept": "chem",
+    "containers": ["red", "green"]
+  },
+  {
+    "code": "TG",
+    "name": "Triglycerid",
+    "dept": "chem",
+    "containers": ["red", "green"]
+  },
+  {
+    "code": "TBIL",
+    "name": "Bilirubin toàn phần",
+    "dept": "chem",
+    "containers": ["red", "green"]
+  },
+  {
+    "code": "URIC",
+    "name": "Acid uric",
+    "dept": "chem",
+    "containers": ["red", "green"]
+  },
+  {
+    "code": "CRP",
+    "name": "CRP",
+    "dept": "chem",
+    "containers": ["red", "green"]
+  },
+  {
+    "code": "A1C",
+    "name": "HbA1c",
+    "dept": "chem",
+    "containers": ["purple"]
+  },
+  {
+    "code": "CBC",
+    "name": "Công thức máu",
+    "dept": "heme",
+    "containers": ["purple"]
+  },
+  {
+    "code": "COAG",
+    "name": "Đông máu (PT, APTT)",
+    "dept": "heme",
+    "containers": ["lightblue"]
+  },
+  {
+    "code": "UA",
+    "name": "Tổng phân tích nước tiểu",
+    "dept": "chem",
+    "containers": ["urine"],
+    "manual": true
+  }
 ]

@@ -78,5 +78,29 @@
     "body": "Một điểm lệch rồi hết: ngẫu nhiên, chạy lại control. Chỉ một mức lệch: lọ control hỏng. Cả hai mức lệch cùng hướng và vượt 3SD: hoá chất. Trôi dần: hiệu chuẩn. Hai mức lệch ngược chiều: phần cứng.",
     "more": "Trong thực tế nhiều nguyên nhân có thể chồng nhau; game đơn giản hoá thành một nguyên nhân cho mỗi hình dạng.",
     "source": ["05-noi-dung-chuyen-mon.md mục 2.5"]
+  },
+  {
+    "id": "ch-dilution",
+    "dept": "chem",
+    "title": "Pha loãng mẫu",
+    "body": "Máy chỉ đo chính xác trong một dải. Kết quả hiện dấu \">\" nghĩa là vượt dải: pha loãng mẫu (1:2, 1:5, 1:10), chạy lại, rồi nhân kết quả với hệ số pha loãng.",
+    "more": "Chọn tỉ lệ nhỏ nhất đưa kết quả vào dải đo. Pha loãng quá nhiều làm sai số nhân lên.",
+    "source": ["05-noi-dung-chuyen-mon.md mục 2.3"]
+  },
+  {
+    "id": "ch-delta",
+    "dept": "chem",
+    "title": "Delta check (Δ)",
+    "body": "So kết quả với lần xét nghiệm trước của cùng bệnh nhân. Nếu khác nhiều bất thường thì nghi nhầm người hoặc lỗi đo: làm lại, và nếu vẫn lệch thì huỷ, lấy mẫu mới.",
+    "more": "Đôi khi bệnh nhân thật sự thay đổi (mất nước, bệnh nặng lên). Làm lại giúp phân biệt lỗi với thay đổi thật.",
+    "source": ["05-noi-dung-chuyen-mon.md mục 2.1", "CLSI EP33 (delta check)"]
+  },
+  {
+    "id": "ch-urine",
+    "dept": "chem",
+    "title": "Que thử nước tiểu 10 thông số",
+    "body": "Nhúng que vào nước tiểu rồi so màu từng ô với bảng màu. Mỗi ô có thời điểm đọc riêng: glucose và bilirubin sớm nhất (30 giây), bạch cầu muộn nhất (2 phút). Đọc sớm thì màu chưa lên, đọc muộn thì màu đã đổi.",
+    "more": "Máy đọc que nước tiểu tự động làm việc này, nhưng vẫn phải biết đọc bằng mắt để kiểm tra khi máy lỗi.",
+    "source": ["05-noi-dung-chuyen-mon.md mục 2.4"]
   }
 ]

@@ -41,6 +41,10 @@ function OrderCard({ order }: { order: Order }) {
   const patient = shift.patients[order.patientId]!;
   const critical = order.results?.some((r) => r.critical);
   const late = shift.clock > order.deadline;
+  const analytes = content.chemTests.flatMap((x) => x.analytes);
+  const urinePads = content.chemUrine.pads;
+  const overRange = order.results?.filter((r) => r.overRange) ?? [];
+  const hasDelta = order.results?.some((r) => r.delta);
   return (
     <div className="card stack">
       <div className="row">
@@ -54,27 +58,79 @@ function OrderCard({ order }: { order: Order }) {
       </div>
       <div className="result-grid">
         {order.results?.map((r) => {
-          const a = content.chemTests.flatMap((x) => x.analytes).find((x) => x.code === r.code)!;
+          const pad = urinePads.find((x) => x.id === r.code);
+          if (pad) {
+            return (
+              <div key={r.code} className={`result-cell ${r.flag ? 'abn' : 'ok'}`}>
+                <span className="rname">{pad.name}</span>
+                <span className="rverdict">{r.flag ? '▲ Bất thường' : 'Bình thường'}</span>
+                <b className="rval">{r.display}</b>
+              </div>
+            );
+          }
+          const a = analytes.find((x) => x.code === r.code)!;
           const [lo, hi] = patient.sex === 'F' && a.refF ? a.refF : a.ref;
           const verdict = r.critical
             ? '‼️ Nguy hiểm'
-            : r.flag === 'H'
-              ? '▲ Cao'
-              : r.flag === 'L'
-                ? '▼ Thấp'
-                : 'Chuẩn';
+            : r.overRange
+              ? '⚠ Vượt dải đo'
+              : r.flag === 'H'
+                ? '▲ Cao'
+                : r.flag === 'L'
+                  ? '▼ Thấp'
+                  : 'Chuẩn';
           return (
-            <div key={r.code} className={`result-cell ${r.critical ? 'crit' : r.flag ? 'abn' : 'ok'}`}>
+            <div
+              key={r.code}
+              className={`result-cell ${r.critical ? 'crit' : r.flag || r.overRange ? 'abn' : 'ok'}`}
+            >
               <span className="rname">{a.name}</span>
               <span className="rverdict">{verdict}</span>
               <span>
                 <b className="rval">{r.display}</b> <span className="muted">{a.unit}</span>
               </span>
+              {r.dilution && !r.overRange && (
+                <span className="muted">
+                  Đo {r.dilution.reading} × {r.dilution.ratio} (pha loãng 1:{r.dilution.ratio})
+                </span>
+              )}
+              {r.delta && (
+                <span className="delta-chip">
+                  Δ Lần trước: {r.delta.previous}
+                  {order.deltaChecked ? ' · đã làm lại, vẫn lệch' : ''}
+                </span>
+              )}
               <span className="muted">Chuẩn: {lo === 0 ? `≤ ${hi}` : `${lo}–${hi}`}</span>
             </div>
           );
         })}
       </div>
+      {overRange.length > 0 && day.unlocks.includes('dilution') && (
+        <div className="card stack dilute-box">
+          <b>⚠ Có kết quả vượt dải đo ({overRange.map((r) => r.display).join(', ')})</b>
+          <span className="muted">
+            Pha loãng mẫu, chạy lại rồi nhân với hệ số. Chọn tỉ lệ nhỏ nhất đưa kết quả vào dải đo.
+          </span>
+          <div className="row wrap">
+            {content.chemRules.dilution.ratios.map((ratio) => (
+              <button
+                key={ratio}
+                className="grow"
+                onClick={() => dispatch({ type: 'chem/dilute', orderId: order.id, ratio })}
+              >
+                1:{ratio}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {hasDelta && (
+        <p className="muted">
+          {order.deltaChecked
+            ? 'Đã làm lại mà vẫn lệch. Nghi nhầm người thì Huỷ, lấy mẫu mới; nếu bệnh nhân thật sự thay đổi thì có thể trả.'
+            : 'Δ: kết quả khác nhiều so với lần trước. Bấm Làm lại để kiểm tra; vẫn lệch mà nghi nhầm người thì Huỷ, lấy mẫu mới.'}
+        </p>
+      )}
       <button className="primary" onClick={() => dispatch({ type: 'releaseOrder', orderId: order.id })}>
         ✅ Duyệt và gửi
       </button>
@@ -96,6 +152,7 @@ function OrderCard({ order }: { order: Order }) {
             📞 Gọi báo ‼️
           </button>
         )}
+        {critical && order.criticalCalled && <span className="pill">✅ Đã báo bác sĩ</span>}
       </div>
     </div>
   );

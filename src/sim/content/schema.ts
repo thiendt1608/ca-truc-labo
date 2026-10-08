@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 export const DeptIdSchema = z.enum(['chem', 'heme', 'micro', 'immuno', 'patho']);
 export const RoomIdSchema = z.enum(['reception', 'chem', 'heme', 'micro', 'immuno', 'patho']);
-export const ContainerIdSchema = z.enum(['purple', 'lightblue', 'green', 'red', 'grey']);
+export const ContainerIdSchema = z.enum(['purple', 'lightblue', 'green', 'red', 'grey', 'urine']);
 export const PrioritySchema = z.enum(['routine', 'stat']);
 export const RejectReasonSchema = z.enum(['identity', 'container', 'volume', 'time', 'leak', 'hemolysis']);
 export const LabelFieldSchema = z.enum(['name', 'birthYear', 'patientCode']);
@@ -37,7 +37,7 @@ export const ContainerSchema = z.object({
   name: z.string(),
   letter: z.string().length(1),
   additive: z.string(),
-  kind: z.literal('tube'),
+  kind: z.enum(['tube', 'cup']),
   color: z.string().regex(/^#[0-9a-f]{6}$/i),
   spin: z.boolean(),
 });
@@ -56,6 +56,8 @@ export const TestCatalogSchema = z.object({
   name: z.string(),
   dept: DeptIdSchema,
   containers: z.array(ContainerIdSchema).min(1),
+  /** Làm tay (không qua máy phân tích): không cần khai báo trong chem/tests.json. */
+  manual: z.boolean().optional(),
 });
 
 export const OrderTypeSchema = z.object({
@@ -123,6 +125,18 @@ export const ChemRulesSchema = z.object({
   }),
   analyzer: z.object({ secondsPerSample: z.number().positive() }),
   recollectSeconds: z.number().positive(),
+  dilution: z.object({
+    ratios: z.array(z.number().int().min(2)).min(1),
+    explanationKey: z.string(),
+    codex: z.string(),
+  }),
+  delta: z.object({
+    /** Tỉ lệ bệnh nhân thật sự thay đổi so với lần trước (Δ hợp lệ, không phải nhầm người). */
+    genuineRate: z.number().min(0).max(1),
+    codex: z.string(),
+    /** Ngưỡng chênh tương đối so với lần trước, theo mã chất phân tích. */
+    rel: z.record(z.string(), z.number().positive()),
+  }),
 });
 
 export const QcRemedySchema = z.enum(['rerun', 'newControl', 'newReagent', 'calibrate', 'callEngineer']);
@@ -149,6 +163,28 @@ export const QcRulesSchema = z.object({
   ),
 });
 
+const UrineLevelRange = z.tuple([z.number().int().min(0), z.number().int().min(0)]);
+export const UrineRulesSchema = z.object({
+  source: z.array(z.string()),
+  /** Thời gian tối đa (ms thực) cho cả mini-game; quá thì trừ điểm Tay nghề. */
+  timeLimitMs: z.number().positive(),
+  /** Mỗi mili giây thực đại diện cho bao nhiêu mili giây ngoài đời (để hiển thị đồng hồ giây-ngoài-đời). */
+  msPerSimSecond: z.number().positive(),
+  pads: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      readAtMs: z.number().positive(),
+      readLabel: z.string(),
+      levels: z.array(z.string()).min(2),
+      normal: z.array(z.number().int().min(0)).min(1),
+      colors: z.array(z.string().regex(/^#[0-9a-f]{6}$/i)).min(2),
+    }),
+  ),
+  healthyRange: z.record(z.string(), UrineLevelRange),
+  profiles: z.record(z.string(), z.record(z.string(), UrineLevelRange)),
+});
+
 export const UnlockSchema = z.enum([
   'routeChem',
   'routeHeme',
@@ -160,6 +196,7 @@ export const UnlockSchema = z.enum([
   'postSpinCheck',
   'qc',
   'critical',
+  'delta',
   'dilution',
   'urine',
   'releaseAllUnflagged',
@@ -209,6 +246,8 @@ export const DayConfigSchema = z.object({
       orderType: z.string().optional(),
       tests: z.array(z.string()).optional(),
       defects: z.array(DefectSchema).optional(),
+      /** Ép hồ sơ bệnh của bệnh nhân (để dạy một tình huống cụ thể). */
+      profile: z.string().optional(),
     }),
   ),
   /** Có thì máy hoá sinh chỉ chạy mẫu bệnh nhân sau khi QC đạt; `scenario` là lỗi ẩn của ngày. */
@@ -239,6 +278,7 @@ export const RawContentSchema = z.object({
   chemTests: z.array(ChemTestSchema),
   chemRules: ChemRulesSchema,
   chemQc: QcRulesSchema,
+  chemUrine: UrineRulesSchema,
   days: z.array(DayConfigSchema),
   codex: z.array(CodexCardSchema),
   i18n: I18nSchema,
@@ -261,6 +301,7 @@ export type Analyte = z.infer<typeof AnalyteSchema>;
 export type ChemTest = z.infer<typeof ChemTestSchema>;
 export type ReceptionRules = z.infer<typeof ReceptionRulesSchema>;
 export type ChemRules = z.infer<typeof ChemRulesSchema>;
+export type UrineRules = z.infer<typeof UrineRulesSchema>;
 export type QcRules = z.infer<typeof QcRulesSchema>;
 export type QcRemedy = z.infer<typeof QcRemedySchema>;
 export type Unlock = z.infer<typeof UnlockSchema>;

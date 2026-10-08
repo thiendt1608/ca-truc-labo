@@ -1,0 +1,121 @@
+{
+  "id": "ch1-d4",
+  "chapter": 1,
+  "day": 4,
+  "room": "chem",
+  "title": "Hoá sinh: giá trị nguy hiểm và pha loãng",
+  "mentor": "hanh",
+  "newThings": [
+    "Giá trị nguy hiểm ‼️: gọi báo bác sĩ",
+    "Kết quả vượt dải đo \">\": pha loãng",
+    "QC khó hơn: lệch hiệu chuẩn (2-2s)"
+  ],
+  "start": 25200,
+  "end": 39600,
+  "startTrust": 70,
+  "unlocks": ["centrifuge", "analyzer", "release", "postSpinCheck", "qc", "critical", "dilution"],
+  "tat": {
+    "stat": 3600,
+    "routine": 7200,
+    "reception": 900
+  },
+  "waves": [
+    {
+      "at": 0,
+      "count": 4,
+      "spread": 300
+    },
+    {
+      "at": 2400,
+      "count": 4,
+      "spread": 1200
+    },
+    {
+      "at": 5400,
+      "count": 5,
+      "spread": 1800
+    },
+    {
+      "at": 9000,
+      "count": 4,
+      "spread": 1800
+    }
+  ],
+  "orderTypes": {
+    "chemPanel": 6,
+    "glucoseOnly": 2
+  },
+  "defects": {
+    "hemolysis": 0.1,
+    "lipemia": 0.05,
+    "labelMismatch": 0.05
+  },
+  "profiles": {
+    "healthy": 4,
+    "diabetes": 1,
+    "hyperglycemia": 2,
+    "severeLipid": 1,
+    "hypoglycemia": 1,
+    "hyperK": 1,
+    "lipid": 1
+  },
+  "scripted": [
+    {
+      "index": 0,
+      "priority": "stat",
+      "orderType": "glucoseOnly",
+      "profile": "hypoglycemia",
+      "defects": []
+    },
+    {
+      "index": 1,
+      "priority": "routine",
+      "orderType": "chemPanel",
+      "tests": ["GLU", "URE"],
+      "profile": "hyperglycemia",
+      "defects": []
+    },
+    {
+      "index": 2,
+      "priority": "routine",
+      "orderType": "chemPanel",
+      "tests": ["TG", "CHOL"],
+      "profile": "severeLipid",
+      "defects": []
+    }
+  ],
+  "tips": [
+    {
+      "trigger": "sampleAccepted",
+      "text": "Ống đã nhận nằm chờ ở Máy ly tâm. Đặt ống vào rổ, ống nào cũng phải có ống đối diện."
+    },
+    {
+      "trigger": "centrifugeShake",
+      "text": "Máy rung vì lệch cân! Ống nào thiếu ống đối diện thì thêm một ống nước."
+    },
+    {
+      "trigger": "centrifugeDone",
+      "text": "Ly tâm xong, huyết thanh đã tách ra. Mở Khay sau ly tâm và nạp ống vào máy hoá sinh."
+    },
+    {
+      "trigger": "qcRun",
+      "text": "Mỗi chấm là một lần chạy control. Chấm nào vượt vạch ±2SD thì phải để ý, vượt ±3SD là loại."
+    },
+    {
+      "trigger": "qcFailed",
+      "text": "QC không đạt! Nhìn hình dạng biểu đồ để chọn cách khắc phục, đừng thử bừa vì mỗi cách tốn thời gian."
+    },
+    {
+      "trigger": "start",
+      "text": "Hôm nay có mẫu nguy hiểm và mẫu vượt dải đo. Chạy QC trước, rồi xem kỹ cờ ‼️ và dấu > ở màn Kết quả."
+    },
+    {
+      "trigger": "resultReady",
+      "text": "Thấy dấu > thì kết quả vượt dải: bấm tỉ lệ pha loãng nhỏ nhất đưa được về dải đo. Thấy ‼️ thì gọi báo bác sĩ trong 15 phút."
+    }
+  ],
+  "codexOnStart": ["ch-qc", "ch-westgard", "ch-dilution"],
+  "qc": {
+    "scenario": "calibration"
+  }
+}

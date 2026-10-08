@@ -1,0 +1,126 @@
+{
+  "source": ["05-noi-dung-chuyen-mon.md mục 2.4"],
+  "timeLimitMs": 30000,
+  "msPerSimSecond": 100,
+  "pads": [
+    {
+      "id": "glucose",
+      "name": "Glucose",
+      "readAtMs": 3000,
+      "readLabel": "30 giây",
+      "levels": ["Âm tính", "+", "++", "+++"],
+      "normal": [0],
+      "colors": ["#8fd3e8", "#7ccf9a", "#c9b24d", "#8a5a2b"]
+    },
+    {
+      "id": "bilirubin",
+      "name": "Bilirubin",
+      "readAtMs": 3000,
+      "readLabel": "30 giây",
+      "levels": ["Âm tính", "+", "++", "+++"],
+      "normal": [0],
+      "colors": ["#f1e3b0", "#e6c07a", "#d49a5a", "#b86a3c"]
+    },
+    {
+      "id": "ketone",
+      "name": "Ceton",
+      "readAtMs": 4000,
+      "readLabel": "40 giây",
+      "levels": ["Âm tính", "+", "++", "+++"],
+      "normal": [0],
+      "colors": ["#f3dfc9", "#e7b6b6", "#c77aa0", "#8e3f7a"]
+    },
+    {
+      "id": "density",
+      "name": "Tỷ trọng",
+      "readAtMs": 4500,
+      "readLabel": "45 giây",
+      "levels": ["1.005", "1.010", "1.020", "1.030", "1.040"],
+      "normal": [0, 1, 2, 3],
+      "colors": ["#2f9e8f", "#5fb79a", "#8fc86f", "#c3c64a", "#e0b422"]
+    },
+    {
+      "id": "blood",
+      "name": "Máu",
+      "readAtMs": 6000,
+      "readLabel": "60 giây",
+      "levels": ["Âm tính", "+", "++", "+++"],
+      "normal": [0],
+      "colors": ["#f4e29b", "#c8d178", "#7fb55a", "#3f8f4a"]
+    },
+    {
+      "id": "ph",
+      "name": "pH",
+      "readAtMs": 6000,
+      "readLabel": "60 giây",
+      "levels": ["5", "6", "7", "8", "9"],
+      "normal": [0, 1, 2, 3],
+      "colors": ["#e8833a", "#eeb43c", "#9cc552", "#4fae8a", "#3f7fb7"]
+    },
+    {
+      "id": "protein",
+      "name": "Protein",
+      "readAtMs": 6000,
+      "readLabel": "60 giây",
+      "levels": ["Âm tính", "+", "++", "+++"],
+      "normal": [0],
+      "colors": ["#e7e58f", "#b4d58a", "#7fc3a4", "#5aa9b8"]
+    },
+    {
+      "id": "urobilinogen",
+      "name": "Urobilinogen",
+      "readAtMs": 6000,
+      "readLabel": "60 giây",
+      "levels": ["Bình thường", "+", "++", "+++"],
+      "normal": [0],
+      "colors": ["#f5d2b3", "#f0b38e", "#e68d73", "#d6685e"]
+    },
+    {
+      "id": "nitrite",
+      "name": "Nitrit",
+      "readAtMs": 6000,
+      "readLabel": "60 giây",
+      "levels": ["Âm tính", "Dương tính"],
+      "normal": [0],
+      "colors": ["#f6efe6", "#f2a7c3"]
+    },
+    {
+      "id": "leukocyte",
+      "name": "Bạch cầu",
+      "readAtMs": 12000,
+      "readLabel": "2 phút",
+      "levels": ["Âm tính", "+", "++", "+++"],
+      "normal": [0],
+      "colors": ["#f2ecd6", "#d9c1d9", "#b78fc4", "#8d5fa8"]
+    }
+  ],
+  "healthyRange": {
+    "density": [1, 2],
+    "ph": [1, 3]
+  },
+  "profiles": {
+    "diabetes": {
+      "glucose": [2, 3],
+      "ketone": [1, 2],
+      "density": [3, 3]
+    },
+    "kidney": {
+      "protein": [2, 3],
+      "blood": [1, 2],
+      "density": [0, 1]
+    },
+    "liver": {
+      "bilirubin": [2, 3],
+      "urobilinogen": [2, 3]
+    },
+    "inflammation": {
+      "leukocyte": [2, 3],
+      "nitrite": [1, 1],
+      "protein": [1, 1]
+    },
+    "dehydration": {
+      "density": [3, 3],
+      "ketone": [1, 1]
+    }
+  }
+}

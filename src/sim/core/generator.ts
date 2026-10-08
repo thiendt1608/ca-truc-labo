@@ -1,5 +1,6 @@
 import type { ContainerId, Defect, DefectKind, LabelField, Priority } from '../content/schema';
-import { newId, type Ctx } from './context';
+import { newId, unlocked, type Ctx } from './context';
+import { urineSeed } from '../minigames/urineStrip';
 import type { Rng } from './rng';
 import type { Label, Order, Patient, Sample, ScheduledArrival } from './types';
 
@@ -20,17 +21,23 @@ export function makeTruth(ctx: Ctx, profileId: string): Record<string, number> {
   return truth;
 }
 
-export function makePatient(ctx: Ctx): Patient {
+export function makePatient(ctx: Ctx, profileId?: string): Patient {
   const { rng } = ctx;
   const sex = rng.chance(0.5) ? 'M' : 'F';
-  return {
+  const patient: Patient = {
     id: newId(ctx, 'p'),
     name: makeName(rng, ctx.content.names, sex),
     birthYear: rng.int(1945, 2012),
     code: `BN${String(rng.int(100000, 999999))}`,
     sex,
-    profileId: rng.weighted(ctx.day.profiles),
+    profileId: profileId ?? rng.weighted(ctx.day.profiles),
   };
+  // Δ: kết quả lần trước. Phần lớn cùng hồ sơ bệnh; một ít là bệnh nhân thật sự thay đổi.
+  if (unlocked(ctx, 'delta')) {
+    const changed = rng.chance(ctx.content.chemRules.delta.genuineRate);
+    patient.previous = makeTruth(ctx, changed ? rng.weighted(ctx.day.profiles) : patient.profileId);
+  }
+  return patient;
 }
 
 function alterLabel(ctx: Ctx, label: Label, field: LabelField): Label {
@@ -102,6 +109,7 @@ export interface SampleSpec {
   orderType?: string;
   tests?: string[];
   defects?: Defect[];
+  profile?: string;
 }
 
 /** Sinh một phiếu + một mẫu (+ bệnh nhân mới). */
@@ -114,7 +122,7 @@ export function makeArrival(ctx: Ctx, spec: SampleSpec): ScheduledArrival {
   if (!orderType) throw new Error(`Loại phiếu không tồn tại: ${orderTypeId}`);
   const tests = pickTests(ctx, orderType.testsFrom, orderType.count, spec.tests);
   const container = orderType.container[priority];
-  const patient = makePatient(ctx);
+  const patient = makePatient(ctx, spec.profile);
   const defects = spec.defects ?? rollDefects(ctx);
 
   const orderId = newId(ctx, 'o');
@@ -157,6 +165,7 @@ export function makeSample(ctx: Ctx, order: Order, patient: Patient, defects: De
   if (mismatch) label = alterLabel(ctx, label, mismatch.field);
   if (defects.some((d) => d.kind === 'noLabel')) label = null;
   const wrongPatient = defects.some((d) => d.kind === 'labelMismatch' || d.kind === 'noLabel');
+  const profileId = wrongPatient ? rng.weighted(ctx.day.profiles) : patient.profileId;
   return {
     id: order.sampleId,
     orderId: order.id,
@@ -168,9 +177,10 @@ export function makeSample(ctx: Ctx, order: Order, patient: Patient, defects: De
     defects,
     hidden: {
       // Nhãn lệch: ống thật ra là máu của người khác → "sự thật" lấy từ một hồ sơ ngẫu nhiên khác.
-      truth: makeTruth(ctx, wrongPatient ? rng.weighted(ctx.day.profiles) : patient.profileId),
+      truth: makeTruth(ctx, profileId),
       wrongPatient,
     },
+    ...(order.tests.includes('UA') ? { urineSeed: urineSeed(profileId, rng.int(0, 999999)) } : {}),
     status: 'tray',
     arrivedAt: at,
   };

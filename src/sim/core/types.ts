@@ -13,6 +13,8 @@ import type {
 export type Difficulty = 'easy' | 'normal' | 'hard';
 
 export interface Patient {
+  /** Kết quả lần trước (chỉ có khi ngày bật Δ). */
+  previous?: Record<string, number>;
   id: string;
   name: string;
   birthYear: number;
@@ -35,6 +37,7 @@ export type SampleStatus =
   | 'contacted'
   | 'bench' // Hoá sinh: đã nhận, chờ ly tâm
   | 'centrifuge'
+  | 'urine' // lọ nước tiểu đã nhận, chờ nhúng que
   | 'spun' // khay sau ly tâm
   | 'analyzer'
   | 'done'
@@ -49,6 +52,8 @@ export interface Sample {
   defects: Defect[];
   /** Thông tin ẩn: không hiển thị cho người chơi (trừ bảng debug). */
   hidden: { truth: Record<string, number>; wrongPatient: boolean };
+  /** Hạt giống mini-game que thử (chỉ mẫu nước tiểu): hồ sơ bệnh + số ngẫu nhiên. */
+  urineSeed?: string;
   status: SampleStatus;
   arrivedAt: number; // giây game kể từ đầu ca
   decidedAt?: number;
@@ -67,6 +72,10 @@ export interface AnalyteResult {
   flag: '' | 'H' | 'L';
   critical: boolean;
   overRange: boolean;
+  /** Kết quả đã pha loãng: giá trị máy đọc × hệ số. */
+  dilution?: { ratio: number; reading: number };
+  /** Δ: khác nhiều so với lần trước của cùng bệnh nhân. */
+  delta?: { previous: number };
 }
 
 export interface Order {
@@ -89,6 +98,10 @@ export interface Order {
   lateCharged?: boolean;
   /** Kết quả đo khi QC đang hỏng (lệch thật so với giá trị đúng). */
   qcFault?: boolean;
+  /** Đang chạy lại pha loãng cho các chất vượt dải. */
+  dilution?: { ratio: number; codes: string[] };
+  /** Đã làm lại để kiểm tra Δ. */
+  deltaChecked?: boolean;
 }
 
 export interface MistakeEntry {
@@ -161,7 +174,9 @@ export interface ActiveMinigame {
   minigameId: string;
   seed: string;
   startedAt: number;
-  context: 'spill';
+  context: 'spill' | 'urine';
+  /** Mẫu đang được làm mini-game (nước tiểu). */
+  sampleId?: string;
 }
 
 export interface SkillEntry {
@@ -221,6 +236,8 @@ export type Command =
   | { t: number; type: 'startCentrifuge'; centrifugeId: 'c1' }
   | { t: number; type: 'chem/loadAnalyzer'; sampleId: string }
   | { t: number; type: 'chem/highSpeedSpin'; sampleId: string }
+  | { t: number; type: 'chem/dilute'; orderId: string; ratio: number }
+  | { t: number; type: 'chem/startUrine'; sampleId: string }
   | { t: number; type: 'chem/runQC' }
   | { t: number; type: 'chem/judgeQC'; verdict: QcVerdict }
   | { t: number; type: 'chem/qcAction'; action: QcRemedy }

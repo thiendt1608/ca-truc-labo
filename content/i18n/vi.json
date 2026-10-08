@@ -49,5 +49,10 @@
   "rule.qcWrongRemedy": "Cách khắc phục chưa đúng với hình dạng biểu đồ: mất thời gian mà lỗi vẫn còn.",
   "rule.qcFalseFail": "QC vẫn ổn nhưng đã báo không đạt: máy bị dừng oan.",
   "rule.qcShouldFail": "Biểu đồ có điểm vi phạm luật loại (1-3s, 2-2s hoặc R-4s), không chỉ là cảnh báo: phải báo Không đạt.",
-  "qc.wrongPassDetail": "Lúc {time} control có điểm {z1} (mức 1) và {z2} (mức 2), vi phạm {rules}, nên đáng lẽ phải báo Không đạt."
+  "qc.wrongPassDetail": "Lúc {time} control có điểm {z1} (mức 1) và {z2} (mức 2), vi phạm {rules}, nên đáng lẽ phải báo Không đạt.",
+  "rule.dilutionTooSmall": "Pha loãng chưa đủ nên kết quả vẫn vượt dải đo: mất thêm một lượt chạy máy. Chọn tỉ lệ nhỏ nhất đưa kết quả vào dải đo.",
+  "rule.releaseOverRange": "Đã trả kết quả vượt dải đo mà chưa pha loãng: bác sĩ chỉ thấy dấu \">\" chứ không biết giá trị thật.",
+  "rule.releaseUnverifiedDelta": "Kết quả có Δ (khác nhiều so với lần trước) mà chưa làm lại để kiểm tra: có thể nhầm người hoặc lỗi đo.",
+  "rule.releaseWrongUrine": "Đọc sai ô màu của que thử: kết quả nước tiểu đã trả không đúng với mẫu. Mỗi ô phải so đúng bảng màu và đúng thời điểm đọc.",
+  "urine.wrongPads": "Các ô đọc nhầm giữa bình thường và bất thường: {pads}."
 }
