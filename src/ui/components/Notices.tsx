@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { getContent } from '../../sim';
 import { t } from '../../i18n';
 import { useGame } from '../../store/game';
@@ -14,10 +14,37 @@ export function Notices() {
   const busy = useGame((s) => s.overlay !== null || s.shift?.minigame != null || s.paused);
   const mentor = dayId ? getContent().dayById.get(dayId)?.mentor : undefined;
 
+  // Mỗi thông báo có đồng hồ riêng, đặt đúng một lần: thông báo mới tới không làm các cái cũ sống lâu hơn.
+  const timers = useRef(new Map<number, number>());
   useEffect(() => {
-    const timers = toasts.map((x) => setTimeout(() => dropToast(x.id), x.kind === 'mistake' ? 5000 : 2200));
-    return () => timers.forEach(clearTimeout);
+    const live = new Set(toasts.map((x) => x.id));
+    for (const [id, h] of timers.current) {
+      if (!live.has(id)) {
+        window.clearTimeout(h);
+        timers.current.delete(id);
+      }
+    }
+    for (const x of toasts) {
+      if (timers.current.has(x.id)) continue;
+      timers.current.set(
+        x.id,
+        window.setTimeout(
+          () => {
+            timers.current.delete(x.id);
+            dropToast(x.id);
+          },
+          x.kind === 'mistake' ? 5000 : 2200,
+        ),
+      );
+    }
   }, [toasts, dropToast]);
+  useEffect(() => {
+    const map = timers.current;
+    return () => {
+      map.forEach((h) => window.clearTimeout(h));
+      map.clear();
+    };
+  }, []);
 
   const tip = busy ? undefined : tips[0];
   return (
@@ -27,6 +54,7 @@ export function Notices() {
           <div key={x.id} className={`toast ${x.kind}`}>
             {x.kind === 'mistake' ? '❌ ' : x.kind === 'good' ? '✅ ' : 'ℹ️ '}
             {x.text}
+            {x.count > 1 && ` ×${x.count}`}
           </div>
         ))}
       </div>

@@ -32,11 +32,30 @@ export interface Toast {
   id: number;
   kind: 'mistake' | 'good' | 'info';
   text: string;
+  /** Số lần thông báo giống hệt bị gộp lại. */
+  count: number;
 }
 
-/** Tỉ lệ thời gian: 1 giây thực ≈ 80 giây game (07-TDD mục 4.1). */
-export const TIME_SCALE = 80;
+/** Một ca ngày chạy khoảng 6 phút thực ở mức Thường, dù ca dài hay ngắn (04-GDD mục 4). */
+export const TARGET_REAL_SECONDS = 360;
+/** Số giây game trôi qua mỗi giây thực của một ca. */
+export function timeScale(durationSeconds: number): number {
+  return durationSeconds / TARGET_REAL_SECONDS;
+}
 const DIFFICULTY_SPEED: Record<Difficulty, number> = { easy: 0.6, normal: 1, hard: 1.2 };
+const MAX_TOASTS = 2;
+
+/** Thêm thông báo; thông báo trùng nội dung được gộp thành "×n" thay vì xếp chồng. */
+export function pushToasts(current: Toast[], incoming: Omit<Toast, 'count'>[]): Toast[] {
+  let list = current;
+  for (const n of incoming) {
+    const dup = list.find((x) => x.text === n.text && x.kind === n.kind);
+    list = dup
+      ? [...list.filter((x) => x !== dup), { ...n, count: dup.count + 1 }]
+      : [...list, { ...n, count: 1 }];
+  }
+  return list.slice(-MAX_TOASTS);
+}
 
 interface GameStore {
   screen: Screen;
@@ -78,7 +97,7 @@ export const useGame = create<GameStore>((set, getState) => {
     const content = getContent();
     const day = content.dayById.get(r.state.dayId);
     const tips: GameStore['tips'] = [];
-    const toasts: Toast[] = [];
+    const toasts: Omit<Toast, 'count'>[] = [];
     for (const e of r.events) {
       if (e.type === 'tip') {
         const tip = day?.tips.find((x) => x.trigger === e.trigger);
@@ -98,7 +117,7 @@ export const useGame = create<GameStore>((set, getState) => {
     set((st) => ({
       shift: r.state,
       tips: [...st.tips, ...tips].slice(-3),
-      toasts: [...st.toasts, ...toasts].slice(-4),
+      toasts: pushToasts(st.toasts, toasts),
     }));
     if (ended) finish(r.state);
     return r.events;
@@ -183,9 +202,11 @@ export const useGame = create<GameStore>((set, getState) => {
       return absorb(applyCommand(shift, cmd, getContent()));
     },
     tickReal(ms) {
-      const { shift, paused, speed, difficulty, carry, screen } = getState();
+      const { shift, paused, speed, difficulty, carry, screen, overlay, tips } = getState();
       if (!shift || shift.ended || paused || screen !== 'room') return;
-      const total = carry + (ms / 1000) * TIME_SCALE * DIFFICULTY_SPEED[difficulty] * speed;
+      // Dừng giờ khi người chơi đang đọc lời hướng dẫn hoặc làm mini-game toàn màn (không có đồng hồ để nhìn).
+      if (shift.minigame || (overlay === null && tips.length > 0)) return;
+      const total = carry + (ms / 1000) * timeScale(shift.duration) * DIFFICULTY_SPEED[difficulty] * speed;
       const whole = Math.floor(total);
       set({ carry: total - whole });
       if (whole > 0) absorb(advance(shift, Math.min(whole, 600), getContent()));

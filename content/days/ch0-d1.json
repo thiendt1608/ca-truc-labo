@@ -10,7 +10,7 @@
   "end": 34200,
   "startTrust": 70,
   "unlocks": ["routeChem", "routeHeme"],
-  "tat": { "stat": 3600, "routine": 7200, "reception": 900 },
+  "tat": { "stat": 3600, "routine": 7200, "reception": 1800 },
   "waves": [
     { "at": 0, "count": 2, "spread": 240 },
     { "at": 900, "count": 4, "spread": 1500 },

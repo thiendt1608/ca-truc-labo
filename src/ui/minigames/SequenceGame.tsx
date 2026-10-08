@@ -55,7 +55,12 @@ export function SequenceGame({
 
   return (
     <div className="stack">
-      {message && <div className="toast mistake">{message}</div>}
+      <b>
+        Bước {Math.min(state.index + 1, input.correct.length)}/{input.correct.length}
+      </b>
+      <div className={`mg-msg ${message ? 'toast mistake' : ''}`} aria-live="polite">
+        {message}
+      </div>
       <div className="steps">
         {input.steps.map((s) => {
           const doneIndex = input.correct.indexOf(s.id);

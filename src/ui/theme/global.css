@@ -79,7 +79,7 @@ button.danger {
   border-color: var(--bad);
 }
 button.small {
-  min-height: 36px;
+  min-height: 44px;
   padding: 0 10px;
   font-size: 14px;
 }
@@ -452,11 +452,11 @@ table.results .crit {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  z-index: 40;
+  z-index: 60;
   pointer-events: none;
 }
 .toast {
-  pointer-events: auto;
+  pointer-events: none;
   padding: 8px 10px;
   border-radius: 8px;
   font-size: 14px;
@@ -512,9 +512,13 @@ table.results .crit {
   gap: 10px;
   overflow-y: auto;
 }
+.mg-msg {
+  min-height: 44px;
+  pointer-events: none;
+}
 .steps {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 8px;
 }
 .step {

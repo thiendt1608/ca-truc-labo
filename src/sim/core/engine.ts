@@ -202,7 +202,7 @@ function chargeLateness(ctx: Ctx) {
       const stat = s.orders[sample.orderId]?.priority === 'stat';
       recordMistake(ctx, {
         kind: stat ? 'lateStat' : 'late',
-        explanationKey: 'rule.late',
+        explanationKey: 'rule.lateReception',
         codex: 'rc-stat',
         trustDelta: stat ? -5 : -1,
         safetyPenalty: 0,

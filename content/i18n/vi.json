@@ -15,6 +15,7 @@
   "rule.releaseWrongPatient": "Đã trả kết quả của một ống nhãn lệch phiếu, bác sĩ đang đọc kết quả của người khác.",
   "rule.releaseBadSample": "Đã trả kết quả của mẫu lẽ ra phải từ chối, kết quả này có thể sai.",
   "rule.late": "Trả kết quả trễ hẹn. Mẫu cấp cứu cần xong trong 60 phút.",
+  "rule.lateReception": "Ống nằm trong khay quá lâu mà chưa được nhận hoặc chuyển khoa. Ống cấp cứu 🚑 cần xử lý trước.",
   "rule.imbalance": "Máy ly tâm lệch cân nên rung mạnh. Mỗi ống cần một ống đối diện.",
   "rule.spillWrong": "Dọn đổ vỡ chưa đúng quy trình: rắc khử khuẩn, chờ đủ thời gian, lau từ ngoài vào trong, bỏ thùng rác y tế.",
   "rule.criticalNotCalled": "Có giá trị nguy hiểm ‼️ mà không gọi báo trong 15 phút.",
