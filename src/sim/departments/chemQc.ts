@@ -38,6 +38,8 @@ export function initQc(ctx: Ctx): QcState | null {
     status: 'unchecked',
     blockedUntil: 0,
     badReleases: 0,
+    note: null,
+    wrongPass: null,
   };
 }
 
@@ -90,6 +92,7 @@ export function handleQc(ctx: Ctx, cmd: Command): boolean {
         qc.runs.push({ z1: normalZ(ctx), z2: normalZ(ctx) });
       }
       qc.status = 'judging';
+      qc.note = null;
       tip(ctx, 'qcRun');
       return true;
     }
@@ -103,10 +106,15 @@ export function handleQc(ctx: Ctx, cmd: Command): boolean {
       if (cmd.verdict === 'pass') {
         // Báo Đạt nhầm không bị phạt ngay: hậu quả lộ ra khi trả kết quả (releaseOrder).
         qc.status = 'passed';
+        const w = evaluateWestgard(qc.runs, s.difficulty);
+        const last = qc.runs[qc.runs.length - 1]!;
+        qc.wrongPass =
+          expected === 'fail' ? { clock: s.clock, z1: last.z1, z2: last.z2, rules: w.violations } : null;
       } else if (cmd.verdict === 'rerun') {
         qc.status = 'unchecked';
         qc.blockedUntil = s.clock + rules.remedies.rerun.seconds;
-        if (expected === 'fail')
+        if (expected === 'fail') {
+          qc.note = 'rule.qcShouldFail';
           recordMistake(ctx, {
             kind: 'qcShouldFail',
             explanationKey: 'rule.qcShouldFail',
@@ -114,10 +122,12 @@ export function handleQc(ctx: Ctx, cmd: Command): boolean {
             trustDelta: 0,
             safetyPenalty: 0,
           });
+        }
       } else {
         qc.status = 'failed';
         tip(ctx, 'qcFailed');
-        if (expected === 'pass')
+        if (expected === 'pass') {
+          qc.note = 'rule.qcFalseFail';
           recordMistake(ctx, {
             kind: 'qcFalseFail',
             explanationKey: 'rule.qcFalseFail',
@@ -125,6 +135,7 @@ export function handleQc(ctx: Ctx, cmd: Command): boolean {
             trustDelta: 0,
             safetyPenalty: 0,
           });
+        }
       }
       return true;
     }
@@ -144,6 +155,7 @@ export function handleQc(ctx: Ctx, cmd: Command): boolean {
         changeTrust(ctx, 5);
       } else {
         s.skills.push({ source: 'qc', skill: 40 });
+        qc.note = sc.explanationKey;
         recordMistake(ctx, {
           kind: 'qcWrongRemedy',
           explanationKey: sc.explanationKey,
@@ -155,4 +167,18 @@ export function handleQc(ctx: Ctx, cmd: Command): boolean {
       return true;
     }
   }
+}
+
+const clockHm = (secs: number) =>
+  `${String(Math.floor(secs / 3600) % 24).padStart(2, '0')}:${String(Math.floor((secs % 3600) / 60)).padStart(2, '0')}`;
+const fmtZ = (z: number) => `${z > 0 ? '+' : ''}${z.toFixed(1)}SD`;
+
+/** Câu giải thích lần báo Đạt nhầm: lúc nào, điểm nào, vi phạm luật nào. */
+export function wrongPassDetail(ctx: Ctx): string | undefined {
+  const w = ctx.s.chem?.qc?.wrongPass;
+  if (!w) return undefined;
+  return ctx.content.i18n['qc.wrongPassDetail']!.replace('{time}', clockHm(ctx.s.dayStart + w.clock))
+    .replace('{z1}', fmtZ(w.z1))
+    .replace('{z2}', fmtZ(w.z2))
+    .replace('{rules}', w.rules.join(', '));
 }

@@ -5,7 +5,7 @@ import { makeSample } from '../core/generator';
 import { measure } from '../core/results';
 import type { ChemState, Command, Order, Sample } from '../core/types';
 import { startMinigame } from '../core/minigameHost';
-import { handleQc, qcBias, qcBlocksAnalyzer } from './chemQc';
+import { handleQc, qcBias, qcBlocksAnalyzer, wrongPassDetail } from './chemQc';
 import { expectedReception } from './reception';
 
 /**
@@ -294,6 +294,7 @@ function releaseOrder(ctx: Ctx, orderId: string) {
     recordMistake(ctx, {
       kind: 'releaseQcFailed',
       explanationKey: 'rule.releaseQcFailed',
+      detail: wrongPassDetail(ctx),
       codex: 'ch-qc',
       trustDelta: qc.badReleases <= 6 ? -5 : 0,
       safetyPenalty: 5,

@@ -97,6 +97,10 @@ export function SequenceGame({
               const r = push({ t: now(), type: 'release' });
               if (r.holdVerdict === 'early')
                 setMessage('Chưa đủ thời gian, chất khử khuẩn chưa kịp diệt mầm bệnh. Giữ lại!');
+              else if (r.holdVerdict === 'late')
+                setMessage(
+                  'Giữ hơi quá vùng xanh: vẫn qua bước nhưng bị trừ điểm Tay nghề. Lần sau thả sớm hơn nhé.',
+                );
               else setMessage(null);
             }}
           />

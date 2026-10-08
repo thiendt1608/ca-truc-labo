@@ -12,6 +12,7 @@ export function Notices() {
   const dropToast = useGame((s) => s.dropToast);
   // Mẹo chờ tới khi không còn lớp phủ, để không che nút của thẻ mẫu hay mini-game.
   const busy = useGame((s) => s.overlay !== null || s.shift?.minigame != null || s.paused);
+  const inMinigame = useGame((s) => s.shift?.minigame != null);
   const mentor = dayId ? getContent().dayById.get(dayId)?.mentor : undefined;
 
   // Mỗi thông báo có đồng hồ riêng, đặt đúng một lần: thông báo mới tới không làm các cái cũ sống lâu hơn.
@@ -49,7 +50,7 @@ export function Notices() {
   const tip = busy ? undefined : tips[0];
   return (
     <>
-      <div className="toasts" aria-live="polite">
+      <div className={`toasts ${inMinigame ? 'in-mg' : ''}`} aria-live="polite">
         {toasts.map((x) => (
           <div key={x.id} className={`toast ${x.kind}`}>
             {x.kind === 'mistake' ? '❌ ' : x.kind === 'good' ? '✅ ' : 'ℹ️ '}

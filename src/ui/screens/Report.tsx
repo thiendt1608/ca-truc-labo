@@ -81,6 +81,7 @@ export function Report() {
                 <span>
                   {m.trustDelta < 0 ? `🔻 ${m.trustDelta}` : '•'} {t(m.explanationKey)}
                 </span>
+                {m.detail && <span className="muted">{m.detail}</span>}
                 {m.codex && content.codexById.has(m.codex) && (
                   <button className="small" onClick={() => setCard(m.codex!)}>
                     📖 Sổ tay: {content.codexById.get(m.codex)!.title}

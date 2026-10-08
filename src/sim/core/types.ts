@@ -98,6 +98,8 @@ export interface MistakeEntry {
   codex?: string;
   trustDelta: number;
   safetyPenalty: number;
+  /** Câu giải thích riêng của lần lỗi này (nếu có), hiện thêm trong "Chuyện hôm nay". */
+  detail?: string;
   sampleId?: string;
   orderId?: string;
 }
@@ -133,6 +135,10 @@ export interface QcState {
   blockedUntil: number;
   /** Số phiếu đã trả khi QC hỏng, để giới hạn mức trừ Niềm tin. */
   badReleases: number;
+  /** Câu giải thích lần phán quyết/khắc phục sai gần nhất, hiện trong QC sheet tới lần chạy control kế tiếp. */
+  note: string | null;
+  /** Lần báo Đạt nhầm (để giải thích hậu quả khi trả phiếu). */
+  wrongPass: { clock: number; z1: number; z2: number; rules: string[] } | null;
 }
 
 export type QcVerdict = 'pass' | 'rerun' | 'fail';

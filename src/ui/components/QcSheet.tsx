@@ -1,4 +1,5 @@
 import { evaluateWestgard, getContent, type QcRemedy } from '../../sim';
+import { t } from '../../i18n';
 import { clockText, useGame } from '../../store/game';
 import { Sheet } from './Overlay';
 
@@ -78,6 +79,8 @@ export function QcSheet() {
   const shift = useGame((s) => s.shift)!;
   const dispatch = useGame((s) => s.dispatch);
   const close = () => useGame.getState().setOverlay(null);
+  const inlineTips = useGame((s) => s.inlineTips);
+  const dismissTip = useGame((s) => s.dismissTip);
   const qc = shift.chem!.qc!;
   const rules = getContent().chemQc;
   const last = qc.runs[qc.runs.length - 1];
@@ -91,7 +94,15 @@ export function QcSheet() {
           ? '✅ QC đạt: máy hoá sinh được chạy mẫu bệnh nhân.'
           : 'Máy chỉ chạy mẫu bệnh nhân sau khi QC đạt. Control là mẫu đã biết trước giá trị; SD (độ lệch chuẩn) là độ chênh cho phép so với giá trị đúng. Chấm vượt vạch đỏ ±3SD là Không đạt.'}
       </p>
+      {inlineTips.map((tp) => (
+        <button key={tp.id} className="tip-inline" onClick={() => dismissTip(tp.id)}>
+          <b>💬 Chị Hạnh</b>
+          {tp.text}
+          <span className="muted"> (chạm để đóng)</span>
+        </button>
+      ))}
       <LJChart runs={qc.runs} />
+      {qc.note && <p className="note-inline">💡 {t(qc.note)}</p>}
       {last && (
         <div className="row wrap">
           <span className="pill">🔵 Mức 1: {fmt(last.z1)}</span>

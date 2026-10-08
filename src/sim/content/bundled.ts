@@ -10,6 +10,7 @@ import chemRules from '../../../content/chem/rules.json';
 import chemQc from '../../../content/chem/qc.json';
 import ch0d1 from '../../../content/days/ch0-d1.json';
 import ch1d1 from '../../../content/days/ch1-d1.json';
+import ch1d2 from '../../../content/days/ch1-d2.json';
 import ch1d3 from '../../../content/days/ch1-d3.json';
 import codexCommon from '../../../content/codex/common.json';
 import codexChem from '../../../content/codex/chem.json';
@@ -28,7 +29,7 @@ export const rawContent = {
   chemTests,
   chemRules,
   chemQc,
-  days: [ch0d1, ch1d1, ch1d3],
+  days: [ch0d1, ch1d1, ch1d2, ch1d3],
   codex: [...codexCommon, ...codexChem],
   i18n,
 };

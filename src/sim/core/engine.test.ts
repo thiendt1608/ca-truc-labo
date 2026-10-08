@@ -98,3 +98,14 @@ describe('kịch bản ngày 1.1 (Hoá sinh)', () => {
     }
   });
 });
+
+describe('kịch bản ngày 1.2 (tan huyết, mẫu để lâu)', () => {
+  it('bot thành thạo ≥4 sao, bot không làm gì 1 sao', () => {
+    for (let i = 0; i < 5; i++) {
+      expect(computeReport(runBot(content, 'ch1-d2', `e${i}`, 'expert').state).stars).toBeGreaterThanOrEqual(
+        4,
+      );
+      expect(computeReport(runBot(content, 'ch1-d2', `i${i}`, 'idle').state).stars).toBe(1);
+    }
+  });
+});

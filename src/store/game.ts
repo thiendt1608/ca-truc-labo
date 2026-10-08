@@ -45,6 +45,8 @@ export function timeScale(durationSeconds: number): number {
 }
 const DIFFICULTY_SPEED: Record<Difficulty, number> = { easy: 0.6, normal: 1, hard: 1.2 };
 const MAX_TOASTS = 2;
+/** Mẹo chỉ có nghĩa khi đang mở QC sheet, nên không xếp hàng chung với mẹo của phòng. */
+const INLINE_TIPS: readonly string[] = ['qcRun', 'qcFailed'];
 
 /** Thêm thông báo; thông báo trùng nội dung được gộp thành "×n" thay vì xếp chồng. */
 export function pushToasts(current: Toast[], incoming: Omit<Toast, 'count'>[]): Toast[] {
@@ -70,6 +72,8 @@ interface GameStore {
   speed: number;
   overlay: Overlay;
   tips: { id: number; text: string }[];
+  /** Mẹo gắn với một lớp phủ (QC), chỉ hiện trong lớp phủ đó và mất khi đóng nó. */
+  inlineTips: { id: number; text: string }[];
   toasts: Toast[];
   report: ShiftReport | null;
   debug: { enabled: boolean; showHidden: boolean };
@@ -98,11 +102,13 @@ export const useGame = create<GameStore>((set, getState) => {
     const content = getContent();
     const day = content.dayById.get(r.state.dayId);
     const tips: GameStore['tips'] = [];
+    const inlineTips: GameStore['tips'] = [];
     const toasts: Omit<Toast, 'count'>[] = [];
     for (const e of r.events) {
       if (e.type === 'tip') {
         const tip = day?.tips.find((x) => x.trigger === e.trigger);
-        if (tip) tips.push({ id: ++toastId, text: tip.text });
+        if (tip)
+          (INLINE_TIPS.includes(e.trigger) ? inlineTips : tips).push({ id: ++toastId, text: tip.text });
       } else if (e.type === 'mistakeRecorded') {
         const delta = e.entry.trustDelta ? ` (${e.entry.trustDelta} Niềm tin)` : '';
         toasts.push({ id: ++toastId, kind: 'mistake', text: `${t(e.entry.explanationKey)}${delta}` });
@@ -118,6 +124,7 @@ export const useGame = create<GameStore>((set, getState) => {
     set((st) => ({
       shift: r.state,
       tips: [...st.tips, ...tips].slice(-3),
+      inlineTips: inlineTips.length > 0 ? inlineTips.slice(-1) : st.inlineTips,
       toasts: pushToasts(st.toasts, toasts),
     }));
     if (ended) finish(r.state);
@@ -158,6 +165,7 @@ export const useGame = create<GameStore>((set, getState) => {
     speed: 1,
     overlay: null,
     tips: [],
+    inlineTips: [],
     toasts: [],
     report: null,
     debug: { enabled: false, showHidden: false },
@@ -184,6 +192,7 @@ export const useGame = create<GameStore>((set, getState) => {
       set({
         log: [],
         tips: [],
+        inlineTips: [],
         toasts: [],
         report: null,
         overlay: null,
@@ -219,10 +228,13 @@ export const useGame = create<GameStore>((set, getState) => {
       set({ speed });
     },
     setOverlay(overlay) {
-      set({ overlay });
+      set(overlay?.kind === 'qc' ? { overlay } : { overlay, inlineTips: [] });
     },
     dismissTip(id) {
-      set((st) => ({ tips: st.tips.filter((x) => x.id !== id) }));
+      set((st) => ({
+        tips: st.tips.filter((x) => x.id !== id),
+        inlineTips: st.inlineTips.filter((x) => x.id !== id),
+      }));
     },
     dropToast(id) {
       set((st) => ({ toasts: st.toasts.filter((x) => x.id !== id) }));

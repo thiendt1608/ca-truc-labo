@@ -602,7 +602,7 @@ button.small {
   overflow-y: auto;
 }
 .mg-msg {
-  min-height: 44px;
+  min-height: 64px;
   pointer-events: none;
 }
 .steps {
@@ -1045,4 +1045,29 @@ button.small {
   font-size: 14px;
   fill: var(--ink-2);
   font-family: var(--font-body);
+}
+
+/* Toast khi đang làm mini-game: xuống dưới tiêu đề khung để không che tên và bước. */
+.toasts.in-mg {
+  top: 190px;
+}
+.tip-inline {
+  flex-shrink: 0;
+  text-align: left;
+  border-radius: var(--radius-lg);
+  background: #dfeafb;
+  color: #1d3a5f;
+  box-shadow: 0 4px 0 #b6cdea;
+  font-weight: 500;
+}
+.tip-inline b {
+  display: block;
+  font-family: var(--font-head);
+}
+.note-inline {
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  background: var(--dept-soft);
+  margin: 0;
+  font-weight: 700;
 }

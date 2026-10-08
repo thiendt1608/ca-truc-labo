@@ -1,0 +1,122 @@
+{
+  "id": "ch1-d2",
+  "chapter": 1,
+  "day": 2,
+  "room": "chem",
+  "title": "Hoá sinh: tan huyết và mẫu để lâu",
+  "mentor": "hanh",
+  "newThings": [
+    "Mẫu tan huyết: chỉ từ chối khi xét nghiệm bị ảnh hưởng",
+    "Ống xám (NaF) được để lâu với Glucose",
+    "Mẫu đục: nhận rồi ly tâm tốc độ cao"
+  ],
+  "start": 25200,
+  "end": 39600,
+  "startTrust": 70,
+  "unlocks": ["centrifuge", "analyzer", "release", "postSpinCheck"],
+  "tat": {
+    "stat": 3600,
+    "routine": 7200,
+    "reception": 900
+  },
+  "waves": [
+    {
+      "at": 0,
+      "count": 4,
+      "spread": 300
+    },
+    {
+      "at": 2400,
+      "count": 4,
+      "spread": 1200
+    },
+    {
+      "at": 5400,
+      "count": 5,
+      "spread": 1800
+    },
+    {
+      "at": 9000,
+      "count": 4,
+      "spread": 1800
+    }
+  ],
+  "orderTypes": {
+    "chemPanel": 5,
+    "glucoseOnly": 3
+  },
+  "defects": {
+    "hemolysis": 0.22,
+    "lipemia": 0.06,
+    "delayed": 0.12,
+    "labelMismatch": 0.05
+  },
+  "profiles": {
+    "healthy": 5,
+    "diabetes": 2,
+    "kidney": 1,
+    "liver": 1,
+    "lipid": 1,
+    "inflammation": 1,
+    "dehydration": 1
+  },
+  "scripted": [
+    {
+      "index": 0,
+      "priority": "routine",
+      "orderType": "chemPanel",
+      "tests": ["GLU", "URE"],
+      "defects": [
+        {
+          "kind": "hemolysis",
+          "level": 1
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "priority": "routine",
+      "orderType": "chemPanel",
+      "tests": ["ELEC"],
+      "defects": [
+        {
+          "kind": "hemolysis",
+          "level": 1
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "priority": "routine",
+      "orderType": "glucoseOnly",
+      "defects": [
+        {
+          "kind": "delayed"
+        }
+      ]
+    }
+  ],
+  "tips": [
+    {
+      "trigger": "start",
+      "text": "Hôm nay em nhìn màu huyết thanh sau ly tâm. Đỏ hồng là tan huyết: chỉ từ chối khi xét nghiệm của phiếu bị ảnh hưởng."
+    },
+    {
+      "trigger": "sampleAccepted",
+      "text": "Ống đã nhận nằm chờ ở Máy ly tâm. Đặt ống vào rổ, ống nào cũng phải có ống đối diện."
+    },
+    {
+      "trigger": "centrifugeShake",
+      "text": "Máy rung vì lệch cân! Ống nào thiếu ống đối diện thì thêm một ống nước."
+    },
+    {
+      "trigger": "centrifugeDone",
+      "text": "Ly tâm xong. Mở Khay sau ly tâm, xem màu huyết thanh rồi quyết định: nạp máy, ly tâm tốc độ cao hoặc từ chối."
+    },
+    {
+      "trigger": "resultReady",
+      "text": "Có kết quả rồi! Xem cờ H (cao), L (thấp) rồi bấm Duyệt và gửi cho bác sĩ."
+    }
+  ],
+  "codexOnStart": ["ch-why-spin", "ch-balance", "ch-hemolysis", "ch-lipemia"]
+}

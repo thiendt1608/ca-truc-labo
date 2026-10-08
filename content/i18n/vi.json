@@ -48,5 +48,6 @@
   "rule.releaseQcFailed": "Đã trả kết quả khi QC của máy đang hỏng: kết quả của cả loạt mẫu có thể sai.",
   "rule.qcWrongRemedy": "Cách khắc phục chưa đúng với hình dạng biểu đồ: mất thời gian mà lỗi vẫn còn.",
   "rule.qcFalseFail": "QC vẫn ổn nhưng đã báo không đạt: máy bị dừng oan.",
-  "rule.qcShouldFail": "Biểu đồ có điểm vi phạm luật loại (1-3s, 2-2s hoặc R-4s), không chỉ là cảnh báo: phải báo Không đạt."
+  "rule.qcShouldFail": "Biểu đồ có điểm vi phạm luật loại (1-3s, 2-2s hoặc R-4s), không chỉ là cảnh báo: phải báo Không đạt.",
+  "qc.wrongPassDetail": "Lúc {time} control có điểm {z1} (mức 1) và {z2} (mức 2), vi phạm {rules}, nên đáng lẽ phải báo Không đạt."
 }

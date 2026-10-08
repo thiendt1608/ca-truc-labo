@@ -47,7 +47,10 @@ export function CentrifugeSheet() {
           </div>
         </>
       ) : (
-        <p className="muted">Chọn ống ở dưới rồi chạm vào ô trong rổ. Chạm ô có ống để lấy ra.</p>
+        <p className="muted">
+          Chọn ống ở dưới rồi chạm vào ô trong rổ. Mỗi ống cần một ống ở ô đối diện (cách nhau 6 ô, ví dụ ô 1
+          và ô 7). Chạm ô có ống để lấy ra.
+        </p>
       )}
       <div className={`rotor ${c.running ? 'running' : ''}`} aria-label="Rổ máy ly tâm">
         <div className="hub" />

@@ -79,6 +79,7 @@ describe('QC Westgard trong ca (ngày 1.3)', () => {
     const trust = s.trust;
     s = run(s, { type: 'releaseOrder', orderId: order.id });
     expect(s.ledger.at(-1)?.kind).toBe('releaseQcFailed');
+    expect(s.ledger.at(-1)?.detail).toMatch(/1-3s.*Không đạt|Không đạt/);
     expect(s.trust).toBe(trust - 5);
   });
 
@@ -92,6 +93,16 @@ describe('QC Westgard trong ca (ngày 1.3)', () => {
     expect(s.chem!.qc!.status).toBe('passed');
     s = run(s, { type: 'chem/runQC' });
     expect(s.chem!.qc!.status).toBe('judging');
+  });
+
+  it('khắc phục sai để lại ghi chú trong QC sheet tới lần chạy control kế tiếp', () => {
+    let s = run(start('note'), { type: 'chem/runQC' });
+    s = run(s, { type: 'chem/judgeQC', verdict: 'fail' });
+    s = run(s, { type: 'chem/qcAction', action: 'newControl' });
+    expect(s.chem!.qc!.note).toBe('qc.cause.reagent');
+    s = advance(s, 600, content).state;
+    s = run(s, { type: 'chem/runQC' });
+    expect(s.chem!.qc!.note).toBeNull();
   });
 
   it('tất định: phát lại cùng hạt giống + lệnh cho cùng trạng thái', () => {
