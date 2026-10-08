@@ -1,0 +1,708 @@
+<!doctype html>
+
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+      name="viewport"
+    />
+    <meta content="mobile_tab" name="shell-type" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+      rel="stylesheet"
+    />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&amp;family=Quicksand:wght@600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      @layer base {
+        html,
+        body {
+          width: 100vw;
+          margin: 0;
+          padding: 0;
+          background-color: #fff8f4;
+        }
+        body {
+          overscroll-behavior: none;
+          font-family: 'Be Vietnam Pro', sans-serif;
+        }
+        .pb-safe {
+          padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        .pt-safe {
+          padding-top: env(safe-area-inset-top, 0px);
+        }
+        main > :first-child {
+          margin-top: 0 !important;
+        }
+        main > :last-child {
+          margin-bottom: 0 !important;
+        }
+      }
+      ::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'on-surface-variant': '#5a413d',
+              error: '#ba1a1a',
+              'inverse-on-surface': '#fdeee2',
+              'secondary-fixed-dim': '#a4c9ff',
+              'primary-fixed': '#ffdad5',
+              'on-primary-fixed-variant': '#910807',
+              'surface-tint': '#b4271d',
+              'on-primary': '#ffffff',
+              primary: '#b1241a',
+              'on-tertiary-container': '#f6fff4',
+              'surface-container-highest': '#efe0d4',
+              'on-error-container': '#93000a',
+              outline: '#8e706b',
+              secondary: '#0060ac',
+              'on-tertiary-fixed-variant': '#005228',
+              'tertiary-fixed-dim': '#61de8a',
+              'outline-variant': '#e2beb9',
+              'on-error': '#ffffff',
+              'on-secondary-fixed-variant': '#004883',
+              'primary-fixed-dim': '#ffb4a9',
+              'inverse-primary': '#ffb4a9',
+              'surface-dim': '#e6d7cc',
+              tertiary: '#006a35',
+              surface: '#fff8f4',
+              'primary-container': '#d43e30',
+              'on-tertiary-fixed': '#00210c',
+              'on-surface': '#211a13',
+              'tertiary-container': '#008645',
+              'on-primary-container': '#fffbff',
+              'on-secondary-container': '#003e73',
+              'on-tertiary': '#ffffff',
+              background: '#fff8f4',
+              'secondary-container': '#68abff',
+              'surface-variant': '#efe0d4',
+              'surface-container-lowest': '#ffffff',
+              'tertiary-fixed': '#7efba4',
+              'surface-container': '#faebdf',
+              'on-background': '#211a13',
+              'inverse-surface': '#372f27',
+              'surface-container-low': '#fff1e7',
+              'secondary-fixed': '#d4e3ff',
+              'surface-bright': '#fff8f4',
+              'on-primary-fixed': '#410000',
+              'on-secondary-fixed': '#001c39',
+              'on-secondary': '#ffffff',
+              'error-container': '#ffdad6',
+              'surface-container-high': '#f5e6da',
+            },
+            borderRadius: { DEFAULT: '1rem', lg: '2rem', xl: '3rem', full: '9999px' },
+            spacing: {
+              'margin-tablet': '1.5rem',
+              'space-sm': '0.5rem',
+              'space-xl': '1.5rem',
+              margin: '1rem',
+              gutter: '0.75rem',
+              'space-2xl': '2rem',
+              'space-lg': '1rem',
+              'space-md': '0.75rem',
+              'space-xs': '0.25rem',
+              'gutter-tablet': '1rem',
+            },
+            fontFamily: {
+              'body-sm': ['Be Vietnam Pro'],
+              'headline-lg': ['Quicksand'],
+              'display-lg': ['Quicksand'],
+              'headline-sm': ['Quicksand'],
+              'label-sm': ['Be Vietnam Pro'],
+              'label-lg': ['Be Vietnam Pro'],
+              'body-lg': ['Be Vietnam Pro'],
+              'headline-md': ['Quicksand'],
+              'body-md': ['Be Vietnam Pro'],
+              'label-md': ['Be Vietnam Pro'],
+            },
+            fontSize: {
+              'body-sm': ['12px', { lineHeight: '16px', fontWeight: '400' }],
+              'headline-lg': ['28px', { lineHeight: '36px', fontWeight: '700' }],
+              'display-lg': ['36px', { lineHeight: '44px', fontWeight: '700' }],
+              'headline-sm': ['18px', { lineHeight: '24px', fontWeight: '700' }],
+              'label-sm': ['11px', { lineHeight: '14px', letterSpacing: '0.5px', fontWeight: '700' }],
+              'label-lg': ['15px', { lineHeight: '20px', fontWeight: '700' }],
+              'body-lg': ['16px', { lineHeight: '24px', fontWeight: '500' }],
+              'headline-md': ['22px', { lineHeight: '28px', fontWeight: '700' }],
+              'body-md': ['14px', { lineHeight: '20px', fontWeight: '500' }],
+              'label-md': ['13px', { lineHeight: '18px', fontWeight: '700' }],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-surface text-on-surface flex flex-col min-h-screen selection:bg-primary-fixed">
+    <header
+      class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"
+    >
+      <div class="h-20 px-space-md flex flex-col justify-center gap-space-xs">
+        <div class="flex items-center justify-between gap-space-xs">
+          <div class="flex items-center gap-space-xs">
+            <img
+              alt="Logo Ca Trực Labo"
+              class="h-8 w-auto object-contain"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDchugz0eHklefGNPrhP_NMKNPbWGecGH2glyWchaJXjdcAC4Z45xPj6g6-ITE8Y5zSVu2-JuEBuUtcLYjhA7Luwg_0ZAGaqe9EbDykeIZPx725Bk-k20T-QQu6QqOBe9oziovKuyiuyQODGWfowHf_K7ejNO2Q0WLumSDjPjB-E5whbglDbKp-1rEbkYOQZwgOuBn2Lh2BRBPTrytzYz9wIRinj3vAb_7LM4hUINXZ"
+            />
+            <div class="flex flex-col">
+              <span class="font-headline-sm text-headline-sm text-primary tracking-tight leading-none"
+                >CA TRỰC LABO</span
+              ><span class="font-label-sm text-label-sm text-on-surface-variant font-medium"
+                >Thiet Bi Va Nang Cap</span
+              >
+            </div>
+          </div>
+          <div class="flex items-center gap-space-xs">
+            <div
+              class="flex items-center gap-1.5 bg-surface-container px-2.5 py-1 rounded-full shadow-[0_2px_0_#e6d7cc]"
+            >
+              <span class="font-label-sm text-label-sm text-on-surface-variant">🪙 12,450</span
+              ><span class="w-1 h-1 rounded-full bg-outline-variant"></span
+              ><span class="font-label-sm text-label-sm text-on-surface-variant">☕ 85/100</span
+              ><span class="w-1 h-1 rounded-full bg-outline-variant"></span
+              ><span class="font-label-sm text-label-sm text-on-surface-variant">⭐ 4.9</span>
+            </div>
+            <button
+              class="w-11 h-11 rounded-full bg-surface-container-high active:translate-y-0.5 shadow-[0_3px_0_#e6d7cc] flex items-center justify-center text-on-surface"
+            >
+              <span class="material-symbols-outlined text-[20px]">pause</span></button
+            ><button
+              class="w-11 h-11 rounded-full bg-surface-container-high active:translate-y-0.5 shadow-[0_3px_0_#e6d7cc] flex items-center justify-center text-on-surface"
+            >
+              <span class="material-symbols-outlined text-[20px]">settings</span></button
+            ><img
+              alt="Profile"
+              class="w-8 h-8 rounded-full object-cover ring-2 ring-primary-fixed"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_dqRHDV4bSfmgxvZ4p4Yt__wSXub3sAGirgdL4HnNPfvt6M_dy4pcIOmw8g4e7ojeeNo0tKeW61NfoEwGWaHI5dPloDXtC1AeY0gQ8uh5kmKNWpNKgvc2qd8oaDhfEfuqy9MO1OzJ4RJPugl9PoCBPNdhEj40j_CV6fB8u_Yfr6FutJLxgcgb5MU7SAKSkLEusyjQlZAGVmmSsmdkw1RU49pqwnqdqcljzcOQ9xrX"
+            />
+          </div>
+        </div>
+        <div
+          class="flex items-center justify-between text-label-sm font-label-sm bg-surface-container-low px-space-sm py-0.5 rounded-DEFAULT"
+        >
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-tertiary-container animate-ping"></span
+            ><span class="text-tertiary font-bold">☀️ Ca Sáng • 08:45</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="text-on-surface-variant">KTV:</span
+            ><span class="font-bold text-on-surface">An Nhiên (Tập sự Lv.3)</span>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="flex flex-col relative w-full pt-20 pb-24 bg-surface min-h-screen">
+      <div class="flex flex-col w-full px-space-md py-space-sm gap-space-md">
+        <!-- Laboratory Renown & Workshop Header Banner -->
+        <section
+          class="relative overflow-hidden rounded-lg bg-surface-container-high p-space-md shadow-[0_4px_0_#e6d7cc]"
+        >
+          <div class="flex items-start justify-between gap-space-sm mb-space-sm">
+            <div class="flex flex-col gap-0.5">
+              <div
+                class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed self-start shadow-[0_2px_0_#a4c9ff]"
+              >
+                <span class="material-symbols-outlined text-[14px]">stars</span>
+                <span class="font-label-sm text-label-sm uppercase tracking-wide">Cấp Độ Labo: 05</span>
+              </div>
+              <h2 class="font-headline-sm text-headline-sm text-on-surface mt-1">Phòng Xét Nghiệm Cấp II</h2>
+              <p class="font-body-sm text-body-sm text-on-surface-variant">
+                Xưởng nâng cấp trang thiết bị chuẩn ISO 15189
+              </p>
+            </div>
+            <div
+              class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary shadow-[0_3px_0_#e6d7cc] shrink-0"
+            >
+              <span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1"
+                >build_circle</span
+              >
+            </div>
+          </div>
+          <!-- Currency & Research Points Bar -->
+          <div class="grid grid-cols-2 gap-space-xs mb-space-sm">
+            <div
+              class="flex items-center gap-2 bg-surface-container-lowest px-3 py-2 rounded-DEFAULT shadow-[0_2px_0_#faebdf]"
+            >
+              <span class="text-[20px]">🪙</span>
+              <div class="flex flex-col">
+                <span class="font-label-sm text-label-sm text-on-surface-variant">Ngân Sách Quỹ</span>
+                <span class="font-headline-sm text-headline-sm text-on-surface font-bold leading-tight"
+                  >12,450</span
+                >
+              </div>
+            </div>
+            <div
+              class="flex items-center gap-2 bg-surface-container-lowest px-3 py-2 rounded-DEFAULT shadow-[0_2px_0_#faebdf]"
+            >
+              <span class="text-[20px]">🧪</span>
+              <div class="flex flex-col">
+                <span class="font-label-sm text-label-sm text-on-surface-variant">Điểm Nghiên Cứu</span>
+                <span class="font-headline-sm text-headline-sm text-tertiary font-bold leading-tight"
+                  >45 PTS</span
+                >
+              </div>
+            </div>
+          </div>
+          <!-- Active Tycoon Buffs Ribbon -->
+          <div class="flex items-center gap-space-xs overflow-x-auto pb-1 -mx-1 px-1">
+            <div
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed shrink-0 shadow-[0_2px_0_#61de8a]"
+            >
+              <span class="material-symbols-outlined text-[16px]">bolt</span>
+              <span class="font-label-sm text-label-sm font-bold">Quay Ly Tâm +25% Tốc Độ</span>
+            </div>
+            <div
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed shrink-0 shadow-[0_2px_0_#a4c9ff]"
+            >
+              <span class="material-symbols-outlined text-[16px]">verified</span>
+              <span class="font-label-sm text-label-sm font-bold">Lỗi Kỹ Thuật -15%</span>
+            </div>
+          </div>
+        </section>
+        <!-- Interactive Section Tabs (Chunky Pill Segment Control) -->
+        <div
+          class="flex items-center gap-space-xs bg-surface-container p-1 rounded-full shadow-[0_3px_0_#e6d7cc]"
+        >
+          <button
+            class="flex-1 py-2 rounded-full font-label-md text-label-md transition-all flex items-center justify-center gap-1.5 bg-surface-container-lowest text-primary shadow-[0_3px_0_#faebdf]"
+            id="tab-machines-btn"
+            onclick="switchLabTab('machines')"
+          >
+            <span class="material-symbols-outlined text-[18px]">biotech</span>
+            <span>Máy Chẩn Đoán</span>
+          </button>
+          <button
+            class="flex-1 py-2 rounded-full font-label-md text-label-md transition-all flex items-center justify-center gap-1.5 text-on-surface-variant active:translate-y-0.5"
+            id="tab-amenities-btn"
+            onclick="switchLabTab('amenities')"
+          >
+            <span class="material-symbols-outlined text-[18px]">coffee</span>
+            <span>Góc Tiện Nghi Ca</span>
+          </button>
+        </div>
+        <!-- CONTAINER 1: Equipment Showcase (Machines) -->
+        <div class="flex flex-col gap-space-md" id="panel-machines">
+          <!-- Card 1: Centrifuge Hettich Chibi -->
+          <article
+            class="flex flex-col bg-surface-container-low rounded-lg p-space-md shadow-[0_4px_0_#faebdf] relative overflow-hidden"
+          >
+            <div class="flex items-start gap-space-sm mb-space-sm">
+              <div
+                class="w-20 h-20 rounded-DEFAULT bg-surface-container-lowest flex items-center justify-center p-1 shadow-[0_2px_0_#faebdf] shrink-0 relative"
+              >
+                <img
+                  class="w-full h-full object-cover rounded-DEFAULT"
+                  data-alt="Chibi laboratory refrigerated centrifuge machine cute style, round acrylic glass lid, retro dial gauge, tiny cartoon stickers, cozy warm lighting, laboratory miniature game asset"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTdPlcem8JI6ZxfktMMGDdNIqMW5OMK-jUAJ7viHfcxC7WkRzCYurOMExQ0CZjiUa5q4AtLT0s40i9jkKMR_Z5JSSxp0-vdWMUFQ8HDAEVIWAW7HMoXj2cpCyxOn9ed_IZ16nUI7wXR-gGsQO2KHxx2Thj14J8hwsDVgnoNWZpNuLOGPYCB113H1NqVvI87MffC87BTZhNTl2TAeLmJKku8OZa2-t-Z5TDVQsznauW"
+                />
+                <span
+                  class="absolute -top-1.5 -right-1.5 bg-primary text-on-primary font-label-sm text-label-sm px-1.5 py-0.2 rounded-full shadow-[0_1.5px_0_#910807]"
+                  >LV.3</span
+                >
+              </div>
+              <div class="flex flex-col flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-1">
+                  <h3 class="font-headline-sm text-headline-sm text-on-surface truncate">
+                    Máy Ly Tâm Lạnh Hettich 🌀
+                  </h3>
+                </div>
+                <div class="flex items-center gap-1 my-1">
+                  <span class="font-label-sm text-label-sm text-on-surface-variant">Cấp Độ:</span>
+                  <div class="flex items-center gap-0.5 text-primary text-[14px]">
+                    <span
+                      class="material-symbols-outlined text-[15px]"
+                      style="font-variation-settings: 'FILL' 1"
+                      >star</span
+                    >
+                    <span
+                      class="material-symbols-outlined text-[15px]"
+                      style="font-variation-settings: 'FILL' 1"
+                      >star</span
+                    >
+                    <span
+                      class="material-symbols-outlined text-[15px]"
+                      style="font-variation-settings: 'FILL' 1"
+                      >star</span
+                    >
+                    <span class="material-symbols-outlined text-[15px] text-outline-variant">star</span>
+                    <span class="material-symbols-outlined text-[15px] text-outline-variant">star</span>
+                  </div>
+                </div>
+                <p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">
+                  Quay tách huyết thanh siêu êm, giảm tối đa vỡ hồng cầu
+                </p>
+              </div>
+            </div>
+            <!-- Stat Progression Compare Box -->
+            <div
+              class="bg-surface-container-lowest rounded-DEFAULT p-space-xs mb-space-sm shadow-[0_2px_0_#faebdf]"
+            >
+              <div class="flex items-center justify-between text-body-sm font-body-sm px-2 py-1">
+                <span class="text-on-surface-variant">Tốc độ xử lý:</span>
+                <div class="flex items-center gap-1.5 font-bold">
+                  <span class="text-on-surface">4 ống/phút</span>
+                  <span class="text-primary material-symbols-outlined text-[14px]">arrow_forward</span>
+                  <span class="text-tertiary">6 ống/phút (+50%)</span>
+                </div>
+              </div>
+            </div>
+            <!-- Chunky Tactile 3D Upgrade Button -->
+            <button
+              class="w-full h-12 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center gap-2 active:translate-y-1 shadow-[0_5px_0_#005228] transition-transform"
+            >
+              <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1"
+                >upgrade</span
+              >
+              <span class="font-label-lg text-label-lg">Nâng Cấp Cấp 4 (3,200 🪙)</span>
+            </button>
+          </article>
+          <!-- Card 2: Optical Microscope Olympus Chibi -->
+          <article
+            class="flex flex-col bg-surface-container-low rounded-lg p-space-md shadow-[0_4px_0_#faebdf] relative overflow-hidden"
+          >
+            <div class="flex items-start gap-space-sm mb-space-sm">
+              <div
+                class="w-20 h-20 rounded-DEFAULT bg-surface-container-lowest flex items-center justify-center p-1 shadow-[0_2px_0_#faebdf] shrink-0 relative"
+              >
+                <img
+                  class="w-full h-full object-cover rounded-DEFAULT"
+                  data-alt="Chibi vintage laboratory optical microscope with bright LED lamp, brass ocular details, cute cartoon character face reflection on lens, soft warm anime pastel laboratory style"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdLCDjzyRa0_I7pAtMBqdhja0MvaVOXRdlrVm2Ptas_RCpimzp4a0tgUhX6Ba8_jOoJWij9MuqK-tvfNdEgQRIbKV4XjdBHjhxjw7ISd_3apP9wwkK9cytLYThGmiq8z7uCCA0ei1yHEObUzR7kxkfMNLZ1F8uEFEbQ-W6sPDJdR92TKHAitSfeRNGaW85sygEViM1S-5h1n4_sB7uhnw1y02iEV04Fy4ZQQCglddX"
+                />
+                <span
+                  class="absolute -top-1.5 -right-1.5 bg-primary text-on-primary font-label-sm text-label-sm px-1.5 py-0.2 rounded-full shadow-[0_1.5px_0_#910807]"
+                  >LV.2</span
+                >
+              </div>
+              <div class="flex flex-col flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-1">
+                  <h3 class="font-headline-sm text-headline-sm text-on-surface truncate">
+                    Kính Hiển Vi Olympus 🔬
+                  </h3>
+                </div>
+                <div class="flex items-center gap-1 my-1">
+                  <span class="font-label-sm text-label-sm text-on-surface-variant">Cấp Độ:</span>
+                  <div class="flex items-center gap-0.5 text-primary text-[14px]">
+                    <span
+                      class="material-symbols-outlined text-[15px]"
+                      style="font-variation-settings: 'FILL' 1"
+                      >star</span
+                    >
+                    <span
+                      class="material-symbols-outlined text-[15px]"
+                      style="font-variation-settings: 'FILL' 1"
+                      >star</span
+                    >
+                    <span class="material-symbols-outlined text-[15px] text-outline-variant">star</span>
+                    <span class="material-symbols-outlined text-[15px] text-outline-variant">star</span>
+                    <span class="material-symbols-outlined text-[15px] text-outline-variant">star</span>
+                  </div>
+                </div>
+                <p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">
+                  Vật kính 100x ngâm dầu soi rõ bạch cầu ái toan &amp; ký sinh trùng
+                </p>
+              </div>
+            </div>
+            <div
+              class="bg-surface-container-lowest rounded-DEFAULT p-space-xs mb-space-sm shadow-[0_2px_0_#faebdf]"
+            >
+              <div class="flex items-center justify-between text-body-sm font-body-sm px-2 py-1">
+                <span class="text-on-surface-variant">Độ chuẩn chẩn đoán:</span>
+                <div class="flex items-center gap-1.5 font-bold">
+                  <span class="text-on-surface">Độ phóng 400x</span>
+                  <span class="text-primary material-symbols-outlined text-[14px]">arrow_forward</span>
+                  <span class="text-tertiary">Chính Xác +20%</span>
+                </div>
+              </div>
+            </div>
+            <button
+              class="w-full h-12 rounded-full bg-secondary text-on-secondary flex items-center justify-center gap-2 active:translate-y-1 shadow-[0_5px_0_#004883] transition-transform"
+            >
+              <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1"
+                >upgrade</span
+              >
+              <span class="font-label-lg text-label-lg">Nâng Cấp Cấp 3 (4,500 🪙)</span>
+            </button>
+          </article>
+          <!-- Card 3: Automated Chemistry Analyzer Cobas Mini -->
+          <article
+            class="flex flex-col bg-surface-container-low rounded-lg p-space-md shadow-[0_4px_0_#faebdf] relative overflow-hidden"
+          >
+            <div class="flex items-start gap-space-sm mb-space-sm">
+              <div
+                class="w-20 h-20 rounded-DEFAULT bg-surface-container-lowest flex items-center justify-center p-1 shadow-[0_2px_0_#faebdf] shrink-0 relative"
+              >
+                <img
+                  class="w-full h-full object-cover rounded-DEFAULT"
+                  data-alt="Chibi automated clinical biochemistry analyzer machine with conveyor belt, miniature colorful serum test tubes, cute blinking green LED status indicator light, cozy isometric game toy style"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAu-NEgYtrRwfKfScYoUPh3mm4ZmYUU6ZsN27C1IklojnqVIMkTHOwDO44_dJH7ikNdwM0t_QeHyZUqfPHtjmY8oNHB4gL-yB9rQnJHTdJLHuXirY23lZkpMCq6lyq4OdsKag07gJmQnQ4xMDRHNFdtlZ2fuX2yqwnzqqg8i8uShL8YCIAvP39wJYXVexKFDNb812ZggTWRaMEHt790xN5fy-AdT_wm4RTwqQKjRK7b"
+                />
+                <span
+                  class="absolute -top-1.5 -right-1.5 bg-primary text-on-primary font-label-sm text-label-sm px-1.5 py-0.2 rounded-full shadow-[0_1.5px_0_#910807]"
+                  >LV.1</span
+                >
+              </div>
+              <div class="flex flex-col flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-1">
+                  <h3 class="font-headline-sm text-headline-sm text-on-surface truncate">
+                    Hệ Cobas-Mini Hóa Sinh 🧪
+                  </h3>
+                </div>
+                <div class="flex items-center gap-1.5 my-1">
+                  <span class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></span>
+                  <span class="font-label-sm text-label-sm text-tertiary font-bold">Độ Bền Máy: 92%</span>
+                </div>
+                <p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">
+                  Tự động hút mẫu pipet, đo 30 chỉ số sinh hóa cùng lúc
+                </p>
+              </div>
+            </div>
+            <!-- Maintenance Info Meter -->
+            <div
+              class="bg-surface-container-lowest rounded-DEFAULT p-space-xs mb-space-sm shadow-[0_2px_0_#faebdf]"
+            >
+              <div class="flex items-center justify-between text-body-sm font-body-sm px-2 py-1">
+                <span class="text-on-surface-variant">Chu kỳ hiệu chuẩn Calibrator:</span>
+                <span class="text-on-surface font-bold">Cần cân lại sau 3 ca</span>
+              </div>
+            </div>
+            <button
+              class="w-full h-12 rounded-full bg-surface-container-highest text-on-surface flex items-center justify-center gap-2 active:translate-y-1 shadow-[0_5px_0_#e6d7cc] transition-transform"
+            >
+              <span class="material-symbols-outlined text-[20px] text-primary">build</span>
+              <span class="font-label-lg text-label-lg">Bảo Dưỡng &amp; Cân Chỉnh (800 🪙)</span>
+            </button>
+          </article>
+          <!-- Card 4: Locked Autoclave & Biosafety Cabinet -->
+          <article
+            class="flex flex-col bg-surface-container rounded-lg p-space-md opacity-80 shadow-[0_3px_0_#e6d7cc] relative"
+          >
+            <div class="flex items-start gap-space-sm mb-space-sm">
+              <div
+                class="w-20 h-20 rounded-DEFAULT bg-surface-dim flex items-center justify-center p-1 shrink-0 relative"
+              >
+                <span class="material-symbols-outlined text-[36px] text-outline">lock</span>
+              </div>
+              <div class="flex flex-col flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-1">
+                  <h3 class="font-headline-sm text-headline-sm text-on-surface-variant truncate">
+                    Tủ An Toàn Sinh Học Cấp 2 ☣️
+                  </h3>
+                </div>
+                <div class="inline-flex items-center gap-1 text-primary my-1">
+                  <span class="material-symbols-outlined text-[16px]">lock_clock</span>
+                  <span class="font-label-sm text-label-sm font-bold">Yêu cầu: Trưởng Kíp Trực (Lv.8)</span>
+                </div>
+                <p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2">
+                  Tiệt trùng hơi nước áp suất cao, nuôi cấy vi sinh vật kháng thuốc an toàn tuyệt đối
+                </p>
+              </div>
+            </div>
+            <button
+              class="w-full h-12 rounded-full bg-surface-dim text-outline cursor-not-allowed flex items-center justify-center gap-2 shadow-[0_2px_0_#faebdf]"
+              disabled=""
+            >
+              <span class="material-symbols-outlined text-[18px]">lock</span>
+              <span class="font-label-lg text-label-lg">Chưa Mở Khóa Thiết Bị</span>
+            </button>
+          </article>
+        </div>
+        <!-- CONTAINER 2: Staff Perks & Lab Comfort Amenities (Hidden by default, toggled via JS) -->
+        <div class="hidden flex-col gap-space-md" id="panel-amenities">
+          <!-- Amenity 1: Espresso Machine -->
+          <article
+            class="flex flex-col bg-surface-container-low rounded-lg p-space-md shadow-[0_4px_0_#faebdf]"
+          >
+            <div class="flex items-start gap-space-sm mb-space-sm">
+              <div
+                class="w-16 h-16 rounded-DEFAULT bg-surface-container-lowest flex items-center justify-center text-[30px] shadow-[0_2px_0_#faebdf] shrink-0"
+              >
+                ☕
+              </div>
+              <div class="flex flex-col flex-1 min-w-0">
+                <h3 class="font-headline-sm text-headline-sm text-on-surface truncate">
+                  Máy Pha Cà Phê Espresso Góc Lab
+                </h3>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+                  Hồi phục năng lượng KTV nhanh hơn +30% giữa các lượt trả kết quả khẩn.
+                </p>
+              </div>
+            </div>
+            <div
+              class="flex items-center justify-between bg-surface-container-lowest px-3 py-2 rounded-DEFAULT mb-space-sm shadow-[0_2px_0_#faebdf]"
+            >
+              <span class="font-body-sm text-body-sm text-on-surface-variant">Hiệu ứng:</span>
+              <span class="font-label-sm text-label-sm text-tertiary font-bold"
+                >+15 Năng Lượng / Ca Trực</span
+              >
+            </div>
+            <button
+              class="w-full h-12 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center gap-2 active:translate-y-1 shadow-[0_5px_0_#005228] transition-transform"
+            >
+              <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+              <span class="font-label-lg text-label-lg">Trang Bị Ngay (1,500 🪙)</span>
+            </button>
+          </article>
+          <!-- Amenity 2: Lo-Fi Speaker -->
+          <article
+            class="flex flex-col bg-surface-container-low rounded-lg p-space-md shadow-[0_4px_0_#faebdf]"
+          >
+            <div class="flex items-start gap-space-sm mb-space-sm">
+              <div
+                class="w-16 h-16 rounded-DEFAULT bg-surface-container-lowest flex items-center justify-center text-[30px] shadow-[0_2px_0_#faebdf] shrink-0"
+              >
+                📻
+              </div>
+              <div class="flex flex-col flex-1 min-w-0">
+                <h3 class="font-headline-sm text-headline-sm text-on-surface truncate">
+                  Dàn Loa Bluetooth Lofi Chill
+                </h3>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+                  Nhạc nền êm dịu giúp toàn bộ nhân sự tập trung, giảm stress khi có ca cấp cứu dồn dập.
+                </p>
+              </div>
+            </div>
+            <div
+              class="flex items-center justify-between bg-surface-container-lowest px-3 py-2 rounded-DEFAULT mb-space-sm shadow-[0_2px_0_#faebdf]"
+            >
+              <span class="font-body-sm text-body-sm text-on-surface-variant">Hiệu ứng:</span>
+              <span class="font-label-sm text-label-sm text-secondary font-bold"
+                >Giảm 50% Tốc Độ Tụt Tinh Thần</span
+              >
+            </div>
+            <button
+              class="w-full h-12 rounded-full bg-secondary text-on-secondary flex items-center justify-center gap-2 active:translate-y-1 shadow-[0_5px_0_#004883] transition-transform"
+            >
+              <span class="material-symbols-outlined text-[20px]">check_circle</span>
+              <span class="font-label-lg text-label-lg">Đang Sử Dụng (Cấp 1)</span>
+            </button>
+          </article>
+          <!-- Amenity 3: Ergonomic Chair -->
+          <article
+            class="flex flex-col bg-surface-container-low rounded-lg p-space-md shadow-[0_4px_0_#faebdf]"
+          >
+            <div class="flex items-start gap-space-sm mb-space-sm">
+              <div
+                class="w-16 h-16 rounded-DEFAULT bg-surface-container-lowest flex items-center justify-center text-[30px] shadow-[0_2px_0_#faebdf] shrink-0"
+              >
+                🪑
+              </div>
+              <div class="flex flex-col flex-1 min-w-0">
+                <h3 class="font-headline-sm text-headline-sm text-on-surface truncate">
+                  Ghế Xoay Êm Ái Chống Đau Lưng
+                </h3>
+                <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+                  Đệm cao su non êm ái, ngồi đọc tiêu bản kính hiển vi 3 tiếng không mỏi cổ.
+                </p>
+              </div>
+            </div>
+            <div
+              class="flex items-center justify-between bg-surface-container-lowest px-3 py-2 rounded-DEFAULT mb-space-sm shadow-[0_2px_0_#faebdf]"
+            >
+              <span class="font-body-sm text-body-sm text-on-surface-variant">Hiệu ứng:</span>
+              <span class="font-label-sm text-label-sm text-tertiary font-bold"
+                >+10% Tốc Độ Đọc Tiêu Bản Máu</span
+              >
+            </div>
+            <button
+              class="w-full h-12 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center gap-2 active:translate-y-1 shadow-[0_5px_0_#005228] transition-transform"
+            >
+              <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+              <span class="font-label-lg text-label-lg">Mua Ghế Mới (2,100 🪙)</span>
+            </button>
+          </article>
+        </div>
+        <!-- Cute Laboratory Tip Clipboard Notice -->
+        <aside
+          class="relative mt-space-xs rounded-DEFAULT bg-surface-container-high p-space-sm flex items-center gap-space-sm shadow-[0_2px_0_#e6d7cc]"
+        >
+          <span class="text-[24px]">💡</span>
+          <p class="font-body-sm text-body-sm text-on-surface-variant">
+            <strong class="text-on-surface">Mẹo nhỏ Labo:</strong> Cân chỉnh máy Cobas-Mini định kỳ sẽ tránh
+            được các kết quả nghi ngờ "chạy lại mẫu" làm chậm tiến độ ca trực!
+          </p>
+        </aside>
+      </div>
+      <script>
+        function switchLabTab(tabName) {
+          const machinesPanel = document.getElementById('panel-machines');
+          const amenitiesPanel = document.getElementById('panel-amenities');
+          const machinesBtn = document.getElementById('tab-machines-btn');
+          const amenitiesBtn = document.getElementById('tab-amenities-btn');
+
+          if (tabName === 'machines') {
+            machinesPanel.classList.remove('hidden');
+            machinesPanel.classList.add('flex');
+            amenitiesPanel.classList.add('hidden');
+            amenitiesPanel.classList.remove('flex');
+
+            machinesBtn.className =
+              'flex-1 py-2 rounded-full font-label-md text-label-md transition-all flex items-center justify-center gap-1.5 bg-surface-container-lowest text-primary shadow-[0_3px_0_#faebdf]';
+            amenitiesBtn.className =
+              'flex-1 py-2 rounded-full font-label-md text-label-md transition-all flex items-center justify-center gap-1.5 text-on-surface-variant active:translate-y-0.5';
+          } else {
+            machinesPanel.classList.add('hidden');
+            machinesPanel.classList.remove('flex');
+            amenitiesPanel.classList.remove('hidden');
+            amenitiesPanel.classList.add('flex');
+
+            amenitiesBtn.className =
+              'flex-1 py-2 rounded-full font-label-md text-label-md transition-all flex items-center justify-center gap-1.5 bg-surface-container-lowest text-primary shadow-[0_3px_0_#faebdf]';
+            machinesBtn.className =
+              'flex-1 py-2 rounded-full font-label-md text-label-md transition-all flex items-center justify-center gap-1.5 text-on-surface-variant active:translate-y-0.5';
+          }
+        }
+      </script>
+    </main>
+    <nav
+      class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-4px_16px_rgba(93,83,74,0.06)]"
+      data-active-classes="bg-surface-container-highest text-primary shadow-[0_3px_0_#e6d7cc]"
+    >
+      <div class="h-20 px-space-xs flex items-center justify-around gap-1">
+        <a
+          class="flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-DEFAULT transition-all text-on-surface-variant active:translate-y-0.5"
+          data-path="tiep-nhan"
+          href="#"
+          ><span class="material-symbols-outlined text-[22px]">inventory_2</span
+          ><span class="font-label-sm text-label-sm mt-0.5 text-center line-clamp-1">Tiếp Nhận</span></a
+        ><a
+          class="flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-DEFAULT transition-all text-on-surface-variant active:translate-y-0.5"
+          data-path="ban-xet-nghiem"
+          href="#"
+          ><span class="material-symbols-outlined text-[22px]">biotech</span
+          ><span class="font-label-sm text-label-sm mt-0.5 text-center line-clamp-1">Bàn Labo</span></a
+        ><a
+          aria-current="page"
+          class="flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-DEFAULT transition-all active:translate-y-0.5 bg-surface-container-highest text-primary shadow-[0_3px_0_#e6d7cc]"
+          data-path="thiet-bi-va-nang-cap"
+          href="#"
+          ><span class="material-symbols-outlined text-[22px]">precision_manufacturing</span
+          ><span class="font-label-sm text-label-sm mt-0.5 text-center line-clamp-1">Nâng Cấp</span></a
+        ><a
+          class="flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-DEFAULT transition-all text-on-surface-variant active:translate-y-0.5"
+          data-path="so-tay-chan-doan"
+          href="#"
+          ><span class="material-symbols-outlined text-[22px]">menu_book</span
+          ><span class="font-label-sm text-label-sm mt-0.5 text-center line-clamp-1">Sổ Tay</span></a
+        >
+      </div>
+    </nav>
+  </body>
+</html>

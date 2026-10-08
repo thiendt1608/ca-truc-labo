@@ -1,0 +1,605 @@
+<!doctype html>
+
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+      name="viewport"
+    />
+    <meta content="mobile_tab" name="shell-type" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&amp;family=Be+Vietnam+Pro:wght@400;500;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      @layer base {
+        html,
+        body {
+          width: 100vw;
+          margin: 0;
+          padding: 0;
+        }
+        body {
+          overscroll-behavior: none;
+        }
+        .pb-safe {
+          padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        .pt-safe {
+          padding-top: env(safe-area-inset-top, 0px);
+        }
+        main > :first-child {
+          margin-top: 0 !important;
+        }
+        main > :last-child {
+          margin-bottom: 0 !important;
+        }
+      }
+      ::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'secondary-fixed': '#d4e3ff',
+              secondary: '#0060ac',
+              'surface-container-low': '#fff1e7',
+              primary: '#b1241a',
+              'on-primary-fixed-variant': '#910807',
+              'inverse-primary': '#ffb4a9',
+              'on-error-container': '#93000a',
+              'on-secondary-fixed-variant': '#004883',
+              'on-error': '#ffffff',
+              surface: '#fff8f4',
+              'on-surface': '#211a13',
+              'on-tertiary': '#ffffff',
+              'surface-container-highest': '#efe0d4',
+              'surface-container-lowest': '#ffffff',
+              'surface-bright': '#fff8f4',
+              'on-secondary': '#ffffff',
+              'on-surface-variant': '#5a413d',
+              tertiary: '#006a35',
+              'primary-container': '#d43e30',
+              'tertiary-container': '#008645',
+              'surface-variant': '#efe0d4',
+              outline: '#8e706b',
+              'inverse-surface': '#372f27',
+              'inverse-on-surface': '#fdeee2',
+              'on-background': '#211a13',
+              'surface-dim': '#e6d7cc',
+              'primary-fixed': '#ffdad5',
+              'on-primary-fixed': '#410000',
+              'tertiary-fixed-dim': '#61de8a',
+              error: '#ba1a1a',
+              'on-primary-container': '#fffbff',
+              'surface-tint': '#b4271d',
+              'tertiary-fixed': '#7efba4',
+              'primary-fixed-dim': '#ffb4a9',
+              'surface-container': '#faebdf',
+              'on-tertiary-container': '#f6fff4',
+              'on-primary': '#ffffff',
+              'on-secondary-container': '#003e73',
+              'secondary-fixed-dim': '#a4c9ff',
+              'on-secondary-fixed': '#001c39',
+              'error-container': '#ffdad6',
+              'surface-container-high': '#f5e6da',
+              'outline-variant': '#e2beb9',
+              'on-tertiary-fixed': '#00210c',
+              'secondary-container': '#68abff',
+              background: '#fff8f4',
+              'on-tertiary-fixed-variant': '#005228',
+            },
+            borderRadius: { DEFAULT: '1rem', lg: '2rem', xl: '3rem', full: '9999px' },
+            spacing: {
+              'gutter-tablet': '1rem',
+              'space-md': '0.75rem',
+              'space-xs': '0.25rem',
+              'space-xl': '1.5rem',
+              'space-lg': '1rem',
+              'space-2xl': '2rem',
+              'margin-tablet': '1.5rem',
+              margin: '1rem',
+              'space-sm': '0.5rem',
+              gutter: '0.75rem',
+            },
+            fontFamily: {
+              'label-lg': ['Be Vietnam Pro'],
+              'body-md': ['Be Vietnam Pro'],
+              'display-lg': ['Quicksand'],
+              'headline-md': ['Quicksand'],
+              'headline-lg': ['Quicksand'],
+              'label-sm': ['Be Vietnam Pro'],
+              'label-md': ['Be Vietnam Pro'],
+              'body-lg': ['Be Vietnam Pro'],
+              'headline-sm': ['Quicksand'],
+              'body-sm': ['Be Vietnam Pro'],
+            },
+            fontSize: {
+              'label-lg': ['15px', { lineHeight: '20px', fontWeight: '700' }],
+              'body-md': ['14px', { lineHeight: '20px', fontWeight: '500' }],
+              'display-lg': ['36px', { lineHeight: '44px', fontWeight: '700' }],
+              'headline-md': ['22px', { lineHeight: '28px', fontWeight: '700' }],
+              'headline-lg': ['28px', { lineHeight: '36px', fontWeight: '700' }],
+              'label-sm': ['11px', { lineHeight: '14px', letterSpacing: '0.5px', fontWeight: '700' }],
+              'label-md': ['13px', { lineHeight: '18px', fontWeight: '700' }],
+              'body-lg': ['16px', { lineHeight: '24px', fontWeight: '500' }],
+              'headline-sm': ['18px', { lineHeight: '24px', fontWeight: '700' }],
+              'body-sm': ['12px', { lineHeight: '16px', fontWeight: '400' }],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-surface text-on-surface font-body-md flex flex-col min-h-screen">
+    <header
+      class="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-xl shadow-[0_2px_12px_rgba(90,65,61,0.06)] pt-safe"
+    >
+      <div class="h-20 px-margin flex items-center justify-between gap-space-sm">
+        <div class="flex items-center gap-space-sm min-w-0">
+          <div class="relative flex-shrink-0">
+            <div
+              class="w-11 h-11 rounded-full bg-surface-container-high flex items-center justify-center shadow-[inset_0_2px_4px_rgba(255,255,255,0.8),0_3px_0_#efe0d4]"
+            >
+              <span class="material-symbols-outlined text-primary text-[24px]">biotech</span>
+            </div>
+            <span
+              class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-tertiary-container shadow-[0_0_8px_rgba(0,134,69,0.4)] flex items-center justify-center text-[10px] text-on-tertiary font-bold"
+              >1</span
+            >
+          </div>
+          <div class="flex flex-col min-w-0">
+            <div class="flex items-center gap-1">
+              <span class="font-headline-sm text-headline-sm text-on-surface truncate tracking-tight"
+                >CA TRỰC LABO</span
+              >
+            </div>
+            <div class="flex items-center gap-space-xs">
+              <span
+                class="bg-secondary-fixed text-on-secondary-fixed-variant px-space-xs py-0.5 rounded-full font-label-sm text-label-sm whitespace-nowrap"
+                >KTV Tập sự C.1</span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-space-sm flex-shrink-0">
+          <div
+            class="flex items-center gap-1.5 bg-surface-container-high px-space-sm py-1 rounded-full shadow-[0_2px_0_#efe0d4]"
+          >
+            <span class="material-symbols-outlined text-primary text-[18px]">monetization_on</span
+            ><span class="font-label-md text-label-md text-on-surface font-bold">450k</span>
+          </div>
+          <a
+            class="w-11 h-11 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface shadow-[0_3px_0_#efe0d4] active:translate-y-0.5 transition-transform"
+            data-path="cai-dat"
+            href="#"
+            ><span class="material-symbols-outlined text-[20px]">settings</span></a
+          >
+          <div
+            class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0 shadow-[0_2px_0_#910807]"
+          >
+            <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="flex flex-col relative w-full pt-20 pb-28 bg-surface min-h-screen">
+      <div class="flex flex-col w-full">
+        <div class="px-margin flex flex-col gap-space-lg w-full max-w-md mx-auto">
+          <!-- Top Player Status Card -->
+          <div
+            class="bg-surface-container rounded-lg p-space-md shadow-[0_4px_0_#efe0d4] flex flex-col gap-space-sm relative overflow-hidden"
+          >
+            <!-- Decorative Lab bubbles background -->
+            <div
+              class="absolute -right-4 -top-4 w-20 h-20 rounded-full bg-secondary-fixed/30 pointer-events-none blur-lg"
+            ></div>
+            <div
+              class="absolute right-12 bottom-0 w-12 h-12 rounded-full bg-tertiary-fixed/40 pointer-events-none blur-md"
+            ></div>
+            <div class="flex items-center justify-between gap-space-sm relative z-10">
+              <!-- Chibi Tech Avatar & Level info -->
+              <div class="flex items-center gap-space-sm min-w-0">
+                <div class="relative flex-shrink-0">
+                  <div
+                    class="w-14 h-14 rounded-full bg-surface-container-lowest overflow-hidden shadow-[inset_0_2px_4px_rgba(255,255,255,0.8),0_3px_0_#efe0d4] flex items-center justify-center"
+                  >
+                    <img
+                      class="w-full h-full object-cover"
+                      data-alt="Chibi cute female laboratory technician with round black glasses, brown twin buns, warm friendly smile, wearing a white miniature lab coat with stetho and miniature colorful test tube pin, soft warm pastel cartoon illustration, cozy Animal Crossing aesthetic"
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQnctZrADrhelfuPrgAxzNxFpQFRXuN-yHO6V1Uz_IT0OiCLziBQ7dYfb6I10Rz3ZBxExJ-3fmKvFX15lJBR31kPCXmHmxK4ldxEGT7bfHmz9OBh8jZbjll89YRsUS2AuH4j5f7nll_o68RnAZGk7npp414OlQuqZDlNKU6gQIaNN3kVx_BfSqtHoCQ_45CqfZgLRwhDhqOJvdHXONrug-rBB9A_sBBzfdK1KkOB3s"
+                    />
+                  </div>
+                  <div
+                    class="absolute -bottom-1 -right-1 bg-primary text-on-primary font-label-sm text-label-sm px-1.5 py-0.5 rounded-full shadow-[0_1px_0_#910807] flex items-center justify-center"
+                  >
+                    Lv.1
+                  </div>
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-headline-sm text-headline-sm text-on-surface truncate">Bé Ly Ly</span>
+                    <span class="text-xs">🧪</span>
+                  </div>
+                  <span class="font-label-sm text-label-sm text-on-surface-variant truncate"
+                    >KTV Tập sự · Cấp 1</span
+                  >
+                  <!-- EXP Bar -->
+                  <div
+                    class="w-28 bg-surface-container-high rounded-full h-3 mt-1 overflow-hidden relative shadow-[inset_0_1px_2px_rgba(90,65,61,0.2)]"
+                  >
+                    <div
+                      class="bg-gradient-to-r from-tertiary to-tertiary-fixed-dim h-full rounded-full transition-all duration-500"
+                      style="width: 65%"
+                    ></div>
+                    <span
+                      class="absolute inset-0 flex items-center justify-center text-[8px] font-bold text-on-surface/80 leading-none"
+                      >65/100 EXP</span
+                    >
+                  </div>
+                </div>
+              </div>
+              <!-- Vital Resources -->
+              <div class="flex flex-col gap-1.5 items-end flex-shrink-0">
+                <!-- Energy Coffee -->
+                <div
+                  class="flex items-center gap-1 bg-surface-container-lowest px-2.5 py-1 rounded-full shadow-[0_2px_0_#efe0d4]"
+                >
+                  <span class="text-sm">☕</span>
+                  <span class="font-label-md text-label-md text-tertiary font-bold">100/100</span>
+                </div>
+                <!-- Shift Clock Status -->
+                <div
+                  class="flex items-center gap-1 bg-secondary-fixed text-on-secondary-fixed-variant px-2 py-0.5 rounded-full"
+                >
+                  <span class="material-symbols-outlined text-[14px]">wb_sunny</span>
+                  <span class="font-label-sm text-label-sm font-bold">Ca Sáng</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Hospital Identity Banner -->
+          <div
+            class="bg-surface-container-lowest rounded-lg p-space-md shadow-[0_4px_0_#efe0d4] flex items-center justify-between gap-space-sm relative overflow-hidden"
+          >
+            <div class="flex items-center gap-space-sm min-w-0">
+              <div
+                class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center flex-shrink-0 shadow-[0_2px_0_#a4c9ff]"
+              >
+                <span class="text-xl">🏥</span>
+              </div>
+              <div class="flex flex-col min-w-0">
+                <span class="font-headline-sm text-headline-sm text-on-surface truncate">BVĐK Labo Xanh</span>
+                <span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1">
+                  <span class="w-2 h-2 rounded-full bg-tertiary-container animate-pulse"></span>
+                  Khoa Xét nghiệm Trung tâm · 08:00 - 16:00
+                </span>
+              </div>
+            </div>
+            <div
+              class="flex items-center gap-1 bg-surface-container px-2 py-1 rounded-full text-on-surface flex-shrink-0 font-label-sm text-label-sm"
+            >
+              <span>🌤️</span>
+              <span class="font-bold">28°C</span>
+            </div>
+          </div>
+          <!-- Campaign Progression Map -->
+          <div
+            class="bg-surface-container-low rounded-lg p-space-md shadow-[0_4px_0_#efe0d4] flex flex-col gap-space-md"
+          >
+            <!-- Roadmap Header -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5">
+                <span class="text-lg">🗺️</span>
+                <div>
+                  <div class="font-headline-sm text-headline-sm text-on-surface leading-tight">
+                    Chiến Dịch: Năm Đầu Đi Làm
+                  </div>
+                  <div class="font-label-sm text-label-sm text-tertiary font-bold">
+                    Chương 1/7: Nhập môn Labo
+                  </div>
+                </div>
+              </div>
+              <span
+                class="bg-surface-container px-2.5 py-1 rounded-full font-label-sm text-label-sm text-on-surface-variant font-bold shadow-[0_1px_0_#efe0d4]"
+              >
+                14%
+              </span>
+            </div>
+            <!-- Stepping Stone Stepper Path -->
+            <div
+              class="bg-surface-container-lowest rounded-DEFAULT p-space-md shadow-[inset_0_2px_4px_rgba(90,65,61,0.05),0_2px_0_#efe0d4] relative"
+            >
+              <div class="flex items-center justify-between relative z-10 px-2">
+                <!-- Node 0.1 Active -->
+                <div class="flex flex-col items-center gap-1 group cursor-pointer">
+                  <div
+                    class="w-12 h-12 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center font-bold shadow-[0_4px_0_#005228,0_0_12px_rgba(0,134,69,0.3)] transform -translate-y-1 transition-transform"
+                  >
+                    <span class="material-symbols-outlined text-[24px]">flag</span>
+                  </div>
+                  <span class="font-label-sm text-label-sm font-bold text-tertiary">0.1 Tiếp nhận</span>
+                </div>
+                <!-- Connecting line 1 -->
+                <div class="flex-1 h-1.5 bg-tertiary-container/30 mx-1 rounded-full"></div>
+                <!-- Node 0.2 Locked -->
+                <div class="flex flex-col items-center gap-1 opacity-70">
+                  <div
+                    class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-bold shadow-[0_3px_0_#efe0d4]"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">lock</span>
+                  </div>
+                  <span class="font-label-sm text-label-sm text-on-surface-variant">0.2 Ly tâm</span>
+                </div>
+                <!-- Connecting line 2 -->
+                <div class="flex-1 h-1.5 bg-surface-container-high mx-1 rounded-full"></div>
+                <!-- Node 0.3 Locked -->
+                <div class="flex flex-col items-center gap-1 opacity-70">
+                  <div
+                    class="w-10 h-10 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center font-bold shadow-[0_3px_0_#efe0d4]"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">lock</span>
+                  </div>
+                  <span class="font-label-sm text-label-sm text-on-surface-variant">0.3 Soi lam</span>
+                </div>
+                <!-- Connecting line 3 -->
+                <div class="flex-1 h-1.5 bg-surface-container-high mx-1 rounded-full"></div>
+                <!-- Boss Review -->
+                <div class="flex flex-col items-center gap-1 opacity-60">
+                  <div
+                    class="w-10 h-10 rounded-full bg-surface-container text-outline flex items-center justify-center font-bold shadow-[0_3px_0_#efe0d4]"
+                  >
+                    <span class="text-base">🏆</span>
+                  </div>
+                  <span class="font-label-sm text-label-sm text-outline">Đánh giá</span>
+                </div>
+              </div>
+            </div>
+            <!-- Active Mission Card (Phiếu Giao Việc) -->
+            <div
+              class="bg-surface-container-lowest rounded-lg p-space-md shadow-[0_4px_0_#DFCDB9] flex flex-col gap-space-sm relative overflow-hidden"
+            >
+              <!-- Clipboard brass clamp effect at top -->
+              <div
+                class="absolute top-0 left-1/2 transform -translate-x-1/2 w-20 h-3 bg-outline/20 rounded-b-lg"
+              ></div>
+              <!-- Mission Header & Badge -->
+              <div class="flex items-start justify-between gap-space-sm pt-2">
+                <div class="flex flex-col">
+                  <span class="font-label-sm text-label-sm text-primary font-bold tracking-wide uppercase"
+                    >Nhiệm vụ hiện tại</span
+                  >
+                  <span class="font-headline-sm text-headline-sm text-on-surface"
+                    >Ngày 0.1: Bàn Tiếp Nhận Mẫu</span
+                  >
+                </div>
+                <!-- Difficulty Pill -->
+                <div
+                  class="bg-tertiary-fixed text-on-tertiary-fixed font-label-sm text-label-sm px-2.5 py-1 rounded-full font-bold flex items-center gap-1 shadow-[0_2px_0_#61de8a]"
+                >
+                  <span>🌱</span> Dễ
+                </div>
+              </div>
+              <!-- Star Frame Rating Slots -->
+              <div class="flex items-center gap-1.5 my-0.5">
+                <div
+                  class="flex items-center justify-center w-8 h-8 rounded-full bg-surface-container text-primary shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]"
+                >
+                  <span
+                    class="material-symbols-outlined text-[20px]"
+                    style="font-variation-settings: 'FILL' 1"
+                    >star</span
+                  >
+                </div>
+                <div
+                  class="flex items-center justify-center w-8 h-8 rounded-full bg-surface-container text-outline-variant shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]"
+                >
+                  <span class="material-symbols-outlined text-[20px]">star</span>
+                </div>
+                <div
+                  class="flex items-center justify-center w-8 h-8 rounded-full bg-surface-container text-outline-variant shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]"
+                >
+                  <span class="material-symbols-outlined text-[20px]">star</span>
+                </div>
+                <span class="font-label-sm text-label-sm text-on-surface-variant ml-1 font-bold"
+                  >1/3 Sao đạt được</span
+                >
+              </div>
+              <!-- Mentor Dialogue Bubble -->
+              <div
+                class="bg-surface-container rounded-DEFAULT p-space-sm flex items-start gap-space-sm relative"
+              >
+                <div
+                  class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 bg-surface-container-highest shadow-[0_2px_0_#efe0d4]"
+                >
+                  <img
+                    class="w-full h-full object-cover"
+                    data-alt="Chibi anime senior lab technician woman named Sister Hanh, smiling warmly, holding a clinical clipboard, lavender glasses, neat dark hair under blue surgical hairnet, cozy pastel colors, soft game UI portrait"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0WCBai_jp-Yzgzq1ap_GQyLB8_wrcMRxCJueVCIcP1BCNy0MflrbODEFLvPiR09QtIRiMCyOlApIkeaMFmjjdQJ5au4EynKELsjoXWQwtdQEVK28TC0LYlQ8dyZGyS7xLYPpimjENOiqOSVtzFGT0-R6qjTCFOsmjNeXWTI_G8oIbt2zRmLKojzulsWK1sWW0HWBSdqqHBIsQ4zUy636vWSQB3pkfm3K63nHAogxe"
+                  />
+                </div>
+                <div class="flex flex-col min-w-0">
+                  <div class="flex items-center gap-1">
+                    <span class="font-label-md text-label-md text-on-surface font-bold">Chị Hạnh</span>
+                    <span
+                      class="text-[10px] bg-secondary-fixed text-on-secondary-fixed-variant px-1.5 py-0.2 rounded-full font-bold"
+                      >KTV Chuyên Trách</span
+                    >
+                  </div>
+                  <p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 leading-snug">
+                    "Chào em mới tới! Hôm nay chị sẽ chỉ em cách soi mã vạch ống nghiệm và phân loại mẫu máu
+                    nhé!"
+                  </p>
+                </div>
+              </div>
+              <!-- Mission Objectives -->
+              <div class="flex flex-col gap-1.5 bg-surface-container-low p-space-sm rounded-DEFAULT">
+                <span class="font-label-sm text-label-sm text-on-surface font-bold flex items-center gap-1">
+                  <span class="text-xs">🎯</span> Mục tiêu ca trực:
+                </span>
+                <div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+                  <span class="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0"></span>
+                  <span>Tiếp nhận &amp; đối chiếu 5 mẫu máu STAT</span>
+                </div>
+                <div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+                  <span class="w-1.5 h-1.5 rounded-full bg-secondary flex-shrink-0"></span>
+                  <span>Nhận diện và từ chối 2 ống bị tán huyết</span>
+                </div>
+              </div>
+              <!-- Mission Rewards -->
+              <div class="flex items-center justify-between pt-1">
+                <span class="font-label-sm text-label-sm text-on-surface-variant font-bold"
+                  >Phần thưởng:</span
+                >
+                <div class="flex items-center gap-2">
+                  <div
+                    class="flex items-center gap-1 bg-surface-container-high px-2 py-0.5 rounded-full font-label-sm text-label-sm text-on-surface font-bold"
+                  >
+                    <span>🪙</span> +150
+                  </div>
+                  <div
+                    class="flex items-center gap-1 bg-surface-container-high px-2 py-0.5 rounded-full font-label-sm text-label-sm text-tertiary font-bold"
+                  >
+                    <span>✨</span> +50 EXP
+                  </div>
+                  <div
+                    class="flex items-center gap-1 bg-surface-container-high px-2 py-0.5 rounded-full font-label-sm text-label-sm text-primary font-bold"
+                  >
+                    <span>🏷️</span> Huy hiệu
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Massive Call-to-Action Section -->
+          <div class="flex flex-col gap-space-sm w-full">
+            <!-- Big Chunky 3D Action Button -->
+            <button
+              class="w-full h-16 rounded-full bg-tertiary-container hover:bg-tertiary active:translate-y-1 text-on-tertiary-container font-headline-md text-headline-md flex items-center justify-center gap-2 shadow-[inset_0_2px_0_rgba(255,255,255,0.4),0_6px_0_#005228] transition-transform cursor-pointer relative overflow-hidden group"
+              id="btn-enter-shift"
+            >
+              <!-- Gloss highlight sheen -->
+              <div
+                class="absolute -top-12 left-0 right-0 h-10 bg-white/20 transform -rotate-12 pointer-events-none group-hover:translate-y-20 transition-transform duration-700"
+              ></div>
+              <span class="material-symbols-outlined text-[28px]">play_circle</span>
+              <span>VÀO CA TRỰC NGAY</span>
+            </button>
+            <!-- Quick Preparation / Streak Banner -->
+            <div
+              class="flex items-center justify-between bg-surface-container-high rounded-full px-space-md py-2 shadow-[0_2px_0_#efe0d4]"
+            >
+              <div class="flex items-center gap-2">
+                <span class="text-lg">🔥</span>
+                <span class="font-label-md text-label-md text-on-surface">Chuỗi 3 ngày đi làm đúng giờ!</span>
+              </div>
+              <span class="font-label-sm text-label-sm text-primary font-bold">+10% Điểm Thưởng</span>
+            </div>
+          </div>
+          <!-- Cozy Mini Hospital Bulletin Board -->
+          <div
+            class="bg-surface-container-low rounded-lg p-space-md shadow-[0_4px_0_#efe0d4] flex items-center gap-space-sm relative"
+          >
+            <div
+              class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center flex-shrink-0 text-primary shadow-[0_2px_0_#ffb4a9]"
+            >
+              <span class="material-symbols-outlined text-[20px]">campaign</span>
+            </div>
+            <div class="flex flex-col min-w-0">
+              <span class="font-label-sm text-label-sm text-primary font-bold uppercase tracking-wider"
+                >Bảng Tin BV Hôm Nay</span
+              >
+              <p class="font-body-sm text-body-sm text-on-surface-variant truncate">
+                Khoa Nhi đang quá tải mẫu xét nghiệm (+20% Thưởng EXP khi xử lý nhanh)!
+              </p>
+            </div>
+          </div>
+          <!-- Quick Tool Tray Preview (Mini Racks) -->
+          <div class="flex items-center justify-between gap-space-sm pt-space-xs pb-space-sm">
+            <div
+              class="flex-1 bg-surface-container rounded-DEFAULT p-space-sm flex flex-col items-center text-center shadow-[0_2px_0_#efe0d4] active:translate-y-0.5 transition-transform cursor-pointer"
+            >
+              <span class="text-2xl mb-1">🩸</span>
+              <span class="font-label-sm text-label-sm text-on-surface font-bold">Huyết học</span>
+              <span class="text-[10px] text-on-surface-variant">4 mẫu chờ</span>
+            </div>
+            <div
+              class="flex-1 bg-surface-container rounded-DEFAULT p-space-sm flex flex-col items-center text-center shadow-[0_2px_0_#efe0d4] active:translate-y-0.5 transition-transform cursor-pointer"
+            >
+              <span class="text-2xl mb-1">🧪</span>
+              <span class="font-label-sm text-label-sm text-on-surface font-bold">Hóa sinh</span>
+              <span class="text-[10px] text-tertiary font-bold">Sẵn sàng</span>
+            </div>
+            <div
+              class="flex-1 bg-surface-container rounded-DEFAULT p-space-sm flex flex-col items-center text-center shadow-[0_2px_0_#efe0d4] active:translate-y-0.5 transition-transform cursor-pointer"
+            >
+              <span class="text-2xl mb-1">🔬</span>
+              <span class="font-label-sm text-label-sm text-on-surface font-bold">Kính soi</span>
+              <span class="text-[10px] text-on-surface-variant">Bảo trì tốt</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script>
+        // Simple micro-interaction for main shift CTA button
+        const enterShiftBtn = document.getElementById('btn-enter-shift');
+        if (enterShiftBtn) {
+          enterShiftBtn.addEventListener('click', function () {
+            enterShiftBtn.classList.add('scale-95');
+            setTimeout(() => {
+              enterShiftBtn.classList.remove('scale-95');
+            }, 150);
+          });
+        }
+      </script>
+    </main>
+    <nav
+      class="fixed bottom-0 w-full z-50 pb-safe pointer-events-none"
+      data-active-classes="bg-primary text-on-primary shadow-[0_4px_0_#910807]"
+    >
+      <div class="max-w-md mx-auto px-margin pb-space-sm">
+        <div
+          class="pointer-events-auto h-16 bg-surface-container-lowest/95 backdrop-blur-xl rounded-full px-space-xs flex items-center justify-around shadow-[0_8px_24px_rgba(90,65,61,0.12),0_4px_0_#efe0d4]"
+        >
+          <a
+            class="flex items-center gap-1.5 px-space-md py-2 rounded-full text-on-surface-variant transition-all font-label-md text-label-md"
+            data-path="ca-truc"
+            href="#"
+            ><span class="material-symbols-outlined text-[22px]">medical_services</span
+            ><span>Ca trực</span></a
+          ><a
+            class="flex items-center gap-1.5 px-space-md py-2 rounded-full text-on-surface-variant transition-all font-label-md text-label-md"
+            data-path="ca-thu-thach"
+            href="#"
+            ><span class="material-symbols-outlined text-[22px]">local_fire_department</span
+            ><span>Thử thách</span></a
+          ><a
+            class="flex items-center gap-1.5 px-space-md py-2 rounded-full text-on-surface-variant transition-all font-label-md text-label-md"
+            data-path="so-tay-ktv"
+            href="#"
+            ><span class="material-symbols-outlined text-[22px]">menu_book</span><span>Sổ tay</span></a
+          ><a
+            class="flex items-center gap-1.5 px-space-md py-2 rounded-full text-on-surface-variant transition-all font-label-md text-label-md"
+            data-path="cai-dat"
+            href="#"
+            ><span class="material-symbols-outlined text-[22px]">tune</span><span>Cài đặt</span></a
+          >
+        </div>
+      </div>
+    </nav>
+  </body>
+</html>
