@@ -130,6 +130,16 @@ export function crossCheck(c: Content): ContentProblem[] {
     if (d.qc && !(d.qc.scenario in c.chemQc.scenarios))
       add(where, `kịch bản QC không tồn tại: ${d.qc.scenario}`);
     if (!!d.qc !== d.unlocks.includes('qc')) add(where, 'qc và unlocks "qc" phải đi cùng nhau');
+    for (const e of d.events) {
+      const kind = c.events.events[e.id]?.kind;
+      if (!kind) add(where, `sự kiện không có định nghĩa: ${e.id}`);
+      if (e.at !== undefined && e.at >= d.end - d.start) add(where, `sự kiện ${e.id} rơi sau khi hết ca`);
+      if (
+        (kind === 'machineFault' || kind === 'power' || kind === 'spill' || kind === 'slowLis') &&
+        d.room !== 'chem'
+      )
+        add(where, `sự kiện ${e.id} cần phòng Hoá sinh`);
+    }
     if (d.qc && d.room !== 'chem') add(where, 'QC chỉ dùng cho phòng Hoá sinh');
     for (const s of d.scripted) {
       if (s.orderType && !c.orderTypeById.has(s.orderType))
@@ -154,6 +164,7 @@ export function crossCheck(c: Content): ContentProblem[] {
       }
     }
   }
+  for (const q of c.events.quizzes) codexRefs.push([`events/quiz/${q.id}`, q.codex]);
   for (const [where, id] of codexRefs)
     if (!c.codexById.has(id)) add(where, `thẻ Sổ tay không tồn tại: ${id}`);
   for (const [where, key] of i18nRefs) if (!(key in c.i18n)) add(where, `thiếu chuỗi i18n: ${key}`);

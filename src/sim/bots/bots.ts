@@ -110,6 +110,33 @@ export function botCommands(state: ShiftState, content: Content, p: BotProfile, 
       return pa - pb;
     });
 
+  // 0) Điện thoại và sự kiện chờ quyết định: người chơi thật xử lý ngay vì chúng không tự hết.
+  for (const call of state.phone.calls) {
+    if (budget-- <= 0) break;
+    const order = state.orders[call.orderId];
+    const right = order && (order.status === 'resulted' || order.status === 'released') ? 'report' : 'wait';
+    cmds.push({
+      t,
+      type: 'answerPhone',
+      callId: call.id,
+      choice: rng.chance(p.spotOther) ? right : rng.pick(['report', 'wait', 'later'] as const),
+    });
+  }
+  for (const ev of state.pending) {
+    if (budget-- <= 0) break;
+    if (ev.quizId) {
+      const quiz = content.events.quizzes.find((q) => q.id === ev.quizId)!;
+      cmds.push({
+        t,
+        type: 'resolveEvent',
+        id: ev.id,
+        choice: String(rng.chance(p.spotOther) ? quiz.correct : 1 - quiz.correct),
+      });
+    } else {
+      cmds.push({ t, type: 'resolveEvent', id: ev.id, choice: 'restart' });
+    }
+  }
+
   // 1) Khay: nhận / từ chối.
   for (const id of byPriority(samples.filter((s) => s.status === 'tray').map((s) => s.id))) {
     if (budget-- <= 0) break;

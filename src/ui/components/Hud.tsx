@@ -16,6 +16,11 @@ export function Hud() {
     stat > 0 ? `🚑 ${stat} mẫu cấp cứu ở khay` : '',
     statResults > 0 ? `🚑 ${statResults} kết quả cấp cứu chờ duyệt` : '',
     shift.chem?.qc && shift.chem.qc.status !== 'passed' ? '🧪 QC chưa đạt: máy chưa chạy mẫu' : '',
+    shift.phone.calls.length > 0 ? `📞 ${shift.phone.calls.length} cuộc gọi đang chờ` : '',
+    shift.pending.length > 0 ? '❗ Có việc cần quyết định' : '',
+    shift.clock < shift.effects.powerOutUntil ? '⚡ Mất điện: máy tạm dừng' : '',
+    shift.clock < shift.effects.analyzerDownUntil ? '⚙️ Máy hoá sinh đang lỗi' : '',
+    shift.clock < shift.effects.slowUntil ? '🐢 LIS chậm: máy chạy lâu hơn' : '',
     shift.chem?.centrifuge.contaminated ? '⚠️ Máy ly tâm cần dọn' : '',
     left < 1800 ? `⏳ Còn ${Math.ceil(left / 60)} phút hết ca` : '',
   ].filter(Boolean);

@@ -185,6 +185,71 @@ export const UrineRulesSchema = z.object({
   profiles: z.record(z.string(), z.record(z.string(), UrineLevelRange)),
 });
 
+export const EventIdSchema = z.enum(['E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'E7', 'E8', 'E9', 'E10']);
+
+export const EventsSchema = z.object({
+  source: z.array(z.string()),
+  phone: z.object({
+    expireSeconds: z.number().positive(),
+    missedPerPenalty: z.number().int().min(1),
+    missedTrust: z.number().max(0),
+    correctTrust: z.number().min(0),
+    wrongTrust: z.number().max(0),
+    from: z.array(z.string()).min(1),
+    options: z.object({ report: z.string(), wait: z.string(), later: z.string() }),
+  }),
+  events: z.record(
+    EventIdSchema,
+    z.object({
+      kind: z.enum([
+        'statRush',
+        'call',
+        'machineFault',
+        'unlabeled',
+        'spill',
+        'slowLis',
+        'soloLunch',
+        'inspection',
+        'power',
+        'quiz',
+      ]),
+      title: z.string(),
+      text: z.string(),
+      count: z.number().int().min(1).optional(),
+      spread: z.number().min(0).optional(),
+      seconds: z.number().positive().optional(),
+      factor: z.number().positive().optional(),
+      defect: DefectKindSchema.optional(),
+      maxWaitSeconds: z.number().positive().optional(),
+      passText: z.string().optional(),
+      failText: z.string().optional(),
+      reward: z.number().optional(),
+      expireSeconds: z.number().positive().optional(),
+      failSeconds: z.number().positive().optional(),
+      options: z
+        .array(
+          z.object({
+            id: z.string(),
+            label: z.string(),
+            seconds: z.number().positive(),
+            successRate: z.number().min(0).max(1),
+          }),
+        )
+        .optional(),
+    }),
+  ),
+  quizzes: z.array(
+    z.object({
+      id: z.string(),
+      question: z.string(),
+      options: z.tuple([z.string(), z.string()]),
+      correct: z.union([z.literal(0), z.literal(1)]),
+      explain: z.string(),
+      codex: z.string(),
+    }),
+  ),
+});
+
 export const UnlockSchema = z.enum([
   'routeChem',
   'routeHeme',
@@ -250,6 +315,8 @@ export const DayConfigSchema = z.object({
       profile: z.string().optional(),
     }),
   ),
+  /** Sự kiện của ngày: `at` là giây kể từ đầu ca (không có thì rơi ngẫu nhiên, vẫn tất định theo hạt giống). */
+  events: z.array(z.object({ id: EventIdSchema, at: z.number().min(0).optional() })).default([]),
   /** Có thì máy hoá sinh chỉ chạy mẫu bệnh nhân sau khi QC đạt; `scenario` là lỗi ẩn của ngày. */
   qc: z.object({ scenario: z.string() }).optional(),
   tips: z.array(z.object({ trigger: TipTriggerSchema, text: z.string().max(200) })),
@@ -279,6 +346,7 @@ export const RawContentSchema = z.object({
   chemRules: ChemRulesSchema,
   chemQc: QcRulesSchema,
   chemUrine: UrineRulesSchema,
+  events: EventsSchema,
   days: z.array(DayConfigSchema),
   codex: z.array(CodexCardSchema),
   i18n: I18nSchema,
@@ -301,6 +369,8 @@ export type Analyte = z.infer<typeof AnalyteSchema>;
 export type ChemTest = z.infer<typeof ChemTestSchema>;
 export type ReceptionRules = z.infer<typeof ReceptionRulesSchema>;
 export type ChemRules = z.infer<typeof ChemRulesSchema>;
+export type EventsRules = z.infer<typeof EventsSchema>;
+export type EventId = z.infer<typeof EventIdSchema>;
 export type UrineRules = z.infer<typeof UrineRulesSchema>;
 export type QcRules = z.infer<typeof QcRulesSchema>;
 export type QcRemedy = z.infer<typeof QcRemedySchema>;

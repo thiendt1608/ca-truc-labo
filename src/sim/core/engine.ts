@@ -14,6 +14,7 @@ import {
 } from '../departments/chem';
 import { finishCtx, makeCtx, recordMistake, tip, unlockCodex, type Ctx } from './context';
 import { buildSchedule } from './generator';
+import { fireEvent, handleEventCommand, initEffects, powerIsOut, scheduleEvents, tickEvents } from './events';
 import { finishMinigame, startMinigame } from './minigameHost';
 import type { DilutionScore } from '../minigames/dilution';
 import type { UrineScore } from '../minigames/urineStrip';
@@ -53,6 +54,9 @@ export function createShift({ content, dayId, seed, difficulty }: NewShiftOption
     chem: day.room === 'chem' ? initChem(content) : null,
     scheduled: [],
     ledger: [],
+    phone: { calls: [], missed: 0 },
+    pending: [],
+    effects: initEffects(),
     decisions: { correct: 0, total: 0 },
     releases: { correct: 0, total: 0 },
     timeliness: [],
@@ -66,6 +70,7 @@ export function createShift({ content, dayId, seed, difficulty }: NewShiftOption
   const ctx = makeCtx(initial, content);
   if (ctx.s.chem) ctx.s.chem.qc = initQc(ctx);
   ctx.s.scheduled = buildSchedule(ctx);
+  scheduleEvents(ctx);
   for (const id of day.codexOnStart) unlockCodex(ctx, id);
   tip(ctx, 'start');
   processDue(ctx);
@@ -134,6 +139,7 @@ function handle(ctx: Ctx, cmd: Command) {
       endShift(ctx, 'time');
       return;
     default:
+      if (handleEventCommand(ctx, cmd)) return;
       if (s.chem && handleChem(ctx, cmd)) return;
       ctx.events.push({ type: 'invalidCommand', message: `Lệnh không dùng được ở phòng này: ${cmd.type}` });
   }
@@ -166,7 +172,8 @@ export function advance(state: ShiftState, seconds: number, content: Content): S
   for (let i = 0; i < seconds && !ctx.s.ended; i++) {
     ctx.s.clock += 1;
     processDue(ctx);
-    if (ctx.s.chem) tickChem(ctx);
+    if (ctx.s.chem && !powerIsOut(ctx)) tickChem(ctx);
+    tickEvents(ctx);
     chargeLateness(ctx);
     if (ctx.s.clock >= ctx.s.duration) endShift(ctx, 'time');
   }
@@ -185,6 +192,8 @@ function processDue(ctx: Ctx) {
       const order = s.orders[sample.orderId]!;
       ctx.events.push({ type: 'sampleArrived', sampleId: sample.id, priority: order.priority });
       if (order.priority === 'stat') tip(ctx, 'statArrived');
+    } else if (item.kind === 'event') {
+      fireEvent(ctx, item.eventId);
     } else if (item.kind === 'criticalCheck') {
       const order = s.orders[item.orderId];
       if (order && !order.criticalCalled) {

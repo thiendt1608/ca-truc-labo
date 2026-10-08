@@ -1,10 +1,11 @@
 import { getContent } from '../../sim';
 import { t } from '../../i18n';
-import { useGame } from '../../store/game';
+import { runProgress, useGame } from '../../store/game';
 import { AnalyzerSheet, CentrifugeSheet, PostSpinSheet, UrineSheet } from '../components/ChemStations';
 import { DebugPanel } from '../components/DebugPanel';
 import { Hud } from '../components/Hud';
 import { Notices } from '../components/Notices';
+import { EventSheet, PhoneSheet } from '../components/EventSheets';
 import { QcSheet } from '../components/QcSheet';
 import { ResultsSheet } from '../components/ResultsSheet';
 import { SampleCard } from '../components/SampleCard';
@@ -28,6 +29,8 @@ export function Room() {
       return pa - pb || a.arrivedAt - b.arrivedAt;
     });
   const resulted = Object.values(shift.orders).filter((o) => o.status === 'resulted').length;
+  const calls = shift.phone.calls.length;
+  const hasPhone = calls > 0 || day.events.some((e) => e.id === 'E2');
 
   const openSample = (id: string) => {
     dispatch({ type: 'inspectSample', sampleId: id });
@@ -73,6 +76,20 @@ export function Room() {
             {resulted > 0 && <span className="dot">{resulted}</span>}
           </button>
         )}
+        {hasPhone && (
+          <button onClick={() => setOverlay({ kind: 'phone' })}>
+            <span aria-hidden>📞</span>
+            <span>Điện thoại</span>
+            {calls > 0 && <span className="dot ring">{calls}</span>}
+          </button>
+        )}
+        {shift.pending.length > 0 && (
+          <button onClick={() => setOverlay({ kind: 'event' })}>
+            <span aria-hidden>❗</span>
+            <span>Sự kiện</span>
+            <span className="dot">{shift.pending.length}</span>
+          </button>
+        )}
         <button onClick={() => setPaused(true)}>
           <span aria-hidden>☰</span>
           <span>Menu</span>
@@ -85,6 +102,8 @@ export function Room() {
       {overlay?.kind === 'analyzer' && <AnalyzerSheet />}
       {overlay?.kind === 'results' && <ResultsSheet />}
       {overlay?.kind === 'qc' && <QcSheet />}
+      {overlay?.kind === 'phone' && <PhoneSheet />}
+      {overlay?.kind === 'event' && <EventSheet />}
       {overlay?.kind === 'urine' && <UrineSheet />}
       {paused && (
         <div className="overlay" style={{ alignItems: 'center', background: 'var(--bg)' }}>
@@ -181,7 +200,9 @@ function ChemStations() {
   const qc = chem.qc;
   const unlocked = getContent().dayById.get(shift.dayId)!.unlocks;
   const qcBusy = !!qc && shift.clock < qc.blockedUntil;
-  const cState = c.contaminated || c.unbalanced ? 'error' : c.running ? 'busy' : 'ready';
+  const powerOut = shift.clock < shift.effects.powerOutUntil;
+  const analyzerDown = shift.clock < shift.effects.analyzerDownUntil;
+  const cState = c.contaminated || c.unbalanced || powerOut ? 'error' : c.running ? 'busy' : 'ready';
   return (
     <>
       {qc && (
@@ -212,17 +233,19 @@ function ChemStations() {
         </span>
         {bench > 0 && <span className="badge">{bench}</span>}
         <span className="status">
-          {c.contaminated
-            ? '⚠️ Cần dọn'
-            : c.running
-              ? c.unbalanced
-                ? '⚠️ Đang rung!'
-                : 'Đang quay'
-              : `${bench} ống chờ`}
+          {powerOut
+            ? '⚡ Mất điện'
+            : c.contaminated
+              ? '⚠️ Cần dọn'
+              : c.running
+                ? c.unbalanced
+                  ? '⚠️ Đang rung!'
+                  : 'Đang quay'
+                : `${bench} ống chờ`}
         </span>
         {c.running && !c.unbalanced && (
           <div className="progress">
-            <div style={{ width: `${100 - ((c.endsAt - shift.clock) / spin) * 100}%` }} />
+            <div style={{ width: `${runProgress(shift, c.endsAt, spin)}%` }} />
           </div>
         )}
       </button>
@@ -247,18 +270,22 @@ function ChemStations() {
       <button className="station card" onClick={() => setOverlay({ kind: 'analyzer' })}>
         <span className="station-head">
           <span className="name">⚗️ Máy hoá sinh</span>
-          <Orb state={a.current ? 'busy' : 'ready'} />
+          <Orb state={analyzerDown || powerOut ? 'error' : a.current ? 'busy' : 'ready'} />
         </span>
         <span className="status">
-          {a.current
-            ? `Đang chạy · chờ ${a.queue.length}`
-            : a.queue.length > 0 && qc && (qc.status !== 'passed' || qcBusy)
-              ? `⏳ ${a.queue.length} ống chờ QC đạt`
-              : 'Rảnh'}
+          {powerOut
+            ? '⚡ Mất điện'
+            : analyzerDown
+              ? '⚙️ Máy đang lỗi'
+              : a.current
+                ? `Đang chạy · chờ ${a.queue.length}`
+                : a.queue.length > 0 && qc && (qc.status !== 'passed' || qcBusy)
+                  ? `⏳ ${a.queue.length} ống chờ QC đạt`
+                  : 'Rảnh'}
         </span>
         {a.current && (
           <div className="progress">
-            <div style={{ width: `${100 - ((a.current.endsAt - shift.clock) / per) * 100}%` }} />
+            <div style={{ width: `${runProgress(shift, a.current.endsAt, per)}%` }} />
           </div>
         )}
       </button>

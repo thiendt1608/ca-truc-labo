@@ -1,0 +1,139 @@
+{
+  "source": ["04-GDD.md mục 5.8 và 7"],
+  "phone": {
+    "expireSeconds": 420,
+    "missedPerPenalty": 3,
+    "missedTrust": -10,
+    "correctTrust": 1,
+    "wrongTrust": -3,
+    "from": ["Khoa Cấp cứu", "Khoa Tim mạch", "Khoa Nội tiết", "Phòng khám"],
+    "options": {
+      "report": "Báo kết quả",
+      "wait": "Chưa xong, cho biết giờ dự kiến",
+      "later": "Bận lắm, hẹn gọi lại sau"
+    }
+  },
+  "events": {
+    "E1": {
+      "kind": "statRush",
+      "title": "🚑 Cấp cứu dồn mẫu",
+      "text": "Khoa Cấp cứu vừa chuyển 3 mẫu khẩn cùng lúc!",
+      "count": 3,
+      "spread": 120
+    },
+    "E2": {
+      "kind": "call",
+      "title": "📞 Bác sĩ gọi hỏi kết quả",
+      "text": "Có điện thoại từ khoa lâm sàng."
+    },
+    "E3": {
+      "kind": "machineFault",
+      "title": "⚙️ Máy hoá sinh báo lỗi",
+      "text": "Máy báo tắc kim hút mẫu và dừng chạy. Em xử lý thế nào?",
+      "options": [
+        {
+          "id": "restart",
+          "label": "Tự rửa kim và khởi động lại (5 phút, có thể không hết lỗi)",
+          "seconds": 300,
+          "successRate": 0.6
+        },
+        {
+          "id": "engineer",
+          "label": "Gọi anh Tuấn, kỹ sư thiết bị (20 phút, chắc chắn sửa được)",
+          "seconds": 1200,
+          "successRate": 1
+        }
+      ],
+      "failSeconds": 600
+    },
+    "E4": {
+      "kind": "unlabeled",
+      "title": "🏷️ Mẫu không nhãn",
+      "text": "Điều dưỡng vừa đưa một ống không có nhãn.",
+      "defect": "noLabel"
+    },
+    "E5": {
+      "kind": "spill",
+      "title": "💥 Rơi vỡ mẫu",
+      "text": "Một ống vừa rơi vỡ gần máy ly tâm! Phải dọn đúng quy trình an toàn."
+    },
+    "E6": {
+      "kind": "slowLis",
+      "title": "🐢 Máy tính (LIS) chậm",
+      "text": "Hệ thống LIS đang chậm, máy hoá sinh chạy lâu hơn trong một lúc.",
+      "seconds": 900,
+      "factor": 1.5
+    },
+    "E7": {
+      "kind": "soloLunch",
+      "title": "🍱 Trực trưa một mình",
+      "text": "Đồng nghiệp đi ăn trưa, mẫu buổi trưa dồn về cùng lúc.",
+      "count": 3,
+      "spread": 600
+    },
+    "E8": {
+      "kind": "inspection",
+      "title": "👔 Trưởng khoa đi kiểm tra",
+      "text": "Trưởng khoa ghé qua xem khay mẫu.",
+      "maxWaitSeconds": 1800,
+      "reward": 5,
+      "passText": "Khay mẫu gọn gàng, em được khen.",
+      "failText": "Còn ống nằm chờ quá lâu trong khay, trưởng khoa nhắc nhở."
+    },
+    "E9": {
+      "kind": "power",
+      "title": "⚡ Mất điện ngắn",
+      "text": "Mất điện! Máy ly tâm và máy hoá sinh dừng rồi chạy lại sau ít phút.",
+      "seconds": 600
+    },
+    "E10": {
+      "kind": "quiz",
+      "title": "🎓 Sinh viên thực tập hỏi bài",
+      "text": "Em thực tập có câu hỏi nhanh cho em.",
+      "reward": 3,
+      "expireSeconds": 300
+    }
+  },
+  "quizzes": [
+    {
+      "id": "q-cap",
+      "question": "Ống nắp xanh lá chứa chất gì?",
+      "options": ["Lithium heparin", "Natri citrat"],
+      "correct": 0,
+      "explain": "Nắp xanh lá là heparin; natri citrat là nắp xanh dương (đông máu).",
+      "codex": "rc-tubes"
+    },
+    {
+      "id": "q-balance",
+      "question": "Máy ly tâm có 3 ống ở các ô 1, 2, 3. Cần làm gì?",
+      "options": ["Thêm ống nước vào ô đối diện", "Chạy luôn vì đã đủ ống"],
+      "correct": 0,
+      "explain": "Mỗi ống cần một ống đối diện nặng bằng nó, nếu không máy rung và có thể vỡ ống.",
+      "codex": "ch-balance"
+    },
+    {
+      "id": "q-hemo",
+      "question": "Huyết thanh hồng đỏ sau ly tâm thường là dấu hiệu của gì?",
+      "options": ["Tan huyết", "Mỡ máu cao"],
+      "correct": 0,
+      "explain": "Hồng cầu vỡ làm huyết thanh hồng đỏ. Mỡ máu làm huyết thanh đục như sữa.",
+      "codex": "ch-hemolysis"
+    },
+    {
+      "id": "q-13s",
+      "question": "Một điểm control vượt +3SD thì QC thế nào?",
+      "options": ["Không đạt", "Chỉ là cảnh báo"],
+      "correct": 0,
+      "explain": "Vượt 3SD (luật 1-3s) là luật loại. Chỉ vượt 2SD (1-2s) mới là cảnh báo.",
+      "codex": "ch-westgard"
+    },
+    {
+      "id": "q-delta",
+      "question": "Kết quả khác rất nhiều so với lần trước của cùng bệnh nhân (Δ). Em nên làm gì?",
+      "options": ["Làm lại để kiểm tra", "Gửi luôn cho nhanh"],
+      "correct": 0,
+      "explain": "Δ có thể là nhầm người hoặc lỗi đo, nên làm lại; vẫn lệch mà nghi nhầm người thì huỷ và lấy mẫu mới.",
+      "codex": "ch-delta"
+    }
+  ]
+}

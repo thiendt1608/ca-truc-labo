@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { runBot } from '../bots/bots';
 import { getContent } from '../content/bundled';
+import type { Content } from '../content/load';
 import { advance, applyCommand, createShift } from '../core/engine';
 import { computeReport } from '../core/scoring';
 import type { Command, PlayerAction, Sample, ShiftState } from '../core/types';
@@ -15,7 +16,12 @@ import {
 } from '../minigames/dilution';
 import { generateUrine, scoreUrine } from '../minigames/urineStrip';
 
-const content = getContent();
+/** Nội dung gốc nhưng bỏ sự kiện ngẫu nhiên của ngày, để các test cơ chế không bị sự kiện chen ngang. */
+const content: Content = (() => {
+  const base = getContent();
+  const dayById = new Map([...base.dayById].map(([id, d]) => [id, { ...d, events: [] }]));
+  return { ...base, dayById };
+})();
 type CommandInput = Command extends infer C ? (C extends Command ? Omit<C, 't'> : never) : never;
 
 function start(dayId: string, seed: string): ShiftState {

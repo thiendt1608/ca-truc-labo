@@ -34,7 +34,8 @@ export function Notices() {
             timers.current.delete(x.id);
             dropToast(x.id);
           },
-          x.kind === 'mistake' ? 5000 : 2200,
+          // Chữ càng dài thì cần càng lâu để đọc (thông báo dạy học dài hơn thông báo ngắn).
+          Math.min(9000, Math.max(x.kind === 'mistake' ? 5000 : 2200, 1500 + x.text.length * 60)),
         ),
       );
     }

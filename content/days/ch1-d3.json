@@ -106,5 +106,15 @@
   "codexOnStart": ["ch-why-spin", "ch-balance", "ch-qc", "ch-westgard"],
   "qc": {
     "scenario": "reagent"
-  }
+  },
+  "events": [
+    {
+      "id": "E3",
+      "at": 4000
+    },
+    {
+      "id": "E2",
+      "at": 7500
+    }
+  ]
 }

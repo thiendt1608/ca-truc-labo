@@ -117,5 +117,23 @@
   "codexOnStart": ["ch-qc", "ch-westgard", "ch-dilution"],
   "qc": {
     "scenario": "calibration"
-  }
+  },
+  "events": [
+    {
+      "id": "E5",
+      "at": 3500
+    },
+    {
+      "id": "E9",
+      "at": 7000
+    },
+    {
+      "id": "E2",
+      "at": 9500
+    },
+    {
+      "id": "E10",
+      "at": 11500
+    }
+  ]
 }

@@ -9,6 +9,7 @@ import { makeSample } from '../core/generator';
 import { measure } from '../core/results';
 import type { ChemState, Command, Order, Sample } from '../core/types';
 import { startMinigame } from '../core/minigameHost';
+import { analyzerIsDown, analyzerSlowFactor } from '../core/events';
 import { handleQc, qcBias, qcBlocksAnalyzer, wrongPassDetail } from './chemQc';
 import { expectedReception } from './reception';
 
@@ -414,7 +415,7 @@ export function tickChem(ctx: Ctx) {
   if (c.running && s.clock >= c.endsAt) finishSpin(ctx, st);
 
   const a = st.analyzer;
-  if (a.current && s.clock >= a.current.endsAt) {
+  if (a.current && s.clock >= a.current.endsAt && !analyzerIsDown(ctx)) {
     const order = s.orders[a.current.orderId]!;
     const sample = s.samples[order.sampleId]!;
     const patient = s.patients[order.patientId]!;
@@ -436,10 +437,16 @@ export function tickChem(ctx: Ctx) {
       s.scheduled.sort((x, y) => x.at - y.at);
     }
   }
-  if (!a.current && a.queue.length > 0 && !qcBlocksAnalyzer(ctx)) {
+  if (!a.current && a.queue.length > 0 && !qcBlocksAnalyzer(ctx) && !analyzerIsDown(ctx)) {
     const orderId = a.queue.shift()!;
     const extra = s.orders[orderId]?.dilution?.extraSeconds ?? 0;
-    a.current = { orderId, endsAt: s.clock + ctx.content.chemRules.analyzer.secondsPerSample + extra };
+    a.current = {
+      orderId,
+      endsAt:
+        s.clock +
+        Math.round(ctx.content.chemRules.analyzer.secondsPerSample * analyzerSlowFactor(ctx)) +
+        extra,
+    };
   }
 }
 

@@ -1,5 +1,6 @@
 import type {
   ContainerId,
+  EventId,
   DayConfig,
   Defect,
   DeptId,
@@ -130,7 +131,39 @@ export interface ScheduledCheck {
   kind: 'criticalCheck';
   orderId: string;
 }
-export type ScheduledItem = ScheduledArrival | ScheduledCheck;
+export interface ScheduledEvent {
+  at: number;
+  kind: 'event';
+  eventId: EventId;
+}
+export type ScheduledItem = ScheduledArrival | ScheduledCheck | ScheduledEvent;
+
+/** Cuộc gọi đến từ khoa lâm sàng hỏi về một phiếu. Người chơi phải chọn câu trả lời đúng trước khi hết hạn. */
+export interface PhoneCall {
+  id: string;
+  from: string;
+  orderId: string;
+  text: string;
+  ringAt: number;
+  expiresAt: number;
+}
+
+/** Sự kiện đang chờ người chơi quyết định (máy lỗi, câu hỏi của sinh viên). */
+export interface ActiveEvent {
+  id: string;
+  eventId: EventId;
+  startedAt: number;
+  expiresAt: number | null;
+  quizId?: string;
+}
+
+/** Hiệu ứng tạm thời do sự kiện gây ra (giây trên đồng hồ ca). */
+export interface Effects {
+  slowUntil: number;
+  slowFactor: number;
+  powerOutUntil: number;
+  analyzerDownUntil: number;
+}
 
 export type SlotContent = string | 'water' | null;
 
@@ -217,6 +250,9 @@ export interface ShiftState {
   chem: ChemState | null;
   scheduled: ScheduledItem[];
   ledger: MistakeEntry[];
+  phone: { calls: PhoneCall[]; missed: number };
+  pending: ActiveEvent[];
+  effects: Effects;
   decisions: DecisionStat;
   releases: DecisionStat;
   timeliness: TimelinessEntry[];
@@ -249,6 +285,8 @@ export type Command =
   | { t: number; type: 'cancelOrderRecollect'; orderId: string }
   | { t: number; type: 'callCritical'; orderId: string }
   | { t: number; type: 'minigameResult'; taskId: string; actions: PlayerAction[] }
+  | { t: number; type: 'answerPhone'; callId: string; choice: 'report' | 'wait' | 'later' }
+  | { t: number; type: 'resolveEvent'; id: string; choice: string }
   | { t: number; type: 'debug/forceSpill' }
   | { t: number; type: 'debug/endShift' };
 
@@ -272,6 +310,9 @@ export type SimEvent =
   | { type: 'minigameStarted'; minigame: ActiveMinigame }
   | { type: 'minigameFinished'; taskId: string; skill: number; ok: boolean }
   | { type: 'tip'; trigger: TipTrigger }
+  | { type: 'eventStarted'; eventId: EventId; title: string; text: string; decision: boolean }
+  | { type: 'phoneRing'; callId: string }
+  | { type: 'notice'; tone: 'good' | 'bad' | 'info'; text: string }
   | { type: 'shiftEnded'; reason: 'time' | 'trust' }
   | { type: 'invalidCommand'; message: string };
 

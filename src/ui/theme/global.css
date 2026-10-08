@@ -1157,3 +1157,8 @@ button.small {
   top: auto;
   bottom: 16px;
 }
+
+/* Điện thoại đổ chuông */
+.dot.ring {
+  animation: bob 0.6s ease-in-out infinite;
+}

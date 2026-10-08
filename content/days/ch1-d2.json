@@ -118,5 +118,19 @@
       "text": "Có kết quả rồi! Xem cờ H (cao), L (thấp) rồi bấm Duyệt và gửi cho bác sĩ."
     }
   ],
-  "codexOnStart": ["ch-why-spin", "ch-balance", "ch-hemolysis", "ch-lipemia"]
+  "codexOnStart": ["ch-why-spin", "ch-balance", "ch-hemolysis", "ch-lipemia"],
+  "events": [
+    {
+      "id": "E1",
+      "at": 4500
+    },
+    {
+      "id": "E6",
+      "at": 8000
+    },
+    {
+      "id": "E8",
+      "at": 10500
+    }
+  ]
 }

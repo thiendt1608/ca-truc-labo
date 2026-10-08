@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { getContent, isBalanced } from '../../sim';
 import { t } from '../../i18n';
-import { clockText, useGame } from '../../store/game';
+import { clockText, runProgress, useGame } from '../../store/game';
 import { Sheet } from './Overlay';
 import { Tube } from './Tube';
 
@@ -41,7 +41,7 @@ export function CentrifugeSheet() {
           <div className="progress">
             <div
               style={{
-                width: `${Math.min(100, 100 - ((c.endsAt - shift.clock) / getContent().chemRules.centrifuge.spinSeconds) * 100)}%`,
+                width: `${runProgress(shift, c.endsAt, getContent().chemRules.centrifuge.spinSeconds)}%`,
               }}
             />
           </div>
@@ -192,7 +192,7 @@ export function AnalyzerSheet() {
         <div className="card stack">
           <b>Đang chạy: {label(a.current.orderId)}</b>
           <div className="progress">
-            <div style={{ width: `${100 - ((a.current.endsAt - shift.clock) / per) * 100}%` }} />
+            <div style={{ width: `${runProgress(shift, a.current.endsAt, per)}%` }} />
           </div>
         </div>
       ) : (

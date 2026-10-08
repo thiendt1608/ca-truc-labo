@@ -55,5 +55,8 @@
   "rule.releaseUnverifiedDelta": "Kết quả có Δ (khác nhiều so với lần trước) mà chưa làm lại để kiểm tra: có thể nhầm người hoặc lỗi đo.",
   "rule.releaseWrongUrine": "Đọc sai ô màu của que thử: kết quả nước tiểu đã trả không đúng với mẫu. Mỗi ô phải so đúng bảng màu và đúng thời điểm đọc.",
   "urine.wrongPads": "Các ô đọc nhầm giữa bình thường và bất thường: {pads}.",
-  "rule.dilutionMultiplyWrong": "Nhân sai hệ số pha loãng: số đọc phải nhân với hệ số rồi mới là kết quả thật, trả sai thì bác sĩ đọc nhầm."
+  "rule.dilutionMultiplyWrong": "Nhân sai hệ số pha loãng: số đọc phải nhân với hệ số rồi mới là kết quả thật, trả sai thì bác sĩ đọc nhầm.",
+  "rule.phoneWrong": "Trả lời điện thoại chưa đúng: bác sĩ cần biết kết quả đã có chưa, hay còn bao lâu nữa.",
+  "rule.phoneMissed": "Bỏ lỡ nhiều cuộc gọi từ khoa lâm sàng: bác sĩ phải tự đi hỏi và chờ.",
+  "rule.quizWrong": "Trả lời sai câu hỏi của sinh viên thực tập."
 }

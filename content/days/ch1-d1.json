@@ -10,15 +10,40 @@
   "end": 39600,
   "startTrust": 70,
   "unlocks": ["centrifuge", "analyzer", "release"],
-  "tat": { "stat": 3600, "routine": 7200, "reception": 900 },
+  "tat": {
+    "stat": 3600,
+    "routine": 7200,
+    "reception": 900
+  },
   "waves": [
-    { "at": 0, "count": 4, "spread": 300 },
-    { "at": 2400, "count": 4, "spread": 1200 },
-    { "at": 5400, "count": 5, "spread": 1800 },
-    { "at": 9000, "count": 4, "spread": 1800 }
+    {
+      "at": 0,
+      "count": 4,
+      "spread": 300
+    },
+    {
+      "at": 2400,
+      "count": 4,
+      "spread": 1200
+    },
+    {
+      "at": 5400,
+      "count": 5,
+      "spread": 1800
+    },
+    {
+      "at": 9000,
+      "count": 4,
+      "spread": 1800
+    }
   ],
-  "orderTypes": { "chemPanel": 6, "glucoseOnly": 1 },
-  "defects": { "labelMismatch": 0.08 },
+  "orderTypes": {
+    "chemPanel": 6,
+    "glucoseOnly": 1
+  },
+  "defects": {
+    "labelMismatch": 0.08
+  },
   "profiles": {
     "healthy": 5,
     "diabetes": 2,
@@ -36,7 +61,13 @@
       "tests": ["GLU", "URE", "CRE"],
       "defects": []
     },
-    { "index": 1, "priority": "stat", "orderType": "chemPanel", "tests": ["ELEC"], "defects": [] }
+    {
+      "index": 1,
+      "priority": "stat",
+      "orderType": "chemPanel",
+      "tests": ["ELEC"],
+      "defects": []
+    }
   ],
   "tips": [
     {
@@ -60,5 +91,15 @@
       "text": "Có kết quả rồi! Xem cờ H (cao), L (thấp) rồi bấm Duyệt và gửi cho bác sĩ."
     }
   ],
-  "codexOnStart": ["ch-why-spin", "ch-balance"]
+  "codexOnStart": ["ch-why-spin", "ch-balance"],
+  "events": [
+    {
+      "id": "E2",
+      "at": 5000
+    },
+    {
+      "id": "E10",
+      "at": 9000
+    }
+  ]
 }

@@ -28,6 +28,8 @@ export type Overlay =
   | { kind: 'results' }
   | { kind: 'qc' }
   | { kind: 'urine' }
+  | { kind: 'phone' }
+  | { kind: 'event' }
   | { kind: 'baskets' };
 
 export interface Toast {
@@ -46,6 +48,8 @@ export function timeScale(durationSeconds: number): number {
 }
 const DIFFICULTY_SPEED: Record<Difficulty, number> = { easy: 0.6, normal: 1, hard: 1.2 };
 const MAX_TOASTS = 2;
+/** Màn quyết định lớn: dừng giờ khi đang mở (04-GDD mục 4). */
+const DECISION_SCREENS: readonly string[] = ['qc', 'phone', 'event'];
 /** Mẹo chỉ có nghĩa khi đang mở QC sheet, nên không xếp hàng chung với mẹo của phòng. */
 const INLINE_TIPS: readonly string[] = ['qcRun', 'qcFailed'];
 
@@ -104,6 +108,7 @@ export const useGame = create<GameStore>((set, getState) => {
     const day = content.dayById.get(r.state.dayId);
     const tips: GameStore['tips'] = [];
     const inlineTips: GameStore['tips'] = [];
+    let openOverlay: Overlay | null = null;
     const toasts: Omit<Toast, 'count'>[] = [];
     for (const e of r.events) {
       if (e.type === 'tip') {
@@ -112,11 +117,21 @@ export const useGame = create<GameStore>((set, getState) => {
           (INLINE_TIPS.includes(e.trigger) ? inlineTips : tips).push({ id: ++toastId, text: tip.text });
       } else if (e.type === 'mistakeRecorded') {
         const delta = e.entry.trustDelta ? ` (${e.entry.trustDelta} Niềm tin)` : '';
-        toasts.push({ id: ++toastId, kind: 'mistake', text: `${t(e.entry.explanationKey)}${delta}` });
+        const detail = e.entry.detail ? ` ${e.entry.detail}` : '';
+        toasts.push({
+          id: ++toastId,
+          kind: 'mistake',
+          text: `${t(e.entry.explanationKey)}${detail}${delta}`,
+        });
       } else if (e.type === 'trustChanged' && e.delta > 0) {
         toasts.push({ id: ++toastId, kind: 'good', text: `+${e.delta} Niềm tin` });
       } else if (e.type === 'tubeBroken') {
         toasts.push({ id: ++toastId, kind: 'mistake', text: 'Một ống bị vỡ trong máy ly tâm!' });
+      } else if (e.type === 'eventStarted') {
+        toasts.push({ id: ++toastId, kind: 'info', text: `${e.title}: ${e.text}` });
+        if (e.decision) openOverlay = { kind: 'event' };
+      } else if (e.type === 'notice') {
+        toasts.push({ id: ++toastId, kind: e.tone === 'bad' ? 'mistake' : e.tone, text: e.text });
       } else if (e.type === 'invalidCommand') {
         toasts.push({ id: ++toastId, kind: 'info', text: e.message });
       }
@@ -127,6 +142,7 @@ export const useGame = create<GameStore>((set, getState) => {
       tips: [...st.tips, ...tips].slice(-3),
       inlineTips: inlineTips.length > 0 ? inlineTips.slice(-1) : st.inlineTips,
       toasts: pushToasts(st.toasts, toasts),
+      ...(openOverlay ? { overlay: openOverlay } : {}),
     }));
     if (ended) finish(r.state);
     return r.events;
@@ -216,7 +232,12 @@ export const useGame = create<GameStore>((set, getState) => {
       const { shift, paused, speed, difficulty, carry, screen, overlay, tips } = getState();
       if (!shift || shift.ended || paused || screen !== 'room') return;
       // Dừng giờ khi đọc lời hướng dẫn, làm mini-game toàn màn, hoặc xem biểu đồ QC (04-GDD mục 4: màn quyết định lớn dừng giờ).
-      if (shift.minigame || overlay?.kind === 'qc' || (overlay === null && tips.length > 0)) return;
+      if (
+        shift.minigame ||
+        (overlay !== null && DECISION_SCREENS.includes(overlay.kind)) ||
+        (overlay === null && tips.length > 0)
+      )
+        return;
       const total = carry + (ms / 1000) * timeScale(shift.duration) * DIFFICULTY_SPEED[difficulty] * speed;
       const whole = Math.floor(total);
       set({ carry: total - whole });
@@ -258,4 +279,10 @@ export function secondsOfDayText(secs: number): string {
   const h = Math.floor(secs / 3600) % 24;
   const m = Math.floor((secs % 3600) / 60);
   return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+/** Tiến độ (0–100) của một lượt chạy máy, đóng băng trong lúc mất điện (kết thúc đã bị đẩy lùi đúng khoảng mất điện). */
+export function runProgress(state: ShiftState, endsAt: number, total: number): number {
+  const outage = Math.max(0, state.effects.powerOutUntil - state.clock);
+  return Math.max(0, Math.min(100, 100 - ((endsAt - state.clock - outage) / total) * 100));
 }
