@@ -255,3 +255,30 @@ Every minigame is split cleanly into two halves:
 1. **Cập nhật AGENTS.md**: nếu thay đổi nhiều (mốc, phạm vi đã/chưa triển khai, kiến trúc, lệnh, quy ước), sửa lại file này trước khi kết thúc.
 2. **Test thực tế bằng subagent + OMP relay**: dùng `task` để giao subagent điều khiển Chrome qua OMP Browser Relay (`browser.open({ app: { relay: true } })`; Chrome phải đang mở ít nhất một tab, dev server chạy sẵn). Subagent tự chơi, kiểm tra hành vi và UI/UX, chụp ảnh (390×844 và 360×640) rồi báo cáo; người dùng chỉ xem kết quả. Không sửa code trong lượt test. Nếu relay không nối được, báo lỗi nguyên văn thay vì đổi sang trình duyệt khác.
 3. **Commit, push, merge**: xong phase/task lớn thì chạy cổng kiểm tra (`pnpm lint && pnpm format:check && pnpm typecheck && pnpm content:check && pnpm test`), commit, rồi `git push` lên GitHub. Xong một nhánh thì merge vào `main` và push `main`.
+
+---
+
+## Mobile Web UI Rules (verified; follow when designing, coding and testing UI)
+
+Verified against MDN, web.dev, W3C WCAG and WebKit docs. Where a commonly circulated rule is wrong for this game, the corrected rule is given.
+
+1. **Viewport.** Keep `<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">` (already in `index.html`). **Do NOT add `maximum-scale=1` / `user-scalable=no`**: it breaks WCAG 1.4.4 (resize text, level AA) and iOS Safari ignores it since iOS 10 anyway (WebKit blog "New Interaction Behaviors in iOS 10"). Stop accidental double-tap zoom with `touch-action: manipulation` (set on every `button`).
+2. **Height.** Use `100dvh` (with `100%` fallback), never bare `100vh` for full-screen shells (`html, body, #root` already do). Prefer `inset: 0` / `100%` over `100vw` (includes scrollbar width on desktop). Only the shell clips (`.app { overflow: hidden }`); every screen/sheet scrolls internally with `overflow-y: auto`. Never put `overflow: hidden` on content that can exceed the viewport at 320×568.
+3. **Safe areas.** `viewport-fit=cover` is required (present). `.app` pads top/left/right with `env(safe-area-inset-*, 0px)` on phones; bottom bars add `env(safe-area-inset-bottom)`. HUD must not touch the notch edge; footers/controls must not sit under the Home bar. New fixed/sticky bars MUST include the bottom inset.
+4. **Orientation.** Portrait only, but **no landscape overlay** (product decision). If one is ever added, do NOT use `innerWidth > innerHeight`: it would also hide the game on desktop. Gate by `(pointer: coarse) and (orientation: landscape)` and a small height.
+5. **Gestures.** `overscroll-behavior: none` on `body` (stops pull-to-refresh/bounce). **Do NOT set `touch-action: none` on the whole app**: it would kill scrolling of screens and sheets (this game is DOM UI, not a canvas). Use `touch-action: none` only on drag/hold surfaces (`.holdbtn`, future drag minigames); use `pan-y` for scrollers that sit inside such surfaces.
+6. **Touch artifacts.** `-webkit-tap-highlight-color: transparent` (on `:root`). `user-select: none` + `-webkit-touch-callout: none` apply to `button` and to `.mg` (minigames), and `.mg` blocks `contextmenu` (press-and-hold buttons need long-press). **Do NOT disable text selection on reading content** (Codex cards, report, sheets): players copy/quote terms and it is an accessibility regression.
+7. **Targets and spacing.** Minimum 44×44 CSS px for every interactive element (Apple HIG 44pt, WCAG 2.5.5 enhanced 44px; WCAG 2.5.8 AA floor is only 24px, so 44 is our stricter project rule). Primary actions (Nhận, Vào ca, Giữ) SHOULD be ≥48px (Material 48dp). Keep ≥8px between adjacent targets.
+8. **Audio (when added).** Browsers block audio until a user gesture. Create/resume the `AudioContext` (`ctx.resume()`) inside the first tap/click handler, again on `visibilitychange` return, and never autoplay BGM before that. iOS also mutes Web Audio with the silent switch; sounds must never be the only feedback (always pair with visual).
+9. **Responsive coverage.** Layout MUST hold at 320×568, 360×640, 390×844, 430×932 (and the desktop frame at 768×1024, 1366×768, 1920×1080). `tests/responsive.spec.ts` audits overflow, centering and tap targets; extend it when adding screens.
+
+### UI test checklist (for relay/Playwright testers; report each item PASS/FAIL with evidence)
+
+- No horizontal scroll; nothing cut off or overlapping at 320×568 and 360×640; text is wrapped, not clipped.
+- Every button/tab/chip ≥44×44 and ≥8px from neighbors (query computed rects); body text ≥14px (SVG tube-cap letters excepted).
+- Pinch/double-tap does not zoom the page by accident; pull-down does not refresh; no rubber-band bounce.
+- Bottom controls are fully visible with the browser toolbar shown and hidden (`100dvh`), and clear of the Home bar (safe-area).
+- Long-press on a button or inside a minigame shows no browser menu and selects no text; long-press on reading text (Codex, report) still selects.
+- Scrolling still works in every sheet/screen (no `touch-action: none` leaks).
+- Hold-and-release minigame control keeps working through a 2s long-press.
+- Sheets, toasts and tips never cover the HUD or the primary action.

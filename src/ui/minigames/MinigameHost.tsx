@@ -29,7 +29,7 @@ export function MinigameHost() {
     setTimeout(() => dispatch({ type: 'minigameResult', taskId: mg.taskId, actions }), 400);
   };
   return (
-    <div className="mg" role="dialog" aria-label={spec.title}>
+    <div className="mg" role="dialog" aria-label={spec.title} onContextMenu={(e) => e.preventDefault()}>
       <div className="mg-head">
         <span className="eyebrow">Thao tác kỹ thuật</span>
         <h2>
