@@ -3,7 +3,7 @@ import { getContent } from '../../sim';
 import { t } from '../../i18n';
 import { useGame } from '../../store/game';
 import { InstallInfo } from '../components/PwaNotices';
-import { CodexCardView } from './Codex';
+import { CodexCardView } from '../components/CodexCardView';
 
 /** Màu thanh theo tiêu chí, lấy từ bảng màu khoa (DESIGN.md). */
 const CRITERIA_COLOR = {
@@ -78,12 +78,23 @@ export function Report() {
           {report.stories.length === 0 ? (
             <p>Không có lỗi nào đáng kể. Chị Hạnh khen em làm tốt lắm! 🎉</p>
           ) : (
-            report.stories.map((m, i) => (
-              <div key={i} className="stack story">
+            report.stories.map((m) => (
+              <div key={`${m.kind}|${m.explanationKey}`} className="stack story">
                 <span>
                   {m.trustDelta < 0 ? `🔻 ${m.trustDelta}` : '•'} {t(m.explanationKey)}
+                  {m.count > 1 && <b> ×{m.count}</b>}
                 </span>
-                {m.detail && <span className="muted">{m.detail}</span>}
+                {m.count === 1 && m.details[0] && <span className="muted">{m.details[0]}</span>}
+                {m.count > 1 && m.details.length > 0 && (
+                  <details className="story-more">
+                    <summary>Chi tiết {m.count} lần</summary>
+                    <ul className="muted notes">
+                      {m.details.map((d) => (
+                        <li key={d}>{d}</li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
                 {m.codex && content.codexById.has(m.codex) && (
                   <button className="small" onClick={() => setCard(m.codex!)}>
                     📖 Sổ tay: {content.codexById.get(m.codex)!.title}
@@ -107,13 +118,11 @@ export function Report() {
           </section>
         )}
 
-        <div className="row wrap">
-          <button className="grow" onClick={() => startShift(shift.seed)}>
-            🔁 Chơi lại (cùng mẫu)
+        <div className="report-actions">
+          <button onClick={() => startShift(shift.seed)} aria-label="Chơi lại với cùng mẫu">
+            🔁 Cùng mẫu
           </button>
-          <button className="grow" onClick={() => startShift()}>
-            🎲 Mẫu mới
-          </button>
+          <button onClick={() => startShift()}>🎲 Mẫu mới</button>
         </div>
       </div>
       <div className="bottombar">

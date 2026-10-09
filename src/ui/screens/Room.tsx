@@ -1,17 +1,23 @@
-import { getContent, routableDepts } from '../../sim';
+import { getContent, overAgeHint, routableDepts } from '../../sim';
 import { t } from '../../i18n';
 import { runProgress, useGame } from '../../store/game';
-import { AnalyzerSheet, CentrifugeSheet, PostSpinSheet, UrineSheet } from '../components/ChemStations';
 import { HelpHost } from '../components/CodexHelp';
-import { DebugPanel } from '../components/DebugPanel';
 import { Hud } from '../components/Hud';
 import { Notices } from '../components/Notices';
 import { CodexSheet, EventSheet, PhoneSheet } from '../components/EventSheets';
-import { QcSheet } from '../components/QcSheet';
-import { ResultsSheet } from '../components/ResultsSheet';
 import { SampleCard } from '../components/SampleCard';
 import { Tube } from '../components/Tube';
-import { MinigameHost } from '../minigames/MinigameHost';
+import {
+  LazyAnalyzerSheet,
+  LazyCentrifugeSheet,
+  LazyDebugPanel,
+  LazyMinigameHost,
+  LazyPostSpinSheet,
+  LazyQcSheet,
+  LazyResultsSheet,
+  LazyUrineSheet,
+  QuietSuspense,
+} from '../lazy';
 
 /** S4 Phòng làm việc: HUD, khay mẫu, lưới trạm, thanh dưới. */
 export function Room() {
@@ -29,6 +35,7 @@ export function Room() {
       const pb = shift.orders[b.orderId]!.priority === 'stat' ? 0 : 1;
       return pa - pb || a.arrivedAt - b.arrivedAt;
     });
+  const hints = getContent().difficulty.levels[shift.difficulty].hints;
   const resulted = Object.values(shift.orders).filter((o) => o.status === 'resulted').length;
   const calls = shift.phone.calls.length;
   const hasPhone = calls > 0 || day.events.some((e) => e.id === 'E2');
@@ -47,6 +54,7 @@ export function Room() {
         {tray.map((s) => {
           const o = shift.orders[s.orderId]!;
           const who = shift.patients[o.patientId]?.name.split(' ').slice(-2).join(' ') ?? s.id;
+          const overAge = hints && overAgeHint(content, s, o, shift.dayStart + shift.clock);
           const waited = Math.floor((shift.clock - s.arrivedAt) / 60);
           return (
             <button
@@ -55,6 +63,11 @@ export function Room() {
               onClick={() => openSample(s.id)}
             >
               {o.priority === 'stat' && <span className="stat">🚑 KHẨN</span>}
+              {overAge && (
+                <span className="overage-flag" role="img" aria-label="Để quá giờ">
+                  ⏰
+                </span>
+              )}
               <Tube
                 container={s.container}
                 size={30}
@@ -110,15 +123,39 @@ export function Room() {
       </nav>
 
       {overlay?.kind === 'sample' && <SampleCard sampleId={overlay.sampleId} />}
-      {overlay?.kind === 'centrifuge' && <CentrifugeSheet />}
-      {overlay?.kind === 'postspin' && <PostSpinSheet />}
-      {overlay?.kind === 'analyzer' && <AnalyzerSheet />}
-      {overlay?.kind === 'results' && <ResultsSheet />}
-      {overlay?.kind === 'qc' && <QcSheet />}
+      {overlay?.kind === 'centrifuge' && (
+        <QuietSuspense>
+          <LazyCentrifugeSheet />
+        </QuietSuspense>
+      )}
+      {overlay?.kind === 'postspin' && (
+        <QuietSuspense>
+          <LazyPostSpinSheet />
+        </QuietSuspense>
+      )}
+      {overlay?.kind === 'analyzer' && (
+        <QuietSuspense>
+          <LazyAnalyzerSheet />
+        </QuietSuspense>
+      )}
+      {overlay?.kind === 'results' && (
+        <QuietSuspense>
+          <LazyResultsSheet />
+        </QuietSuspense>
+      )}
+      {overlay?.kind === 'qc' && (
+        <QuietSuspense>
+          <LazyQcSheet />
+        </QuietSuspense>
+      )}
       {overlay?.kind === 'phone' && <PhoneSheet />}
       {overlay?.kind === 'event' && <EventSheet />}
       {overlay?.kind === 'codex' && <CodexSheet />}
-      {overlay?.kind === 'urine' && <UrineSheet />}
+      {overlay?.kind === 'urine' && (
+        <QuietSuspense>
+          <LazyUrineSheet />
+        </QuietSuspense>
+      )}
       {paused && (
         <div className="overlay" style={{ alignItems: 'center', background: 'var(--bg)' }}>
           <div className="sheet stack" style={{ borderRadius: 16, margin: 16 }}>
@@ -139,10 +176,14 @@ export function Room() {
           </div>
         </div>
       )}
-      <MinigameHost />
+      <QuietSuspense>
+        <LazyMinigameHost />
+      </QuietSuspense>
       <HelpHost />
       <Notices />
-      <DebugPanel />
+      <QuietSuspense>
+        <LazyDebugPanel />
+      </QuietSuspense>
     </>
   );
 }

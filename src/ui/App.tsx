@@ -1,12 +1,9 @@
 import { useEffect } from 'react';
 import { useGame } from '../store/game';
 import { useGameLoop } from '../store/loop';
-import { Briefing } from './screens/Briefing';
-import { Codex } from './screens/Codex';
 import { Home } from './screens/Home';
-import { Report } from './screens/Report';
+import { LazyBriefing, LazyCodex, LazyReport, LazySettings, preloadLazy, ScreenSuspense } from './lazy';
 import { Room } from './screens/Room';
-import { Settings } from './screens/Settings';
 
 export function App() {
   const screen = useGame((s) => s.screen);
@@ -18,15 +15,18 @@ export function App() {
   }, [reducedMotion]);
   useEffect(() => {
     void useGame.getState().init();
+    preloadLazy();
   }, []);
   return (
     <div className="app" data-room={screen === 'room' || screen === 'report' ? room : 'reception'}>
       {screen === 'home' && <Home />}
-      {screen === 'briefing' && <Briefing />}
       {screen === 'room' && <Room />}
-      {screen === 'report' && <Report />}
-      {screen === 'codex' && <Codex />}
-      {screen === 'settings' && <Settings />}
+      <ScreenSuspense>
+        {screen === 'briefing' && <LazyBriefing />}
+        {screen === 'report' && <LazyReport />}
+        {screen === 'codex' && <LazyCodex />}
+        {screen === 'settings' && <LazySettings />}
+      </ScreenSuspense>
     </div>
   );
 }

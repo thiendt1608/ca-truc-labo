@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getContent, routableDepts, type RejectReason } from '../../sim';
+import { getContent, overAgeHint, routableDepts, type RejectReason } from '../../sim';
 import { t } from '../../i18n';
 import { clockText, secondsOfDayText, useGame, useHints } from '../../store/game';
 import { Sheet } from './Overlay';
@@ -25,6 +25,7 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
   const testNames = order.tests.map((code) => content.testByCode.get(code)?.name ?? code);
 
   const depts = routableDepts(day);
+  const overAge = hints && overAgeHint(content, sample, order, shift.dayStart + shift.clock);
   const leaking = sample.defects.some((d) => d.kind === 'leak');
 
   const act = (fn: () => void) => {
@@ -91,6 +92,7 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
               Bây giờ: {clockText(shift)}
             </span>
           </div>
+          {overAge && <span className="pill overage">⏰ Để quá giờ</span>}
           {leaking && <p className="v">💧 Lọ ướt, có dịch rỉ ra ngoài</p>}
         </div>
       </div>

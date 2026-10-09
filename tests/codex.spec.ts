@@ -55,6 +55,7 @@ test('thẻ mới có dấu "Mới" cho tới khi đọc; đã đọc thì nhớ
   // Nút Sổ tay ở Sảnh hiện số thẻ mới.
   await expect(page.getByRole('button', { name: /Sổ tay/ }).locator('.dot')).toBeVisible();
   await page.getByRole('button', { name: /Sổ tay/ }).click();
+  await expect(page.getByRole('heading', { name: /Sổ tay KTV/ })).toBeVisible();
 
   const badges = page.locator('.new-badge');
   const before = await badges.count();
@@ -79,6 +80,7 @@ test('thẻ mới có dấu "Mới" cho tới khi đọc; đã đọc thì nhớ
 
   await page.reload();
   await page.getByRole('button', { name: /Sổ tay/ }).click();
+  await expect(page.getByRole('heading', { name: /Sổ tay KTV/ })).toBeVisible();
   await expect(page.locator('.new-badge')).toHaveCount(before - 1);
 });
 

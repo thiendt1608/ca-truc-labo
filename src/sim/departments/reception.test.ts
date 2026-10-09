@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { getContent } from '../content/bundled';
 import type { Order, Sample } from '../core/types';
-import { evaluateDecision, expectedReception } from './reception';
+import { evaluateDecision, expectedReception, overAgeHint } from './reception';
 
 const content = getContent();
 
@@ -85,5 +85,26 @@ describe('tiếp nhận', () => {
     expect(expectedReception(content, sample, order).decision).toEqual({ type: 'contact' });
     const v = evaluateDecision(content, sample, order, { type: 'reject', reason: 'volume' }, 'reception');
     expect(v).toMatchObject({ kind: 'rejectIrreplaceable', trustDelta: -30 });
+  });
+});
+
+describe('huy hiệu để quá giờ (mức Dễ)', () => {
+  const max = content.receptionRules.maxTransportMinutes * 60;
+  it('hiện khi tuổi mẫu trên nhãn vượt ngưỡng và có xét nghiệm nhạy thời gian', () => {
+    const { sample, order } = fixture({}, { tests: ['GLU'] });
+    expect(overAgeHint(content, sample, order, max + 60)).toBe(true);
+    expect(overAgeHint(content, sample, order, max - 60)).toBe(false);
+  });
+  it('không hiện khi xét nghiệm không nhạy thời gian hoặc ống xám (miễn trừ)', () => {
+    const slow = fixture({}, { tests: ['URE'] });
+    expect(overAgeHint(content, slow.sample, slow.order, max + 600)).toBe(false);
+    const grey = fixture({ container: 'grey' }, { tests: ['GLU'] });
+    expect(overAgeHint(content, grey.sample, grey.order, max + 600)).toBe(false);
+  });
+  it('chỉ dựa vào dữ liệu thấy được: không nhãn thì không hiện, lỗi ẩn không ảnh hưởng', () => {
+    const noLabel = fixture({ label: null }, { tests: ['GLU'] });
+    expect(overAgeHint(content, noLabel.sample, noLabel.order, max + 600)).toBe(false);
+    const hiddenOnly = fixture({ defects: [{ kind: 'delayed' }] }, { tests: ['GLU'] });
+    expect(overAgeHint(content, hiddenOnly.sample, hiddenOnly.order, 60)).toBe(false);
   });
 });

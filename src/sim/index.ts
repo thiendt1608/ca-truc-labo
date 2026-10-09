@@ -6,6 +6,6 @@ export * from './core/rng';
 export { getContent } from './content/bundled';
 export { routableDepts, type Content } from './content/load';
 export type * from './content/schema';
-export { expectedReception, evaluateDecision, isTimeSensitive } from './departments/reception';
+export { expectedReception, evaluateDecision, isTimeSensitive, overAgeHint } from './departments/reception';
 export { isBalanced, balanceSkill, expectedPostSpin } from './departments/chem';
 export { MINIGAMES, spillCleanup, holdTimer, urineStrip, dilution } from './minigames';

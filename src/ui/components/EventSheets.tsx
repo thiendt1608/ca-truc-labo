@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getContent } from '../../sim';
 import { clockText, useGame } from '../../store/game';
-import { CodexCardView } from '../screens/Codex';
+import { CodexCardView } from './CodexCardView';
 import { Sheet } from './Overlay';
 
 /** S9 Cuộc gọi (lớp phủ, dừng giờ): khoa lâm sàng hỏi về một phiếu; chọn câu trả lời có sẵn. */
@@ -11,7 +11,7 @@ export function PhoneSheet() {
   const close = () => useGame.getState().setOverlay(null);
   const options = getContent().events.phone.options;
   return (
-    <Sheet title="📞 Điện thoại" onClose={close}>
+    <Sheet title="📞 Điện thoại" onClose={close} escapeClose={shift.phone.calls.length === 0}>
       {shift.phone.calls.length === 0 && <p className="muted">Không có cuộc gọi nào đang chờ.</p>}
       {shift.phone.calls.map((call) => {
         const order = shift.orders[call.orderId];
@@ -90,7 +90,7 @@ export function EventSheet() {
   const def = content.events.events[ev.eventId];
   const quiz = ev.quizId ? content.events.quizzes.find((q) => q.id === ev.quizId) : undefined;
   return (
-    <Sheet title={def.title} onClose={close}>
+    <Sheet title={def.title} onClose={close} escapeClose={false}>
       {inlineTips.map((tp) => (
         <button key={tp.id} className="tip-inline" onClick={() => dismissTip(tp.id)}>
           <b>💬 Chị Hạnh</b>

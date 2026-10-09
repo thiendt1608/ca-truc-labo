@@ -120,7 +120,7 @@ export function Home() {
         <button className="primary" onClick={() => openDay(current.id)}>
           🏥 Ca trực
         </button>
-        <button onClick={() => go('codex')}>
+        <button className="codex-btn" onClick={() => go('codex')}>
           📖 Sổ tay {collected}/{totalCards}
           {fresh > 0 && (
             <span className="dot" aria-label={`${fresh} thẻ mới`}>

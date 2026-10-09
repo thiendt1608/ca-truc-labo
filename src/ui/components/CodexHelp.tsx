@@ -1,6 +1,6 @@
 import { getContent, type HelpContext } from '../../sim';
 import { useGame } from '../../store/game';
-import { CodexCardView } from '../screens/Codex';
+import { CodexCardView } from './CodexCardView';
 
 /**
  * Nút "?" (04-GDD mục 12): mở thẻ Sổ tay liên quan nhất tới màn đang xem (map ở content/codex/help.json).

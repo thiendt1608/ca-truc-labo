@@ -53,6 +53,17 @@ export function isTimeSensitive(content: Content, sample: Sample, order: Order):
   });
 }
 
+/**
+ * Huy hiệu "⏰ Để quá giờ" (chỉ mức Dễ, GDD 5.1: Dễ có gợi ý). Tính từ dữ liệu người chơi tự thấy được:
+ * giờ lấy mẫu trên nhãn so với "Bây giờ", vượt `maxTransportMinutes` và phiếu có xét nghiệm nhạy thời gian.
+ * KHÔNG đọc `sample.defects` nên không lộ lỗi ẩn nào khác. Ống không nhãn: không có giờ nên không hiện.
+ */
+export function overAgeHint(content: Content, sample: Sample, order: Order, nowSecOfDay: number): boolean {
+  if (!sample.label) return false;
+  const ageMin = (nowSecOfDay - sample.label.collectedAt) / 60;
+  return ageMin > content.receptionRules.maxTransportMinutes && isTimeSensitive(content, sample, order);
+}
+
 export interface Verdict {
   correct: boolean;
   kind: string;

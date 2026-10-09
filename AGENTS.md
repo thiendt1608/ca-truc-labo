@@ -55,6 +55,10 @@ The codebase strictly decouples pure deterministic simulation from user interfac
 - React 19 components consuming Zustand state via `useGame()`.
 - Pure CSS with design variables (`src/ui/theme/global.css`) following greybox guidelines (touch targets $\ge 44\text{px}$).
 - Storage layer: `src/platform/save.ts` is pure (SaveData v3, `migrate` v1→v2→v3, save codes); `src/platform/storage.ts` saves player progression (IndexedDB key stays `save:v1`, the `version` field inside the data selects the migration) via `idb-keyval` with graceful fallback when storage is denied and old saves read through `migrate`. `src/platform/pwa.ts` registers the service worker (build only), captures `beforeinstallprompt` and exposes update/install state to `src/ui/components/PwaNotices.tsx`.
+- **Lazy chunks** (`src/ui/lazy.tsx`): Codex, Settings, Report, Briefing screens and QcSheet, ResultsSheet, ChemStations sheets, MinigameHost (all mini-games) and DebugPanel are `React.lazy` chunks (main chunk ~246 kB, react-dom vendor chunk ~232 kB, no Vite >500 kB warning). `preloadLazy()` fetches them when idle after boot; all chunks are in the SW precache (verify `dist/sw.js` after adding a chunk). Screens use `ScreenSuspense` ("Đang tải…"), sheets `QuietSuspense` (no fallback). A module imported statically anywhere stays in the main chunk, so shared pieces (`CodexCardView`, `Sheet`) live in `components/` and are not imported from lazy screens by static code. E2E must wait for a lazy screen's heading before counting its content.
+- **Escape** (`src/ui/useEscape.ts`): a module-level overlay stack; `Sheet` and `CodexCardView` register on mount and clean up on unmount, the top-most overlay closes first. `Sheet escapeClose={false}` (event decision, phone with pending calls) and any `Sheet` under an active mini-game ignore Escape and also block the sheets beneath. The mini-game itself has no Escape handling.
+- **"Chuyện hôm nay"**: `groupStories` (`src/sim/core/scoring.ts`) merges the ledger by `kind` + `explanationKey` into `StoryGroup` (`×N`, summed Niềm tin/An toàn for display only; scoring still uses the raw ledger); Report shows distinct per-entry details inside a `<details>` when `count > 1`.
+- **"⏰ Để quá giờ"** (`overAgeHint` in `src/sim/departments/reception.ts`): shown on `SampleCard` (pill) and tray chips (⏰ corner) only at levels with `hints` (Easy, GDD 5.1: Easy gives hints, Normal/Hard players read the label time vs "Bây giờ" themselves). Computed from visible data only (label `collectedAt` vs now, `maxTransportMinutes`, time-sensitive tests), never from `sample.defects`, so it reveals no hidden defect.
 
 ---
 
@@ -215,7 +219,7 @@ Every minigame is split cleanly into two halves:
 - **Key Test Suites**:
   - `src/sim/core/engine.test.ts`: Verifies simulation determinism: identical seed + identical command stream produces bit-for-bit identical state (`hashState(replay) === hashState(run.state)`).
   - `src/sim/core/qc.test.ts`: Tests Westgard multi-rule algorithms ($1_{2s}, 1_{3s}, 2_{2s}, R_{4s}, 4_{1s}, 10_x$).
-  - `src/sim/core/scoring.test.ts`: Tests 4-pillar grading (TAT, Accuracy, Safety, Efficiency) and star calculation.
+  - `src/sim/core/scoring.test.ts`: Tests 4-pillar grading (TAT, Accuracy, Safety, Efficiency), star calculation and `groupStories` (merging of repeated mistakes).
   - `src/store/toasts.test.ts`: Toast merging (`×n`, max 2) and per-shift clock pacing (`timeScale`).
   - `src/sim/core/events.test.ts`: each event kind (E1–E10 effects), phone answers/missed calls, quiz, determinism with events. Mechanic tests that must not be disturbed by events build a Content copy with `events: []` (see `chemExtras.test.ts`).
   - `src/sim/departments/chemExtras.test.ts`: dilution minigame (pure scoring, flow, too-small re-run, wrong multiply, premature release), Δ (flag, unverified release), urine strip (pure scoring, flow, misread penalty), bots on `ch1-d4`/`ch1-d5`.
@@ -235,6 +239,7 @@ Every minigame is split cleanly into two halves:
 - **Web Server**: Auto-launches production preview on port 4173 (`pnpm build && pnpm preview --port 4173 --strictPort`).
 - **Save/PWA spec** (`tests/save-pwa.spec.ts`): export → reset → import round-trip, wrong codes, reduced-motion switch, install reminder (once), settings from pause menu, manifest validity, service worker ready + offline reload on `vite preview`. `tests/responsive.spec.ts` also audits the Settings screen and the Codex (progress, filter, search, card, `?` over the centrifuge sheet).
 - **Codex spec** (`tests/codex.spec.ts`): Codex from Home shows % and locked hints, `Mới` badge persists across reload, `?` in a shift opens a card, holds the clock and returns to the same sheet, locked card shows `Mở khi ...`, `?` inside a minigame keeps the game, Easy shows the needed container on `ch0-d2`.
+- **UI fixes spec** (`tests/ui-fixes.spec.ts`): Escape closing (sheet, stacked card, not in mini-game), live save code in Settings, equal-height report buttons and one-line Home Codex button. `tests/chemExtras`: `ch1-d5` always yields Δ over 10 fixed seeds.
 - **Debug Assistance**: E2E tests navigate with query parameter `?debug=1` to expose the Debug Panel (`Bảng debug`), allowing instant shift completion (`Kết thúc ca ngay`) without waiting for real-time timers.
 
 ### 3. Balance Bot Testing (`pnpm balance`)

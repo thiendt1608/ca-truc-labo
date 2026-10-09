@@ -325,6 +325,21 @@ button.small {
   font-size: 14px;
   color: var(--ink-2);
 }
+.tray-item .overage-flag {
+  position: absolute;
+  top: -6px;
+  left: -4px;
+  font-size: 14px;
+  background: var(--warn);
+  border-radius: 9999px;
+  padding: 0 4px;
+}
+.pill.overage {
+  background: var(--warn);
+  color: #1a1a1a;
+  align-self: flex-start;
+  margin-top: 4px;
+}
 .tray-item.late {
   outline: 3px solid var(--bad);
 }
@@ -620,7 +635,8 @@ button.small {
   overflow-y: auto;
 }
 .mg-msg {
-  min-height: 64px;
+  /* Chỗ cố định cho dòng phản hồi (tới 4 dòng ở 320px) để danh sách bước không nhảy khi nó hiện/ẩn */
+  min-height: 112px;
   pointer-events: none;
 }
 .steps {
@@ -1405,4 +1421,31 @@ details > summary {
   align-items: center;
   min-height: 44px;
   cursor: pointer;
+}
+
+/* Nút Sổ tay ở Sảnh: một dòng, huy hiệu mới chồng ở góc (không đẩy chữ xuống dòng) */
+.bottombar .codex-btn {
+  white-space: nowrap;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+.bottombar .codex-btn .dot {
+  position: absolute;
+  top: -6px;
+  right: 6px;
+  margin: 0;
+  padding: 0 6px;
+  font-size: 14px;
+  line-height: 18px;
+}
+/* Hai nút cuối báo cáo: cùng hàng, cùng chiều cao */
+.report-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.report-actions button {
+  white-space: nowrap;
+  padding-left: 8px;
+  padding-right: 8px;
 }

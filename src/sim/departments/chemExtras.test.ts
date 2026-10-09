@@ -329,3 +329,17 @@ describe('bot trên ngày 1.4 và 1.5', () => {
     }
   });
 });
+
+describe('ngày 1.5 luôn có phiếu Δ (mục tiêu của ngày)', () => {
+  it('10 hạt giống cố định, nội dung thật (có sự kiện): bot thành thạo thấy ≥1 phiếu Δ và tip deltaFlag được bắn', () => {
+    for (let i = 0; i < 10; i++) {
+      const st = runBot(getContent(), 'ch1-d5', `d${i}`, 'expert').state;
+      // Làm lại để kiểm tra (deltaChecked) có thể xoá cờ Δ, nên đếm cả phiếu đã kiểm Δ.
+      const deltaOrders = Object.values(st.orders).filter(
+        (o) => o.deltaChecked || o.results?.some((r) => r.delta),
+      );
+      expect(deltaOrders.length, `seed d${i}`).toBeGreaterThanOrEqual(1);
+      expect(st.tipsShown, `seed d${i}`).toContain('deltaFlag');
+    }
+  });
+});

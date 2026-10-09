@@ -12,9 +12,59 @@ export interface ShiftReport {
   budget: number;
   endReason: 'time' | 'trust';
   trust: number;
-  /** "Chuyện hôm nay": 3–5 lỗi đáng nhớ nhất. */
-  stories: MistakeEntry[];
+  /** "Chuyện hôm nay": tối đa 5 nhóm lỗi đáng nhớ nhất (đã gộp theo loại + lý do). */
+  stories: StoryGroup[];
   counts: { samples: number; decisions: number; releases: number; mistakes: number; statOnTime: string };
+}
+
+/** Nhiều lần lỗi cùng `kind` + cùng `explanationKey` gộp thành một dòng "×N" với tổng điểm. */
+export interface StoryGroup {
+  kind: string;
+  explanationKey: string;
+  codex?: string;
+  count: number;
+  /** Tổng Niềm tin của mọi lần trong nhóm (chỉ để hiển thị, không ảnh hưởng điểm). */
+  trustDelta: number;
+  safetyPenalty: number;
+  /** Các lần lỗi gốc theo thời gian, để mở xem chi tiết. */
+  entries: MistakeEntry[];
+  /** Các câu giải thích riêng, đã bỏ trùng. */
+  details: string[];
+}
+
+/** Gộp sổ lỗi thành các nhóm, xếp nặng nhất trước (Niềm tin tổng thấp nhất, rồi An toàn, rồi sớm nhất). Hàm thuần. */
+export function groupStories(ledger: readonly MistakeEntry[], limit = 5): StoryGroup[] {
+  const groups = new Map<string, StoryGroup>();
+  for (const m of ledger) {
+    const key = `${m.kind}\u0000${m.explanationKey}`;
+    let g = groups.get(key);
+    if (!g) {
+      g = {
+        kind: m.kind,
+        explanationKey: m.explanationKey,
+        count: 0,
+        trustDelta: 0,
+        safetyPenalty: 0,
+        entries: [],
+        details: [],
+      };
+      groups.set(key, g);
+    }
+    g.count += 1;
+    g.trustDelta += m.trustDelta;
+    g.safetyPenalty += m.safetyPenalty;
+    g.entries.push(m);
+    if (m.codex && !g.codex) g.codex = m.codex;
+    if (m.detail && !g.details.includes(m.detail)) g.details.push(m.detail);
+  }
+  return [...groups.values()]
+    .sort(
+      (a, b) =>
+        a.trustDelta - b.trustDelta ||
+        b.safetyPenalty - a.safetyPenalty ||
+        (a.entries[0]?.t ?? 0) - (b.entries[0]?.t ?? 0),
+    )
+    .slice(0, limit);
 }
 
 export const WEIGHTS = { accuracy: 0.3, timeliness: 0.2, safety: 0.35, skill: 0.15 } as const;
@@ -49,15 +99,7 @@ export function computeReport(s: ShiftState, _content?: Content): ShiftReport {
   if (endReason === 'trust') stars = 1;
   if (totalDecisions === 0) stars = 1;
 
-  const seen = new Set<string>();
-  const stories = [...s.ledger]
-    .sort((a, b) => a.trustDelta - b.trustDelta || b.safetyPenalty - a.safetyPenalty || a.t - b.t)
-    .filter((m) => {
-      if (seen.has(m.kind)) return false;
-      seen.add(m.kind);
-      return true;
-    })
-    .slice(0, 5);
+  const stories = groupStories(s.ledger);
 
   const statDone = s.timeliness.filter((t) => t.weight === 2);
   return {
