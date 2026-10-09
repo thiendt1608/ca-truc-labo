@@ -63,7 +63,7 @@ Game giờ có 6 khu và 27 mini-game — quá lớn để làm một lần. Cá
 - [ ] M3-2 Giá trị nguy hiểm, gọi báo, Δ, HIL; pha loãng; que nước tiểu (`CompareGame` bản đầu).
 - [ ] M3-3 Sự kiện chung E1–E10; điện thoại.
 - [ ] M3-4 Cấu hình 8 ngày (chương 0–1); hướng dẫn của chị Hạnh.
-- [ ] M3-5 Hình ảnh thật cho Tiếp nhận + Hoá sinh; âm thanh.
+- [~] M3-5 Hình ảnh thật cho Tiếp nhận + Hoá sinh; âm thanh. **Hoãn**: bỏ khỏi M3, làm sau khi game ổn định (giữ CSS/emoji, chưa có âm thanh).
 - [ ] M3-6 Sổ tay (thẻ Tiếp nhận + Hoá sinh); 3 mức độ khó.
 - [ ] M3-7 Lưu game, mã lưu, PWA; khả năng tiếp cận.
 - [ ] M3-8 Kiểm tra trên điện thoại thật; chơi thử 8–10 người.
