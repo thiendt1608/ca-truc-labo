@@ -17,6 +17,20 @@ export default defineConfig({
       name: 'phone-390',
       use: { ...devices['iPhone 13'], viewport: { width: 390, height: 844 }, browserName: 'chromium' },
     },
+    // Responsive: máy nhỏ, máy lớn, máy tính bảng và cửa sổ máy tính (tests/responsive.spec.ts).
+    ...(
+      [
+        ['phone-320', 320, 568],
+        ['phone-430', 430, 932],
+        ['tablet-768', 768, 1024],
+        ['desktop-1366', 1366, 768],
+        ['desktop-1920', 1920, 1080],
+      ] as const
+    ).map(([name, width, height]) => ({
+      name,
+      testMatch: /responsive\.spec\.ts/,
+      use: { browserName: 'chromium' as const, viewport: { width, height }, hasTouch: width < 600 },
+    })),
   ],
   webServer: {
     command: 'pnpm build && pnpm preview --port 4173 --strictPort',

@@ -10,6 +10,7 @@
   - _Not Yet Implemented_: outgoing phone calls beyond `callCritical`/contact, equipment effects on events (maintenance contract), shifts after `ch1-d5`, processing Micro/Immuno/Patho samples (Reception only routes to those departments), Hematology department onwards, Free shift / Challenge mode, equipment purchasing (budget increments only, no store spending), PWA service worker, audio/sound effects, save codes, dark mode toggle, campaign/settings map. Commands from `docs/07-TDD.md` section 4.2 are only partially implemented.
 - **Domain Fidelity**: Strictly guided by professional laboratory rules ("Labo Xanh", SSOT in `docs/05-noi-dung-chuyen-mon.md` & `content/*.json`). Technologists never diagnose diseases. Critical samples marked as irreplaceable (e.g., CSF, surgical biopsy) must never be rejected outright (require `contact` action).
 - **Target Platform**: Client-side static web application with PWA/offline architecture, designed mobile-first (touch-first viewports: 360×640 to 390×844).
+  - Responsive: `.app` is a portrait column (max 480px) centered; at ≥600px wide it becomes a rounded frame (height ≤900px) over a decorative background; `100dvh` on html/body/#root. Landscape phone is intentionally unsupported. `tests/responsive.spec.ts` audits overflow, centering and tap targets at 320×568, 360×640, 390×844, 430×932, 768×1024, 1366×768, 1920×1080 (Playwright projects in `playwright.config.ts`).
 
 ---
 
