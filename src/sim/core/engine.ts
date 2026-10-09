@@ -1,4 +1,4 @@
-import type { Content } from '../content/load';
+import { routableDepts, type Content } from '../content/load';
 import { initQc } from '../departments/chemQc';
 import { applyTrayDecision, type Decision } from '../departments/reception';
 import {
@@ -94,6 +94,7 @@ function handle(ctx: Ctx, cmd: Command) {
       const sample = s.samples[cmd.sampleId];
       if (sample) sample.opened = true;
       tip(ctx, 'sampleOpened');
+      if (sample?.irreplaceable) tip(ctx, 'irreplaceable');
       return;
     }
     case 'acceptSample':
@@ -103,8 +104,15 @@ function handle(ctx: Ctx, cmd: Command) {
       if (!sample) return void ctx.events.push({ type: 'invalidCommand', message: 'Không có mẫu này.' });
       if (cmd.type === 'rejectSample' && sample.status === 'spun' && s.chem)
         return rejectAfterSpin(ctx, cmd.sampleId, cmd.reason);
-      if (cmd.type === 'acceptSample' && s.room === 'reception' && !cmd.target)
-        return void ctx.events.push({ type: 'invalidCommand', message: 'Chọn khoa để chuyển mẫu.' });
+      if (cmd.type === 'acceptSample' && s.room === 'reception') {
+        if (!cmd.target)
+          return void ctx.events.push({ type: 'invalidCommand', message: 'Chọn khoa để chuyển mẫu.' });
+        if (!routableDepts(ctx.day).includes(cmd.target))
+          return void ctx.events.push({
+            type: 'invalidCommand',
+            message: 'Hôm nay chưa chuyển mẫu tới khoa này.',
+          });
+      }
       const decision: Decision =
         cmd.type === 'acceptSample'
           ? { type: 'accept', target: cmd.target }
@@ -120,6 +128,9 @@ function handle(ctx: Ctx, cmd: Command) {
       } else if (s.chem) {
         onTrayDecision(ctx, sample, decision.type);
       }
+      // Lọ rò rỉ đã được cầm lên (từ chối hoặc liên hệ): phải dọn an toàn sinh học ngay.
+      if (decision.type !== 'accept' && sample.defects.some((d) => d.kind === 'leak') && !s.minigame)
+        startMinigame(ctx, 'spillCleanup', 'spill', { sampleId: sample.id });
       return;
     }
     case 'minigameResult': {

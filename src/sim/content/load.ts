@@ -1,4 +1,4 @@
-import { RawContentSchema, type RawContent } from './schema';
+import { RawContentSchema, type DeptId, type RawContent } from './schema';
 
 /** Nội dung đã kiểm tra, kèm bảng tra cứu theo id. */
 export interface Content extends RawContent {
@@ -34,6 +34,15 @@ export function loadContent(raw: unknown): Content {
   return content;
 }
 
+/** Các khoa mà bàn Tiếp nhận của ngày này được chuyển mẫu tới (theo `unlocks`). */
+export function routableDepts(day: Pick<RawContent['days'][number], 'unlocks'>): DeptId[] {
+  if (day.unlocks.includes('routeAll')) return ['chem', 'heme', 'micro', 'immuno', 'patho'];
+  const out: DeptId[] = [];
+  if (day.unlocks.includes('routeChem')) out.push('chem');
+  if (day.unlocks.includes('routeHeme')) out.push('heme');
+  return out;
+}
+
 export function crossCheck(c: Content): ContentProblem[] {
   const problems: ContentProblem[] = [];
   const add = (where: string, message: string) => problems.push({ where, message });
@@ -65,6 +74,15 @@ export function crossCheck(c: Content): ContentProblem[] {
       if (!containerIds.has(ct)) add(`tests/${t.code}`, `ống không tồn tại: ${ct}`);
     if (t.dept === 'chem' && !t.manual && !c.chemTestByCode.has(t.code))
       add(`tests/${t.code}`, 'xét nghiệm hoá sinh chưa có trong chem/tests.json');
+  }
+  for (const code of c.receptionRules.timeSensitiveTests)
+    if (!c.testByCode.has(code))
+      add('reception-rules', `timeSensitiveTests: xét nghiệm không tồn tại: ${code}`);
+  for (const [code, list] of Object.entries(c.receptionRules.timeExemptContainers)) {
+    if (!c.testByCode.has(code))
+      add('reception-rules', `timeExemptContainers: xét nghiệm không tồn tại: ${code}`);
+    for (const id of list)
+      if (!containerIds.has(id)) add('reception-rules', `timeExemptContainers: ống không tồn tại: ${id}`);
   }
   for (const ct of c.chemTests) {
     for (const a of ct.analytes) {
@@ -103,6 +121,9 @@ export function crossCheck(c: Content): ContentProblem[] {
     ['chem/rules/delta', c.chemRules.delta.codex],
     ...c.receptionRules.defects.map((d) => [`reception-rules/${d.defect}`, d.codex] as [string, string]),
     ['reception-rules/irreplaceable', c.receptionRules.irreplaceable.codex],
+    ...Object.entries(c.receptionRules.delayedByContainer).map(
+      ([id, o]) => [`reception-rules/delayed/${id}`, o.codex] as [string, string],
+    ),
     ['chem/rules/hemolysis', c.chemRules.hemolysis.codex],
     ['chem/rules/lipemia', c.chemRules.lipemia.codex],
     ['chem/rules/icterus', c.chemRules.icterus.codex],
@@ -112,6 +133,9 @@ export function crossCheck(c: Content): ContentProblem[] {
       (d) => [`reception-rules/${d.defect}`, d.explanationKey] as [string, string],
     ),
     ['reception-rules/irreplaceable', c.receptionRules.irreplaceable.explanationKey],
+    ...Object.entries(c.receptionRules.delayedByContainer).map(
+      ([id, o]) => [`reception-rules/delayed/${id}`, o.explanationKey] as [string, string],
+    ),
     ['chem/rules/hemolysis', c.chemRules.hemolysis.explanationKey],
     ['chem/rules/dilution', c.chemRules.dilution.explanationKey],
     ...Object.entries(c.chemQc.scenarios).flatMap(([id, sc]) => {
@@ -155,12 +179,22 @@ export function crossCheck(c: Content): ContentProblem[] {
     const total = d.waves.reduce((n, w) => n + w.count, 0);
     for (const s of d.scripted)
       if (s.index >= total) add(where, `kịch bản #${s.index} vượt quá số mẫu (${total})`);
-    const roomDepts = d.room === 'reception' ? null : d.room;
-    if (roomDepts) {
+    if (d.room === 'reception') {
+      const routable = routableDepts(d);
       for (const id of Object.keys(d.orderTypes)) {
         const ot = c.orderTypeById.get(id);
-        if (ot && ot.dept !== roomDepts)
-          add(where, `phòng ${d.room} nhưng có loại phiếu của khoa ${ot.dept}`);
+        if (ot && !routable.includes(ot.dept))
+          add(where, `loại phiếu ${id} thuộc khoa ${ot.dept} nhưng ngày này chưa mở chuyển tới khoa đó`);
+      }
+      for (const s of d.scripted) {
+        const ot = s.orderType ? c.orderTypeById.get(s.orderType) : undefined;
+        if (ot?.irreplaceable && (s.defects ?? []).length > 0 && !d.unlocks.includes('contact'))
+          add(where, `kịch bản #${s.index}: mẫu không lấy lại được có lỗi cần mở "contact"`);
+      }
+    } else {
+      for (const id of Object.keys(d.orderTypes)) {
+        const ot = c.orderTypeById.get(id);
+        if (ot && ot.dept !== d.room) add(where, `phòng ${d.room} nhưng có loại phiếu của khoa ${ot.dept}`);
       }
     }
   }

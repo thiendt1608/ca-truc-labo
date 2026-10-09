@@ -1,4 +1,4 @@
-import { getContent } from '../../sim';
+import { getContent, routableDepts } from '../../sim';
 import { t } from '../../i18n';
 import { runProgress, useGame } from '../../store/game';
 import { AnalyzerSheet, CentrifugeSheet, PostSpinSheet, UrineSheet } from '../components/ChemStations';
@@ -58,6 +58,7 @@ export function Room() {
                 container={s.container}
                 size={30}
                 underfill={s.defects.some((d) => d.kind === 'underfill')}
+                leak={s.defects.some((d) => d.kind === 'leak')}
               />
               <span className="who">{who}</span>
               <span className="age">
@@ -70,7 +71,11 @@ export function Room() {
           );
         })}
       </div>
-      <div className="stations">{shift.room === 'reception' ? <ReceptionStations /> : <ChemStations />}</div>
+      <div
+        className={`stations ${shift.room === 'reception' && routableDepts(day).length > 2 ? 'dense' : ''}`}
+      >
+        {shift.room === 'reception' ? <ReceptionStations /> : <ChemStations />}
+      </div>
       <nav className="bottombar navbar" aria-label="Thanh lệnh">
         {shift.room !== 'reception' && (
           <button onClick={() => setOverlay({ kind: 'results' })}>
@@ -164,11 +169,12 @@ function Orb({ state }: { state: 'ready' | 'busy' | 'error' }) {
 
 function ReceptionStations() {
   const shift = useGame((s) => s.shift)!;
+  const day = getContent().dayById.get(shift.dayId)!;
   const count = (pred: (s: (typeof shift.samples)[string]) => boolean) =>
     Object.values(shift.samples).filter(pred).length;
   return (
     <>
-      {(['chem', 'heme'] as const).map((d) => (
+      {routableDepts(day).map((d) => (
         <div key={d} data-room={d} className="station card">
           <span className="station-head">
             <span className="name">🧺 Giỏ {t(`dept.${d}`)}</span>
@@ -182,6 +188,14 @@ function ReceptionStations() {
         </span>
         <span className="status">{count((s) => s.status === 'rejected')} ống</span>
       </div>
+      {day.unlocks.includes('contact') && (
+        <div className="station card">
+          <span className="station-head">
+            <span className="name">📞 Đã liên hệ</span>
+          </span>
+          <span className="status">{count((s) => s.status === 'contacted')} ống</span>
+        </div>
+      )}
       <div className="station card">
         <span className="station-head">
           <span className="name">✔️ Đã xử lý</span>

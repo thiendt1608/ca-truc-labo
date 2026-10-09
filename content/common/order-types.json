@@ -58,5 +58,66 @@
       "stat": "urine",
       "routine": "urine"
     }
+  },
+  {
+    "id": "stool",
+    "dept": "micro",
+    "count": [1, 1],
+    "testsFrom": ["KST"],
+    "container": {
+      "stat": "stool",
+      "routine": "stool"
+    }
+  },
+  {
+    "id": "swabCulture",
+    "dept": "micro",
+    "count": [1, 1],
+    "testsFrom": ["SWAB"],
+    "container": {
+      "stat": "swab",
+      "routine": "swab"
+    }
+  },
+  {
+    "id": "bloodCulture",
+    "dept": "micro",
+    "count": [1, 1],
+    "testsFrom": ["BCULT"],
+    "container": {
+      "stat": "bloodculture",
+      "routine": "bloodculture"
+    }
+  },
+  {
+    "id": "immunoSerum",
+    "dept": "immuno",
+    "count": [1, 2],
+    "testsFrom": ["HBSAG", "NS1"],
+    "container": {
+      "stat": "red",
+      "routine": "red"
+    }
+  },
+  {
+    "id": "fluSwab",
+    "dept": "immuno",
+    "count": [1, 1],
+    "testsFrom": ["FLU"],
+    "container": {
+      "stat": "swab",
+      "routine": "swab"
+    }
+  },
+  {
+    "id": "histology",
+    "dept": "patho",
+    "count": [1, 1],
+    "testsFrom": ["HISTO"],
+    "container": {
+      "stat": "tissue",
+      "routine": "tissue"
+    },
+    "irreplaceable": true
   }
 ]

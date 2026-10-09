@@ -5,8 +5,28 @@
     "open-exam-prep ASCP PBT: acceptability-rejection-criteria"
   ],
   "maxTransportMinutes": 120,
-  "timeSensitiveTests": ["GLU", "ELEC"],
-  "timeExemptContainers": { "GLU": ["grey"] },
+  "timeSensitiveTests": ["GLU", "ELEC", "UA", "KST", "SWAB", "FLU", "BCULT"],
+  "timeExemptContainers": {
+    "GLU": ["grey"]
+  },
+  "delayedByContainer": {
+    "urine": {
+      "explanationKey": "rule.time.urine",
+      "codex": "rc-cup-urine"
+    },
+    "stool": {
+      "explanationKey": "rule.time.stool",
+      "codex": "rc-stool"
+    },
+    "swab": {
+      "explanationKey": "rule.time.swab",
+      "codex": "rc-swab"
+    },
+    "bloodculture": {
+      "explanationKey": "rule.time.bloodculture",
+      "codex": "rc-bloodculture"
+    }
+  },
   "defects": [
     {
       "defect": "noLabel",

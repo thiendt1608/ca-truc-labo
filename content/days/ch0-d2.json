@@ -1,0 +1,161 @@
+{
+  "id": "ch0-d2",
+  "chapter": 0,
+  "day": 2,
+  "room": "reception",
+  "title": "Lọ, chai, que và đủ năm khoa",
+  "mentor": "hanh",
+  "newThings": [
+    "Lọ nước tiểu, lọ phân, que tăm bông, chai cấy máu, lọ mô",
+    "Chuyển mẫu tới đủ 5 khoa: Hoá sinh, Huyết học, Vi sinh, Miễn dịch, Giải phẫu bệnh",
+    "Mẫu để quá giờ: từ chối nếu xét nghiệm nhạy với thời gian"
+  ],
+  "start": 25200,
+  "end": 34200,
+  "startTrust": 70,
+  "unlocks": ["routeChem", "routeHeme", "routeAll"],
+  "tat": {
+    "stat": 3600,
+    "routine": 7200,
+    "reception": 1800
+  },
+  "waves": [
+    {
+      "at": 0,
+      "count": 3,
+      "spread": 240
+    },
+    {
+      "at": 900,
+      "count": 4,
+      "spread": 1500
+    },
+    {
+      "at": 3000,
+      "count": 5,
+      "spread": 1800
+    },
+    {
+      "at": 5400,
+      "count": 4,
+      "spread": 2100
+    }
+  ],
+  "orderTypes": {
+    "chemPanel": 3,
+    "glucoseOnly": 1,
+    "cbc": 2,
+    "coag": 1,
+    "urine": 2,
+    "stool": 2,
+    "swabCulture": 1,
+    "bloodCulture": 1,
+    "immunoSerum": 2,
+    "fluSwab": 1,
+    "histology": 2
+  },
+  "defects": {
+    "noLabel": 0.03,
+    "labelMismatch": 0.07,
+    "wrongContainer": 0.06,
+    "underfill": 0.03,
+    "delayed": 0.16
+  },
+  "profiles": {
+    "healthy": 6,
+    "diabetes": 1,
+    "kidney": 1,
+    "liver": 1,
+    "lipid": 1,
+    "inflammation": 1
+  },
+  "scripted": [
+    {
+      "index": 0,
+      "priority": "routine",
+      "orderType": "urine",
+      "defects": []
+    },
+    {
+      "index": 1,
+      "priority": "routine",
+      "orderType": "stool",
+      "defects": []
+    },
+    {
+      "index": 2,
+      "priority": "routine",
+      "orderType": "swabCulture",
+      "defects": []
+    },
+    {
+      "index": 3,
+      "priority": "routine",
+      "orderType": "histology",
+      "defects": []
+    },
+    {
+      "index": 4,
+      "priority": "routine",
+      "orderType": "immunoSerum",
+      "defects": []
+    },
+    {
+      "index": 5,
+      "priority": "routine",
+      "orderType": "urine",
+      "defects": [
+        {
+          "kind": "delayed"
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "priority": "routine",
+      "orderType": "glucoseOnly",
+      "defects": [
+        {
+          "kind": "delayed"
+        }
+      ]
+    }
+  ],
+  "tips": [
+    {
+      "trigger": "start",
+      "text": "Hôm nay mẫu không chỉ có ống máu mà còn lọ, chai, que đủ loại. Em xem xét nghiệm trên phiếu để chuyển đúng trong 5 khoa nhé."
+    },
+    {
+      "trigger": "sampleOpened",
+      "text": "Nhìn cả giờ lấy mẫu: nước tiểu, phân, que tăm bông và chai cấy máu để quá 2 giờ thì từ chối. Đường hay điện giải trong ống thường cũng vậy."
+    },
+    {
+      "trigger": "sampleAccepted",
+      "text": "Hoá sinh nhận cả nước tiểu. Vi sinh nhận lọ phân, que cấy, chai cấy máu. Miễn dịch nhận ống đỏ làm test miễn dịch. Lọ mô đi Giải phẫu bệnh."
+    },
+    {
+      "trigger": "mistake",
+      "text": "Không sao, em đọc thẻ Sổ tay vừa mở là nhớ. Cuối ca mình xem lại trong mục Chuyện hôm nay nhé."
+    },
+    {
+      "trigger": "statArrived",
+      "text": "Ống có 🚑 là mẫu cấp cứu, em xử lý trước nhé."
+    }
+  ],
+  "codexOnStart": [
+    "rc-routing",
+    "rc-cup-urine",
+    "rc-stool",
+    "rc-swab",
+    "rc-bloodculture",
+    "rc-tissue",
+    "rc-transport-time"
+  ],
+  "events": [
+    {
+      "id": "E8",
+      "at": 6000
+    }
+  ]
+}

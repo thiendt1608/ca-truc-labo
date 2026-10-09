@@ -1187,3 +1187,29 @@ button.small {
   padding-right: 4px;
   min-width: 0;
 }
+
+/* Lọ rò rỉ: giọt chất lỏng nhỏ ở góc dưới lọ */
+.tube-wrap {
+  position: relative;
+  display: inline-flex;
+}
+.tube-leak {
+  position: absolute;
+  right: -8px;
+  bottom: -2px;
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Bàn Tiếp nhận có 5 giỏ khoa: thẻ trạm gọn hơn để thấy hết trên màn hình nhỏ */
+.stations.dense .station {
+  min-height: 72px;
+  padding: 8px 12px;
+}
+
+/* Khung giữ luôn ở đáy màn để không phải cuộn tìm ở 640px */
+.hold-panel {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+}

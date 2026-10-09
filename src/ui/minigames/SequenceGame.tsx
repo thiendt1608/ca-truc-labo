@@ -87,7 +87,7 @@ export function SequenceGame({
         })}
       </div>
       {holding && (
-        <div className="card stack">
+        <div className="card stack hold-panel">
           <b>Giữ nút cho chất khử khuẩn ngấm, thả tay khi thanh ở vùng xanh.</b>
           <TimingGame
             input={input.hold}

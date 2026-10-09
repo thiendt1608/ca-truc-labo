@@ -35,7 +35,11 @@ export function MinigameHost() {
         <h2>
           {INTRO[spec.id]?.icon} {spec.title}
         </h2>
-        <p className="muted">{INTRO[spec.id]?.text}</p>
+        <p className="muted">
+          {mg.context === 'spill' && mg.sampleId
+            ? 'Lọ rò rỉ! Chạm các bước theo đúng thứ tự để dọn an toàn sinh học.'
+            : INTRO[spec.id]?.text}
+        </p>
       </div>
       <div className="mg-body">
         {spec.id === 'dilution' && <MeasureGame input={input as DilutionInput} onDone={finish} />}

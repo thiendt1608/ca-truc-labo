@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getContent, type DeptId, type RejectReason } from '../../sim';
+import { getContent, routableDepts, type RejectReason } from '../../sim';
 import { t } from '../../i18n';
 import { clockText, secondsOfDayText, useGame } from '../../store/game';
 import { Sheet } from './Overlay';
@@ -24,11 +24,8 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
   const container = content.containers.find((c) => c.id === sample.container)!;
   const testNames = order.tests.map((code) => content.testByCode.get(code)?.name ?? code);
 
-  const depts: DeptId[] = day.unlocks.includes('routeAll')
-    ? ['chem', 'heme', 'micro', 'immuno', 'patho']
-    : (['chem', 'heme'] as DeptId[]).filter((d) =>
-        day.unlocks.includes(d === 'chem' ? 'routeChem' : 'routeHeme'),
-      );
+  const depts = routableDepts(day);
+  const leaking = sample.defects.some((d) => d.kind === 'leak');
 
   const act = (fn: () => void) => {
     fn();
@@ -57,6 +54,7 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
           <Field k="Mã bệnh nhân" v={patient.code} />
           <Field k="Khoa gửi" v={order.ward} />
           <Field k="Xét nghiệm" v={testNames.join(', ')} />
+          {sample.irreplaceable && <Field k="Ghi chú" v="🧬 Bệnh phẩm sinh thiết, không lấy lại được" />}
           {difficulty === 'easy' && (
             <div className="field">
               <div className="k">Ống cần (gợi ý mức Dễ)</div>
@@ -84,6 +82,7 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
               container={sample.container}
               size={30}
               underfill={sample.defects.some((d) => d.kind === 'underfill')}
+              leak={leaking}
             />
             <span className="muted">
               {container.name} ({container.letter})
@@ -91,6 +90,7 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
               Bây giờ: {clockText(shift)}
             </span>
           </div>
+          {leaking && <p className="v">💧 Lọ ướt, có dịch rỉ ra ngoài</p>}
         </div>
       </div>
 
@@ -109,9 +109,7 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
             ❌ Từ chối
           </button>
           {day.unlocks.includes('contact') && (
-            <button onClick={() => act(() => dispatch({ type: 'contactWard', sampleId }))}>
-              📞 Liên hệ khoa gửi
-            </button>
+            <button onClick={() => act(() => dispatch({ type: 'contactWard', sampleId }))}>📞 Liên hệ</button>
           )}
         </div>
       )}

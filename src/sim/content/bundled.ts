@@ -11,6 +11,8 @@ import events from '../../../content/common/events.json';
 import chemUrine from '../../../content/chem/urine.json';
 import chemQc from '../../../content/chem/qc.json';
 import ch0d1 from '../../../content/days/ch0-d1.json';
+import ch0d2 from '../../../content/days/ch0-d2.json';
+import ch0d3 from '../../../content/days/ch0-d3.json';
 import ch1d1 from '../../../content/days/ch1-d1.json';
 import ch1d2 from '../../../content/days/ch1-d2.json';
 import ch1d3 from '../../../content/days/ch1-d3.json';
@@ -35,7 +37,7 @@ export const rawContent = {
   chemQc,
   chemUrine,
   events,
-  days: [ch0d1, ch1d1, ch1d2, ch1d3, ch1d4, ch1d5],
+  days: [ch0d1, ch0d2, ch0d3, ch1d1, ch1d2, ch1d3, ch1d4, ch1d5],
   codex: [...codexCommon, ...codexChem],
   i18n,
 };

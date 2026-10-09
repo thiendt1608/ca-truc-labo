@@ -4,7 +4,7 @@ export * from './core/scoring';
 export * from './core/qc';
 export * from './core/rng';
 export { getContent } from './content/bundled';
-export type { Content } from './content/load';
+export { routableDepts, type Content } from './content/load';
 export type * from './content/schema';
 export { expectedReception, evaluateDecision, isTimeSensitive } from './departments/reception';
 export { isBalanced, balanceSkill, expectedPostSpin } from './departments/chem';

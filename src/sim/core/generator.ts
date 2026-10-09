@@ -72,10 +72,13 @@ function pickTests(ctx: Ctx, from: string[], count: [number, number], fixed?: st
   return ctx.rng.shuffle(from).slice(0, n);
 }
 
-function wrongContainerFor(ctx: Ctx, tests: string[]): ContainerId {
+/** Ống/lọ sai: ưu tiên cùng dạng với đồ đúng (ống máu nhầm ống máu, lọ nhầm lọ); không có thì lấy bất kỳ loại nào không hợp lệ. */
+function wrongContainerFor(ctx: Ctx, tests: string[], correct: ContainerId): ContainerId {
   const allowed = new Set(tests.flatMap((code) => ctx.content.testByCode.get(code)?.containers ?? []));
-  const options = ctx.content.containers.map((c) => c.id).filter((id) => !allowed.has(id));
-  return ctx.rng.pick(options);
+  const wrong = ctx.content.containers.filter((c) => !allowed.has(c.id));
+  const kind = ctx.content.containers.find((c) => c.id === correct)?.kind;
+  const sameKind = wrong.filter((c) => c.kind === kind);
+  return ctx.rng.pick((sameKind.length > 0 ? sameKind : wrong).map((c) => c.id));
 }
 
 function rollDefects(ctx: Ctx): Defect[] {
@@ -123,7 +126,13 @@ export function makeArrival(ctx: Ctx, spec: SampleSpec): ScheduledArrival {
   const tests = pickTests(ctx, orderType.testsFrom, orderType.count, spec.tests);
   const container = orderType.container[priority];
   const patient = makePatient(ctx, spec.profile);
-  const defects = spec.defects ?? rollDefects(ctx);
+  const irreplaceable = orderType.irreplaceable ?? false;
+  // Mẫu không lấy lại được chỉ có lỗi khi ngày đã mở "Liên hệ": trước đó người chơi chưa có cách xử lý đúng
+  // (từ chối là lỗi nghiêm trọng), nên bệnh phẩm luôn nguyên vẹn.
+  // Que tăm bông không có "thể tích" để người chơi nhìn thấy, nên không roll lỗi thiếu thể tích cho que.
+  const swab = content.containers.find((c) => c.id === container)?.kind === 'swab';
+  const rolled = spec.defects ?? rollDefects(ctx).filter((d) => !(swab && d.kind === 'underfill'));
+  const defects = irreplaceable && !unlocked(ctx, 'contact') ? [] : rolled;
 
   const orderId = newId(ctx, 'o');
   const sampleId = newId(ctx, 's');
@@ -146,11 +155,18 @@ export function makeArrival(ctx: Ctx, spec: SampleSpec): ScheduledArrival {
     kind: 'arrival',
     patient,
     order,
-    sample: makeSample(ctx, order, patient, defects, spec.at),
+    sample: makeSample(ctx, order, patient, defects, spec.at, irreplaceable),
   };
 }
 
-export function makeSample(ctx: Ctx, order: Order, patient: Patient, defects: Defect[], at: number): Sample {
+export function makeSample(
+  ctx: Ctx,
+  order: Order,
+  patient: Patient,
+  defects: Defect[],
+  at: number,
+  irreplaceable = false,
+): Sample {
   const { rng } = ctx;
   const collectedAgo = defects.some((d) => d.kind === 'delayed')
     ? rng.int(130, 200) * 60
@@ -170,10 +186,10 @@ export function makeSample(ctx: Ctx, order: Order, patient: Patient, defects: De
     id: order.sampleId,
     orderId: order.id,
     container: defects.some((d) => d.kind === 'wrongContainer')
-      ? wrongContainerFor(ctx, order.tests)
+      ? wrongContainerFor(ctx, order.tests, order.container)
       : order.container,
     label,
-    irreplaceable: false,
+    irreplaceable,
     defects,
     hidden: {
       // Nhãn lệch: ống thật ra là máu của người khác → "sự thật" lấy từ một hồ sơ ngẫu nhiên khác.

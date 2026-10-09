@@ -52,5 +52,41 @@
     "kind": "cup",
     "color": "#e0b422",
     "spin": false
+  },
+  {
+    "id": "stool",
+    "name": "Lọ phân",
+    "letter": "P",
+    "additive": "Không có (lọ sạch nắp xúc)",
+    "kind": "cup",
+    "color": "#8d6e63",
+    "spin": false
+  },
+  {
+    "id": "swab",
+    "name": "Que tăm bông trong ống môi trường",
+    "letter": "Q",
+    "additive": "Môi trường vận chuyển (giữ que ẩm)",
+    "kind": "swab",
+    "color": "#16a085",
+    "spin": false
+  },
+  {
+    "id": "bloodculture",
+    "name": "Chai cấy máu",
+    "letter": "B",
+    "additive": "Môi trường nuôi cấy vi khuẩn",
+    "kind": "bottle",
+    "color": "#e67e22",
+    "spin": false
+  },
+  {
+    "id": "tissue",
+    "name": "Lọ mô ngâm formalin",
+    "letter": "M",
+    "additive": "Formalin trung tính 10%",
+    "kind": "jar",
+    "color": "#c2185b",
+    "spin": false
   }
 ]

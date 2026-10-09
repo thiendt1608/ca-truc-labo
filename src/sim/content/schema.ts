@@ -4,7 +4,18 @@ import { z } from 'zod';
 
 export const DeptIdSchema = z.enum(['chem', 'heme', 'micro', 'immuno', 'patho']);
 export const RoomIdSchema = z.enum(['reception', 'chem', 'heme', 'micro', 'immuno', 'patho']);
-export const ContainerIdSchema = z.enum(['purple', 'lightblue', 'green', 'red', 'grey', 'urine']);
+export const ContainerIdSchema = z.enum([
+  'purple',
+  'lightblue',
+  'green',
+  'red',
+  'grey',
+  'urine',
+  'stool',
+  'swab',
+  'bloodculture',
+  'tissue',
+]);
 export const PrioritySchema = z.enum(['routine', 'stat']);
 export const RejectReasonSchema = z.enum(['identity', 'container', 'volume', 'time', 'leak', 'hemolysis']);
 export const LabelFieldSchema = z.enum(['name', 'birthYear', 'patientCode']);
@@ -37,7 +48,7 @@ export const ContainerSchema = z.object({
   name: z.string(),
   letter: z.string().length(1),
   additive: z.string(),
-  kind: z.enum(['tube', 'cup']),
+  kind: z.enum(['tube', 'cup', 'swab', 'bottle', 'jar']),
   color: z.string().regex(/^#[0-9a-f]{6}$/i),
   spin: z.boolean(),
 });
@@ -66,6 +77,8 @@ export const OrderTypeSchema = z.object({
   count: z.tuple([z.number().int().min(1), z.number().int().min(1)]),
   testsFrom: z.array(z.string()).min(1),
   container: z.object({ stat: ContainerIdSchema, routine: ContainerIdSchema }),
+  /** Bệnh phẩm không lấy lại được (sinh thiết, mô phẫu thuật): lỗi thì Liên hệ, không bao giờ từ chối. */
+  irreplaceable: z.boolean().optional(),
 });
 
 const MeanSd = z.tuple([z.number(), z.number().min(0)]);
@@ -95,6 +108,8 @@ export const ReceptionRulesSchema = z.object({
   maxTransportMinutes: z.number().positive(),
   timeSensitiveTests: z.array(z.string()),
   timeExemptContainers: z.record(z.string(), z.array(ContainerIdSchema)),
+  /** Lỗi "để quá giờ" có lời giải thích và thẻ Sổ tay riêng theo loại lọ (nước tiểu, phân, que, chai cấy máu). */
+  delayedByContainer: z.partialRecord(ContainerIdSchema, RuleOutcome).default({}),
   defects: z.array(
     RuleOutcome.extend({
       defect: DefectKindSchema,
@@ -283,6 +298,7 @@ export const TipTriggerSchema = z.enum([
   'deltaFlag',
   'phoneRing',
   'eventDecision',
+  'irreplaceable',
 ]);
 
 export const DayConfigSchema = z.object({

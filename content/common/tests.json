@@ -89,5 +89,47 @@
     "dept": "chem",
     "containers": ["urine"],
     "manual": true
+  },
+  {
+    "code": "KST",
+    "name": "Soi phân tìm ký sinh trùng",
+    "dept": "micro",
+    "containers": ["stool"]
+  },
+  {
+    "code": "SWAB",
+    "name": "Cấy dịch phết (que tăm bông)",
+    "dept": "micro",
+    "containers": ["swab"]
+  },
+  {
+    "code": "BCULT",
+    "name": "Cấy máu",
+    "dept": "micro",
+    "containers": ["bloodculture"]
+  },
+  {
+    "code": "HBSAG",
+    "name": "HBsAg (viêm gan B)",
+    "dept": "immuno",
+    "containers": ["red"]
+  },
+  {
+    "code": "NS1",
+    "name": "Sốt xuất huyết NS1",
+    "dept": "immuno",
+    "containers": ["red"]
+  },
+  {
+    "code": "FLU",
+    "name": "Test nhanh cúm (que mũi họng)",
+    "dept": "immuno",
+    "containers": ["swab"]
+  },
+  {
+    "code": "HISTO",
+    "name": "Giải phẫu bệnh (mô sinh thiết)",
+    "dept": "patho",
+    "containers": ["tissue"]
   }
 ]

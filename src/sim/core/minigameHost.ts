@@ -8,8 +8,8 @@ export function startMinigame(
   ctx: Ctx,
   minigameId: string,
   context: ActiveMinigame['context'],
-  /** Đề bài gắn với một mẫu hoặc phiếu cụ thể (nước tiểu, pha loãng): hạt giống và đối tượng. */
-  bound?: { seed: string; sampleId?: string; orderId?: string },
+  /** Đề bài gắn với một mẫu hoặc phiếu cụ thể (nước tiểu, pha loãng, lọ rò rỉ): đối tượng và hạt giống (mặc định theo ca). */
+  bound?: { seed?: string; sampleId?: string; orderId?: string },
 ) {
   const taskId = newId(ctx, 'mg');
   const mg: ActiveMinigame = {

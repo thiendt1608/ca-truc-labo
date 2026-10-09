@@ -24,10 +24,12 @@ export function expectedReception(content: Content, sample: Sample, order: Order
     const has = sample.defects.some((d) => d.kind === rule.defect);
     if (!has) continue;
     if (rule.defect === 'delayed' && !isTimeSensitive(content, sample, order)) continue;
+    // Lỗi để quá giờ có lời giải thích riêng theo loại lọ (nước tiểu, phân, que, chai cấy máu).
+    const outcome = (rule.defect === 'delayed' && rules.delayedByContainer[sample.container]) || rule;
     const r = {
       defect: rule.defect,
-      explanationKey: rule.explanationKey,
-      codex: rule.codex,
+      explanationKey: outcome.explanationKey,
+      codex: outcome.codex,
       releaseTrust: rule.releaseTrust,
     };
     if (sample.irreplaceable) {
@@ -41,7 +43,7 @@ export function expectedReception(content: Content, sample: Sample, order: Order
   return { decision: { type: 'accept', target: order.dept } };
 }
 
-/** Mẫu để lâu chỉ hỏng nếu phiếu có xét nghiệm nhạy với thời gian (Glucose ngoài ống xám, điện giải). */
+/** Mẫu để lâu chỉ hỏng nếu phiếu có xét nghiệm nhạy với thời gian (Glucose ngoài ống xám, điện giải, nước tiểu, phân, que, cấy máu). */
 export function isTimeSensitive(content: Content, sample: Sample, order: Order): boolean {
   const rules = content.receptionRules;
   return order.tests.some((code) => {
@@ -79,6 +81,7 @@ export function evaluateDecision(
           correct: false,
           kind: 'wrongRoute',
           explanationKey: 'rule.wrongRoute',
+          codex: 'rc-routing',
           trustDelta: -3,
           safetyPenalty: 0,
         };

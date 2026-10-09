@@ -110,5 +110,53 @@
     "body": "Ống vỡ có thể chứa mầm bệnh. Rắc chất khử khuẩn, chờ đủ thời gian, lau từ ngoài vào trong, rồi bỏ vào thùng rác y tế.",
     "more": "Lau từ ngoài vào trong để không kéo chất bẩn ra rộng hơn.",
     "source": ["WHO LQMS"]
+  },
+  {
+    "id": "rc-routing",
+    "dept": "reception",
+    "title": "Chuyển mẫu đúng khoa",
+    "body": "Xem xét nghiệm trên phiếu để biết khoa nào làm. Hoá sinh: máu hoá sinh và nước tiểu. Huyết học: công thức máu, đông máu. Vi sinh: lọ phân, que cấy, chai cấy máu. Miễn dịch: ống đỏ làm test miễn dịch, que mũi họng. Giải phẫu bệnh: lọ mô.",
+    "more": "Cùng là que tăm bông nhưng cấy vi khuẩn thì sang Vi sinh, test nhanh cúm thì sang Miễn dịch. Vì vậy luôn nhìn tên xét nghiệm trên phiếu, đừng chỉ nhìn loại lọ.",
+    "source": ["SOP Labo Xanh", "05-noi-dung-chuyen-mon.md mục 1.2"]
+  },
+  {
+    "id": "rc-cup-urine",
+    "dept": "reception",
+    "title": "Lọ nước tiểu (U)",
+    "body": "Lọ nước tiểu sạch dùng cho tổng phân tích nước tiểu, chuyển sang Hoá sinh. Phải gửi trong 2 giờ: để lâu thì vi khuẩn sinh sôi và tế bào bị phá huỷ, kết quả không còn đúng.",
+    "more": "Nước tiểu để cấy vi khuẩn dùng lọ vô trùng riêng và đi Vi sinh. Nếu chưa gửi kịp thì giữ lạnh 2 đến 8°C.",
+    "source": ["SOP Labo Xanh", "05-noi-dung-chuyen-mon.md mục 1.2"]
+  },
+  {
+    "id": "rc-stool",
+    "dept": "reception",
+    "title": "Lọ phân (P)",
+    "body": "Lọ phân dùng để soi tìm ký sinh trùng đường ruột, chuyển sang Vi sinh – Ký sinh trùng. Phải soi sớm và đủ lượng (khoảng bằng đầu ngón tay). Để quá 2 giờ thì từ chối.",
+    "more": "Để lâu, ký sinh trùng trong phân bị biến dạng hoặc tiêu giải nên khi soi rất dễ bỏ sót.",
+    "source": ["SOP Labo Xanh", "05-noi-dung-chuyen-mon.md mục 1.2"]
+  },
+  {
+    "id": "rc-swab",
+    "dept": "reception",
+    "title": "Que tăm bông trong ống môi trường (Q)",
+    "body": "Que tăm bông phải nằm trong ống môi trường vận chuyển và que không được khô. Que lấy dịch để cấy vi khuẩn đi Vi sinh; que mũi họng làm test nhanh cúm đi Miễn dịch. Để quá 2 giờ thì từ chối.",
+    "more": "Que khô thì vi khuẩn chết dần, kết quả cấy sẽ sai. Test nhanh cúm cũng nên làm ngay.",
+    "source": ["SOP Labo Xanh", "05-noi-dung-chuyen-mon.md mục 1.2"]
+  },
+  {
+    "id": "rc-bloodculture",
+    "dept": "reception",
+    "title": "Chai cấy máu (B)",
+    "body": "Chai cấy máu là một cặp chai hiếu khí và kỵ khí, chuyển sang Vi sinh. Gửi ngay, không để tủ lạnh. Để quá 2 giờ thì từ chối.",
+    "more": "Lạnh hoặc để lâu làm vi khuẩn chết hoặc chậm mọc, kết quả cấy máu có thể âm tính giả trong khi bệnh nhân vẫn đang nhiễm khuẩn.",
+    "source": ["SOP Labo Xanh", "05-noi-dung-chuyen-mon.md mục 1.2"]
+  },
+  {
+    "id": "rc-tissue",
+    "dept": "reception",
+    "title": "Lọ mô ngâm formalin (M)",
+    "body": "Lọ mô ngâm formalin trung tính 10% chuyển sang Giải phẫu bệnh. Formalin phải khoảng 10 lần thể tích mô, mô ngập hoàn toàn, phiếu ghi vị trí lấy mô. Mô sinh thiết không lấy lại được: lọ có lỗi thì chọn Liên hệ.",
+    "more": "Formalin giữ mô không bị phân huỷ để cắt lát và nhuộm. Formalin độc nên lọ rò phải dọn theo quy trình an toàn.",
+    "source": ["SOP Labo Xanh", "05-noi-dung-chuyen-mon.md mục 1.2 và 6"]
   }
 ]

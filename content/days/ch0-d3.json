@@ -1,0 +1,171 @@
+{
+  "id": "ch0-d3",
+  "chapter": 0,
+  "day": 3,
+  "room": "reception",
+  "title": "Mẫu không lấy lại được và lọ rò rỉ",
+  "mentor": "hanh",
+  "newThings": [
+    "Mẫu không lấy lại được (sinh thiết): có lỗi thì Liên hệ, không bao giờ từ chối",
+    "Lọ rò rỉ: từ chối rồi dọn an toàn sinh học",
+    "Cấp cứu dồn mẫu: làm ống 🚑 trước"
+  ],
+  "start": 25200,
+  "end": 34200,
+  "startTrust": 70,
+  "unlocks": ["routeChem", "routeHeme", "routeAll", "contact"],
+  "tat": {
+    "stat": 3600,
+    "routine": 7200,
+    "reception": 1500
+  },
+  "waves": [
+    {
+      "at": 0,
+      "count": 3,
+      "spread": 240
+    },
+    {
+      "at": 900,
+      "count": 5,
+      "spread": 1500
+    },
+    {
+      "at": 3000,
+      "count": 5,
+      "spread": 1800
+    },
+    {
+      "at": 5400,
+      "count": 5,
+      "spread": 2100
+    }
+  ],
+  "orderTypes": {
+    "chemPanel": 2,
+    "glucoseOnly": 1,
+    "cbc": 2,
+    "urine": 2,
+    "stool": 1,
+    "swabCulture": 1,
+    "bloodCulture": 2,
+    "immunoSerum": 2,
+    "fluSwab": 1,
+    "histology": 3
+  },
+  "defects": {
+    "noLabel": 0.03,
+    "labelMismatch": 0.06,
+    "wrongContainer": 0.05,
+    "underfill": 0.04,
+    "delayed": 0.07,
+    "leak": 0.09
+  },
+  "profiles": {
+    "healthy": 6,
+    "diabetes": 1,
+    "kidney": 1,
+    "liver": 1,
+    "lipid": 1,
+    "inflammation": 1
+  },
+  "scripted": [
+    {
+      "index": 0,
+      "priority": "routine",
+      "orderType": "chemPanel",
+      "defects": []
+    },
+    {
+      "index": 1,
+      "priority": "routine",
+      "orderType": "urine",
+      "defects": [
+        {
+          "kind": "leak"
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "priority": "routine",
+      "orderType": "histology",
+      "defects": [
+        {
+          "kind": "underfill"
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "priority": "routine",
+      "orderType": "stool",
+      "defects": []
+    },
+    {
+      "index": 5,
+      "priority": "routine",
+      "orderType": "histology",
+      "defects": [
+        {
+          "kind": "wrongContainer"
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "priority": "routine",
+      "orderType": "histology",
+      "defects": [
+        {
+          "kind": "leak"
+        }
+      ]
+    }
+  ],
+  "tips": [
+    {
+      "trigger": "start",
+      "text": "Hôm nay có bệnh phẩm không lấy lại được và lọ rò rỉ. Em bình tĩnh, mỗi loại có cách xử lý riêng."
+    },
+    {
+      "trigger": "sampleOpened",
+      "text": "Lọ ướt, có dịch rỉ ra là lọ rò: từ chối rồi dọn an toàn. Còn bệnh phẩm sinh thiết có lỗi thì không bao giờ từ chối, em chọn Liên hệ."
+    },
+    {
+      "trigger": "irreplaceable",
+      "text": "Đây là bệnh phẩm không lấy lại được. Nếu nhãn, lượng formalin hay lọ có lỗi, em chọn Liên hệ khoa gửi, tuyệt đối không từ chối hay vứt."
+    },
+    {
+      "trigger": "mistake",
+      "text": "Không sao, em đọc thẻ Sổ tay vừa mở là nhớ. Cuối ca mình xem lại trong mục Chuyện hôm nay nhé."
+    },
+    {
+      "trigger": "spill",
+      "text": "Dọn theo thứ tự: rắc chất khử khuẩn, chờ đủ thời gian, lau từ ngoài vào trong, rồi bỏ vào thùng rác y tế."
+    },
+    {
+      "trigger": "statArrived",
+      "text": "Cấp cứu dồn về rồi! Em làm ống 🚑 trước, ống thường chờ được."
+    }
+  ],
+  "codexOnStart": ["rc-irreplaceable", "rc-leak", "rc-spill", "rc-stat", "rc-tissue"],
+  "events": [
+    {
+      "id": "E1",
+      "at": 2400
+    },
+    {
+      "id": "E4",
+      "at": 4200
+    },
+    {
+      "id": "E1",
+      "at": 6000
+    },
+    {
+      "id": "E8",
+      "at": 7500
+    }
+  ]
+}
