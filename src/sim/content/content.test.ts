@@ -77,3 +77,15 @@ describe('content', () => {
     expect(() => loadContent(bad)).toThrow();
   });
 });
+
+describe('mẹo của người hướng dẫn', () => {
+  it('mọi mẹo đủ ngắn để không che giỏ/khay: mục tiêu ≤ 120 ký tự, quá 140 là lỗi', () => {
+    for (const d of getContent().days)
+      for (const tip of d.tips) expect(tip.text.length, `${d.id}/${tip.trigger}`).toBeLessThanOrEqual(100);
+  });
+  it('báo lỗi khi một mẹo dài hơn 110 ký tự', () => {
+    const bad = structuredClone(rawContent);
+    bad.days[0]!.tips[0]!.text = 'a'.repeat(111);
+    expect(() => loadContent(bad)).toThrow(/110 ký tự/);
+  });
+});

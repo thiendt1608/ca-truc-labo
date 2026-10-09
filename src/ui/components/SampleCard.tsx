@@ -55,6 +55,7 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
           <Field k="Năm sinh" v={patient.birthYear} />
           <Field k="Mã bệnh nhân" v={patient.code} />
           <Field k="Khoa gửi" v={order.ward} />
+          <Field k="Mức ưu tiên" v={order.priority === 'stat' ? '🚑 Cấp cứu (khẩn)' : 'Thường'} />
           <Field k="Xét nghiệm" v={testNames.join(', ')} />
           {sample.irreplaceable && <Field k="Ghi chú" v="🧬 Bệnh phẩm sinh thiết, không lấy lại được" />}
           {hints && (

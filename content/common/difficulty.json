@@ -1,5 +1,6 @@
 {
   "source": ["04-GDD.md mục 13.1 và 13.2", "06-UI-UX-va-mi-thuat.md mục 7"],
+  "workSheetClockFactor": 0.25,
   "levels": {
     "easy": {
       "name": "Dễ",

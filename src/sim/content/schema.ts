@@ -2,6 +2,9 @@ import { z } from 'zod';
 
 /** Schema cho dữ liệu trong thư mục content/. Kiểm tra lúc chạy game, lúc test và bằng `pnpm content:check`. */
 
+/** Mẹo quá dài che khay mẫu và nút ở màn nhỏ (320px): tối đa số ký tự này (mục tiêu thực tế ≤ 100, ~3 dòng ở 320px). */
+export const MAX_TIP_CHARS = 110;
+
 export const DeptIdSchema = z.enum(['chem', 'heme', 'micro', 'immuno', 'patho']);
 export const RoomIdSchema = z.enum(['reception', 'chem', 'heme', 'micro', 'immuno', 'patho']);
 export const ContainerIdSchema = z.enum([
@@ -230,6 +233,8 @@ export const DifficultyLevelSchema = z.object({
 });
 export const DifficultySchema = z.object({
   source: z.array(z.string()),
+  /** Hệ số nhân tốc độ đồng hồ khi đang mở tấm làm việc (thẻ mẫu, máy, khay, kết quả, bàn nước tiểu). Chủ dự án chọn sau playtest. */
+  workSheetClockFactor: z.number().gt(0).lt(1),
   levels: z.object({
     easy: DifficultyLevelSchema,
     normal: DifficultyLevelSchema,
@@ -376,7 +381,17 @@ export const DayConfigSchema = z.object({
   events: z.array(z.object({ id: EventIdSchema, at: z.number().min(0).optional() })).default([]),
   /** Có thì máy hoá sinh chỉ chạy mẫu bệnh nhân sau khi QC đạt; `scenario` là lỗi ẩn của ngày. */
   qc: z.object({ scenario: z.string() }).optional(),
-  tips: z.array(z.object({ trigger: TipTriggerSchema, text: z.string().max(200) })),
+  tips: z.array(
+    z.object({
+      trigger: TipTriggerSchema,
+      text: z
+        .string()
+        .max(
+          MAX_TIP_CHARS,
+          `mẹo dài quá ${MAX_TIP_CHARS} ký tự (che giỏ/khay ở 320px): rút gọn, dẫn "xem Sổ tay"`,
+        ),
+    }),
+  ),
   codexOnStart: z.array(z.string()),
 });
 

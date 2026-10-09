@@ -18,7 +18,7 @@ export function ResultsSheet() {
   return (
     <Sheet title={`📋 Kết quả (${ready.length} chờ duyệt)`} help="results" onClose={close}>
       <p className="muted">
-        Đã gửi {released} phiếu. Kỹ thuật viên chỉ kiểm tra và gửi kết quả; bác sĩ mới là người kết luận bệnh.
+        Đã gửi {released} phiếu. KTV chỉ kiểm tra và gửi kết quả; bác sĩ mới là người kết luận bệnh.
       </p>
       {day.unlocks.includes('releaseAllUnflagged') && unflagged.length > 1 && (
         <button onClick={() => unflagged.forEach((o) => dispatch({ type: 'releaseOrder', orderId: o.id }))}>
@@ -129,9 +129,12 @@ function OrderCard({ order }: { order: Order }) {
             : 'Δ: kết quả khác nhiều so với lần trước. Bấm Làm lại để kiểm tra; vẫn lệch mà nghi nhầm người thì Huỷ, lấy mẫu mới.'}
         </p>
       )}
-      <button className="primary" onClick={() => dispatch({ type: 'releaseOrder', orderId: order.id })}>
-        ✅ Duyệt và gửi
-      </button>
+      {/* Dính đáy tấm khi thẻ dài: nút duyệt luôn trong tầm nhìn dù kết quả nhiều hay có thêm ghi chú. */}
+      <div className="sticky-action">
+        <button className="primary" onClick={() => dispatch({ type: 'releaseOrder', orderId: order.id })}>
+          ✅ Duyệt và gửi
+        </button>
+      </div>
       <div className="row wrap">
         <button className="small grow" onClick={() => dispatch({ type: 'rerunOrder', orderId: order.id })}>
           🔁 Làm lại

@@ -99,7 +99,7 @@
   "tips": [
     {
       "trigger": "start",
-      "text": "Hôm nay em nhìn màu huyết thanh sau ly tâm. Đỏ hồng là tan huyết: chỉ từ chối khi xét nghiệm của phiếu bị ảnh hưởng."
+      "text": "Nhìn màu huyết thanh: đỏ hồng là tan huyết, chỉ từ chối khi xét nghiệm bị ảnh hưởng."
     },
     {
       "trigger": "sampleAccepted",
@@ -111,7 +111,7 @@
     },
     {
       "trigger": "centrifugeDone",
-      "text": "Ly tâm xong. Mở Khay sau ly tâm, xem màu huyết thanh rồi quyết định: nạp máy, ly tâm tốc độ cao hoặc từ chối."
+      "text": "Ly tâm xong. Mở Khay sau ly tâm, xem màu huyết thanh rồi nạp máy hoặc từ chối."
     },
     {
       "trigger": "resultReady",

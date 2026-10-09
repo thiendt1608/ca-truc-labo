@@ -7,6 +7,7 @@ import {
   smallestRatio,
   type DilutionInput,
 } from '../../sim/minigames/dilution';
+import { useRevealOnShow } from '../scrollSheet';
 
 /** Thời gian (ms) kể từ thao tác đầu tiên. Chỉ gọi trong xử lý sự kiện. */
 function elapsedMs(start: { current: number | null }): number {
@@ -50,6 +51,8 @@ export function MeasureGame({
   const [ratio, setRatio] = useState<number | null>(null);
   const [wrong, setWrong] = useState<string[]>([]);
   const [message, setMessage] = useState<string | null>(null);
+  const msgRef = useRef<HTMLDivElement>(null);
+  useRevealOnShow(msgRef, message !== null);
   const { analyte } = input;
 
   const push = (a: PlayerAction) => {
@@ -148,7 +151,7 @@ export function MeasureGame({
         </>
       )}
 
-      <div className={`mg-msg ${message ? 'toast mistake' : ''}`} aria-live="polite">
+      <div ref={msgRef} className={`mg-msg ${message ? 'toast mistake' : ''}`} aria-live="polite">
         {message}
       </div>
     </div>

@@ -1,6 +1,8 @@
+import { useRef } from 'react';
 import { evaluateWestgard, getContent, type QcRemedy } from '../../sim';
 import { t } from '../../i18n';
 import { clockText, useGame } from '../../store/game';
+import { useScrollSheetToFit } from '../scrollSheet';
 import { Sheet } from './Overlay';
 
 const W = 340;
@@ -88,21 +90,35 @@ export function QcSheet() {
   const level = getContent().difficulty.levels[shift.difficulty];
   const hint = level.hints ? evaluateWestgard(qc.runs, level.advancedWestgard) : null;
 
+  // Sau khi bấm Chạy control / Không đạt, nút phán quyết và nút khắc phục phải nằm trong tầm nhìn cùng biểu đồ.
+  const chartRef = useRef<HTMLDivElement>(null);
+  const actionsRef = useRef<HTMLDivElement>(null);
+  useScrollSheetToFit(
+    chartRef,
+    actionsRef,
+    qc.status === 'judging' || qc.status === 'failed' ? `${qc.status}:${qc.runs.length}` : null,
+  );
+
   return (
     <Sheet title="🧪 Kiểm tra chất lượng (QC)" help="qc" onClose={close}>
       <p className="muted">
         {qc.status === 'passed'
           ? '✅ QC đạt: máy hoá sinh được chạy mẫu bệnh nhân.'
-          : 'Máy chỉ chạy mẫu bệnh nhân sau khi QC đạt. Control là mẫu đã biết trước giá trị; SD (độ lệch chuẩn) là độ chênh cho phép so với giá trị đúng. Chấm vượt vạch đỏ ±3SD là Không đạt.'}
+          : 'Máy chỉ chạy mẫu bệnh nhân sau khi QC đạt. Control là mẫu biết trước giá trị; vượt vạch đỏ ±3SD (độ lệch chuẩn) là Không đạt.'}
       </p>
       {inlineTips.map((tp) => (
         <button key={tp.id} className="tip-inline" onClick={() => dismissTip(tp.id)}>
           <b>💬 Chị Hạnh</b>
           {tp.text}
-          <span className="muted"> (chạm để đóng)</span>
+          <span className="muted" aria-hidden>
+            {' '}
+            ✕
+          </span>
         </button>
       ))}
-      <LJChart runs={qc.runs} />
+      <div ref={chartRef}>
+        <LJChart runs={qc.runs} />
+      </div>
       {qc.note && <p className="note-inline">💡 {t(qc.note)}</p>}
       {last && (
         <div className="row wrap">
@@ -131,33 +147,31 @@ export function QcSheet() {
       )}
 
       {qc.status === 'judging' && (
-        <>
+        <div ref={actionsRef} className="stack">
           <b>Em thấy lần chạy này thế nào?</b>
-          <div className="stack">
-            <button onClick={() => dispatch({ type: 'chem/judgeQC', verdict: 'pass' })}>
-              ✅ Đạt: cho máy chạy mẫu
-            </button>
-            <button onClick={() => dispatch({ type: 'chem/judgeQC', verdict: 'rerun' })}>
-              🔁 Cảnh báo: chạy lại control
-            </button>
-            <button className="danger" onClick={() => dispatch({ type: 'chem/judgeQC', verdict: 'fail' })}>
-              ❌ Không đạt: phải khắc phục
-            </button>
-          </div>
-        </>
+          <button onClick={() => dispatch({ type: 'chem/judgeQC', verdict: 'pass' })}>
+            ✅ Đạt: cho máy chạy mẫu
+          </button>
+          <button onClick={() => dispatch({ type: 'chem/judgeQC', verdict: 'rerun' })}>
+            🔁 Cảnh báo: chạy lại control
+          </button>
+          <button className="danger" onClick={() => dispatch({ type: 'chem/judgeQC', verdict: 'fail' })}>
+            ❌ Không đạt: phải khắc phục
+          </button>
+        </div>
       )}
 
       {qc.status === 'failed' && (
-        <>
+        <div ref={actionsRef} className="stack">
           <b>Nhìn hình dạng biểu đồ, em chọn cách khắc phục nào?</b>
-          <div className="stack">
+          <div className="remedies">
             {(Object.keys(rules.remedies) as QcRemedy[]).map((id) => (
               <button key={id} onClick={() => dispatch({ type: 'chem/qcAction', action: id })}>
                 {rules.remedies[id].label} · {Math.round(rules.remedies[id].seconds / 60)} phút
               </button>
             ))}
           </div>
-        </>
+        </div>
       )}
     </Sheet>
   );

@@ -49,6 +49,31 @@ export const TARGET_REAL_SECONDS = 360;
 export function timeScale(durationSeconds: number): number {
   return durationSeconds / TARGET_REAL_SECONDS;
 }
+/** Tấm làm việc: giờ vẫn chạy nhưng chậm (hệ số `workSheetClockFactor` trong difficulty.json). */
+const WORK_SHEETS: readonly string[] = ['sample', 'centrifuge', 'postspin', 'analyzer', 'results', 'urine'];
+
+/** Phần của store quyết định nhịp đồng hồ. */
+export interface ClockGate {
+  overlay: Overlay;
+  /** Có mini-game đang mở trong lõi (kể cả khi còn chờ người chơi bấm "Dọn ngay"). */
+  minigame: boolean;
+  /** Có thẻ Sổ tay mở bằng nút "?". */
+  help: boolean;
+  /** Số mẹo đang xếp hàng (chỉ giữ giờ khi không có lớp phủ). */
+  tips: number;
+}
+/**
+ * Hệ số nhân tốc độ đồng hồ: 0 = dừng hẳn (mẹo, mini-game toàn màn, QC/điện thoại/sự kiện/Sổ tay, thẻ "?"),
+ * `workFactor` = đang mở tấm làm việc, 1 = bình thường (04-GDD mục 4; chủ dự án chọn sau playtest).
+ */
+export function clockFactor(g: ClockGate, workFactor: number): number {
+  if (g.help || g.minigame) return 0;
+  if (g.overlay !== null) {
+    if (DECISION_SCREENS.includes(g.overlay.kind)) return 0;
+    return WORK_SHEETS.includes(g.overlay.kind) ? workFactor : 1;
+  }
+  return g.tips > 0 ? 0 : 1;
+}
 /** Ngày sau đó hiện thẻ nhắc lưu bền một lần (07-TDD mục 7). */
 const INSTALL_HINT_DAY = 'ch0-d3';
 const MAX_TOASTS = 2;
@@ -56,6 +81,17 @@ const MAX_TOASTS = 2;
 const DECISION_SCREENS: readonly string[] = ['qc', 'phone', 'event', 'codex'];
 /** Mẹo chỉ có nghĩa khi đang mở QC sheet, nên không xếp hàng chung với mẹo của phòng. */
 const INLINE_TIPS: readonly string[] = ['qcRun', 'qcFailed', 'eventDecision'];
+
+/** Nội dung thẻ nhắc trước mini-game tự bật. */
+export interface MinigameNotice {
+  title: string;
+  text: string;
+}
+/** Ống vỡ khi ly tâm lệch (không có sự kiện đi kèm). */
+const AUTO_SPILL_NOTICE: MinigameNotice = {
+  title: '💥 Ống vỡ trong máy ly tâm',
+  text: 'Một ống vừa vỡ trong máy ly tâm! Phải dọn đúng quy trình an toàn.',
+};
 
 /** Thêm thông báo; thông báo trùng nội dung được gộp thành "×n" thay vì xếp chồng. */
 export function pushToasts(current: Toast[], incoming: Omit<Toast, 'count'>[]): Toast[] {
@@ -93,6 +129,8 @@ interface GameStore {
   carry: number;
   /** Thẻ Sổ tay đang mở bằng nút "?" (chồng lên màn/lớp phủ hiện tại, dừng giờ trong lúc đọc). */
   help: string | null;
+  /** Thẻ nhắc trước mini-game tự bật (ống vỡ, sự kiện rơi vỡ); null khi không có hoặc người chơi đã xác nhận. */
+  mgNotice: (MinigameNotice & { taskId: string }) | null;
   /** Thẻ đã đọc trong ca này nhưng chưa nằm trong bản lưu (lưu vào `codexSeen` khi hết ca). */
   seenInShift: string[];
 
@@ -116,6 +154,8 @@ interface GameStore {
   /** Nút "?": mở thẻ Sổ tay liên quan nhất tới `context` (map trong content/codex/help.json). */
   openHelp(context: HelpContext): void;
   closeHelp(): void;
+  /** Người chơi bấm "Dọn ngay" trên thẻ nhắc: mini-game (đã mở trong lõi) hiện ra. */
+  ackMinigame(): void;
   /** Đánh dấu thẻ đã đọc (bỏ dấu "Mới"). */
   markCodexSeen(id: string): void;
 }
@@ -124,13 +164,23 @@ let toastId = 0;
 
 export const useGame = create<GameStore>((set, getState) => {
   /** Nhận kết quả một bước của lõi: cập nhật state, biến events thành mẹo/thông báo, kết thúc ca. */
-  const absorb = (r: StepResult) => {
+  const absorb = (r: StepResult, auto = false) => {
     const content = getContent();
     const day = content.dayById.get(r.state.dayId);
     const tips: GameStore['tips'] = [];
     const inlineTips: GameStore['tips'] = [];
     let openOverlay: Overlay | null = null;
     const toasts: Omit<Toast, 'count'>[] = [];
+    // Mini-game tự bật do thời gian trôi (ống vỡ, sự kiện rơi vỡ): xin người chơi xác nhận rồi mới vào,
+    // thay vì chiếm màn hình đột ngột. Mini-game do chính lệnh của người chơi (từ chối lọ rò, pha loãng...) vào luôn.
+    const started = auto ? r.events.find((e) => e.type === 'minigameStarted') : undefined;
+    let notice: MinigameNotice | null = null;
+    if (started?.type === 'minigameStarted') {
+      const ev = r.events.find(
+        (e) => e.type === 'eventStarted' && content.events.events[e.eventId]?.kind === 'spill',
+      );
+      notice = ev?.type === 'eventStarted' ? { title: ev.title, text: ev.text } : AUTO_SPILL_NOTICE;
+    }
     for (const e of r.events) {
       if (e.type === 'tip') {
         const tip = day?.tips.find((x) => x.trigger === e.trigger);
@@ -147,9 +197,10 @@ export const useGame = create<GameStore>((set, getState) => {
       } else if (e.type === 'trustChanged' && e.delta > 0) {
         toasts.push({ id: ++toastId, kind: 'good', text: `+${e.delta} Niềm tin` });
       } else if (e.type === 'tubeBroken') {
-        toasts.push({ id: ++toastId, kind: 'mistake', text: 'Một ống bị vỡ trong máy ly tâm!' });
+        if (!notice) toasts.push({ id: ++toastId, kind: 'mistake', text: 'Một ống bị vỡ trong máy ly tâm!' });
       } else if (e.type === 'eventStarted') {
-        toasts.push({ id: ++toastId, kind: 'info', text: `${e.title}: ${e.text}` });
+        if (!notice || content.events.events[e.eventId]?.kind !== 'spill')
+          toasts.push({ id: ++toastId, kind: 'info', text: `${e.title}: ${e.text}` });
         if (e.decision) openOverlay = { kind: 'event' };
       } else if (e.type === 'notice') {
         toasts.push({ id: ++toastId, kind: e.tone === 'bad' ? 'mistake' : e.tone, text: e.text });
@@ -164,6 +215,9 @@ export const useGame = create<GameStore>((set, getState) => {
       inlineTips: inlineTips.length > 0 ? inlineTips.slice(-1) : st.inlineTips,
       toasts: pushToasts(st.toasts, toasts),
       ...(openOverlay ? { overlay: openOverlay } : {}),
+      ...(notice && started?.type === 'minigameStarted'
+        ? { mgNotice: { ...notice, taskId: started.minigame.taskId } }
+        : {}),
     }));
     if (ended) finish(r.state);
     return r.events;
@@ -202,6 +256,7 @@ export const useGame = create<GameStore>((set, getState) => {
       screen: 'report',
       overlay: null,
       help: null,
+      mgNotice: null,
       paused: false,
       installHint: showHint,
     });
@@ -227,15 +282,18 @@ export const useGame = create<GameStore>((set, getState) => {
     debug: { enabled: false, showHidden: false },
     carry: 0,
     help: null,
+    mgNotice: null,
     seenInShift: [],
 
     async init() {
       const save = await loadSave();
       const enabled = new URLSearchParams(location.search).has('debug');
+      // Chỉ khi ?debug=1: e2e dùng cửa này để dựng tình huống (kết quả chờ duyệt, QC hỏng) mà không phải chơi cả ca.
+      if (enabled) Object.assign(window, { __game: useGame, __content: getContent() });
       set({ save, difficulty: save.difficulty, debug: { enabled, showHidden: false } });
     },
     go(screen) {
-      set({ screen, overlay: null, help: null });
+      set({ screen, overlay: null, help: null, mgNotice: null });
     },
     setDifficulty(difficulty) {
       set((st) => ({ difficulty, save: { ...st.save, difficulty } }));
@@ -279,6 +337,7 @@ export const useGame = create<GameStore>((set, getState) => {
         report: null,
         overlay: null,
         help: null,
+        mgNotice: null,
         seenInShift: [],
         paused: false,
         speed: 1,
@@ -297,26 +356,32 @@ export const useGame = create<GameStore>((set, getState) => {
       return absorb(applyCommand(shift, cmd, getContent()));
     },
     tickReal(ms) {
-      const { shift, paused, speed, difficulty, carry, screen, overlay, tips, help } = getState();
+      const { shift, paused, speed, difficulty, carry, screen, overlay, tips, help, mgNotice } = getState();
       if (!shift || shift.ended || paused || screen !== 'room') return;
-      // Dừng giờ khi đọc lời hướng dẫn, làm mini-game toàn màn, xem biểu đồ QC (04-GDD mục 4: màn quyết định lớn dừng giờ)
-      // hoặc đọc thẻ Sổ tay mở từ nút "?".
-      if (
-        help !== null ||
-        shift.minigame ||
-        (overlay !== null && DECISION_SCREENS.includes(overlay.kind)) ||
-        (overlay === null && tips.length > 0)
-      )
-        return;
+      const content = getContent();
+      const factor = clockFactor(
+        {
+          overlay,
+          minigame: shift.minigame !== null || mgNotice !== null,
+          help: help !== null,
+          tips: tips.length,
+        },
+        content.difficulty.workSheetClockFactor,
+      );
+      if (factor === 0) return;
       const total =
         carry +
         (ms / 1000) *
           timeScale(shift.duration) *
-          getContent().difficulty.levels[difficulty].clockSpeed *
-          speed;
+          content.difficulty.levels[difficulty].clockSpeed *
+          speed *
+          factor;
       const whole = Math.floor(total);
       set({ carry: total - whole });
-      if (whole > 0) absorb(advance(shift, Math.min(whole, 600), getContent()));
+      if (whole > 0) absorb(advance(shift, Math.min(whole, 600), content), true);
+    },
+    ackMinigame() {
+      set({ mgNotice: null });
     },
     setPaused(paused) {
       set({ paused });
@@ -361,6 +426,21 @@ export const useGame = create<GameStore>((set, getState) => {
 /** Mức độ khó của ca đang chơi có gợi ý (ống cần dùng, bước tiếp theo, ô chưa cân bằng...) không. */
 export function useHints(): boolean {
   return useGame((s) => getContent().difficulty.levels[s.shift?.difficulty ?? s.difficulty].hints);
+}
+
+/** Hệ số đồng hồ hiện tại (0 = dừng, <1 = giờ chậm vì đang mở tấm làm việc, 1 = bình thường). */
+export function useClockFactor(): number {
+  return useGame((s) =>
+    clockFactor(
+      {
+        overlay: s.overlay,
+        minigame: s.shift?.minigame != null || s.mgNotice !== null,
+        help: s.help !== null,
+        tips: s.tips.length,
+      },
+      getContent().difficulty.workSheetClockFactor,
+    ),
+  );
 }
 
 /** Thẻ đã mở: nằm trong bản lưu hoặc vừa mở trong ca đang chơi. */

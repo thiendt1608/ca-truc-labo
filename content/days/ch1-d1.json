@@ -92,7 +92,7 @@
     },
     {
       "trigger": "phoneRing",
-      "text": "Điện thoại đổ chuông! Bấm nút 📞: phiếu xong rồi thì báo kết quả, chưa xong thì cho biết giờ dự kiến."
+      "text": "Điện thoại đổ chuông! Bấm 📞: xong thì báo kết quả, chưa xong thì báo giờ dự kiến."
     },
     {
       "trigger": "eventDecision",

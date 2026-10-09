@@ -95,7 +95,10 @@ export function EventSheet() {
         <button key={tp.id} className="tip-inline" onClick={() => dismissTip(tp.id)}>
           <b>💬 Chị Hạnh</b>
           {tp.text}
-          <span className="muted"> (chạm để đóng)</span>
+          <span className="muted" aria-hidden>
+            {' '}
+            ✕
+          </span>
         </button>
       ))}
       <p>{quiz ? quiz.question : def.text}</p>
@@ -124,5 +127,27 @@ export function EventSheet() {
         <p className="muted">Còn {shift.pending.length - 1} việc khác đang chờ.</p>
       )}
     </Sheet>
+  );
+}
+
+/**
+ * Thẻ nhắc trước mini-game tự bật (ống vỡ, sự kiện rơi vỡ): giờ đã dừng, mini-game chỉ hiện khi người chơi bấm "Dọn ngay".
+ * Không có ✕/chạm nền/Escape vì việc dọn là bắt buộc; không có "để sau" vì lõi đã mở mini-game và giờ ca dừng sẵn.
+ */
+export function MinigameNoticeSheet() {
+  const notice = useGame((s) => s.mgNotice);
+  const ack = useGame((s) => s.ackMinigame);
+  if (!notice) return null;
+  return (
+    <div className="overlay top">
+      <div className="sheet stack" role="alertdialog" aria-modal="true" aria-label={notice.title}>
+        <h2>{notice.title}</h2>
+        <p>{notice.text}</p>
+        <p className="muted">⏸ Đồng hồ ca đang dừng cho tới khi dọn xong.</p>
+        <button className="primary" autoFocus onClick={ack}>
+          🧽 Dọn ngay
+        </button>
+      </div>
+    </div>
   );
 }

@@ -1,5 +1,6 @@
 /// <reference lib="dom" />
 import { expect, test, type Page } from '@playwright/test';
+import { fabricateResult, startViaStore } from './debug-store';
 
 /** Kiểm tra bố cục trên nhiều kích thước: không tràn ngang, khung ở giữa, nút đủ lớn, nằm trong khung. */
 async function audit(page: Page, where: string) {
@@ -106,4 +107,34 @@ test('Sổ tay gọn ở mọi kích thước (tiến độ, lọc, tìm kiếm,
   await page.getByRole('button', { name: 'Mở thẻ Sổ tay liên quan' }).click();
   await expect(page.getByRole('dialog').last().getByText('Biết thêm')).toBeVisible();
   await audit(page, 'thẻ từ nút ?');
+});
+
+test('Kết quả có thông báo và thẻ nhắc ống vỡ gọn ở mọi kích thước', async ({ page }) => {
+  await startViaStore(page, 'ch1-d1');
+  await fabricateResult(page, 9);
+  await page
+    .locator('nav.bottombar')
+    .getByRole('button', { name: /Kết quả/ })
+    .click();
+  await expect(page.getByRole('button', { name: /Duyệt và gửi/ })).toBeVisible();
+  await page.evaluate(() => {
+    window.__game!.getState().dispatch({ type: 'releaseOrder', orderId: 'khong-co' });
+  });
+  await expect(page.locator('.sheet-overlay .toast')).toBeVisible();
+  await audit(page, 'kết quả + thông báo');
+  await page.keyboard.press('Escape');
+
+  // Thẻ nhắc trước mini-game tự bật (dựng bằng cửa debug: lõi mở mini-game, store giữ thẻ nhắc).
+  await page.evaluate(() => {
+    const g = window.__game!;
+    g.getState().dispatch({ type: 'debug/forceSpill' });
+    g.setState({
+      mgNotice: { taskId: 'x', title: '💥 Rơi vỡ mẫu', text: 'Một ống vừa rơi vỡ gần máy ly tâm!' },
+    });
+  });
+  await expect(page.getByRole('alertdialog')).toBeVisible();
+  await audit(page, 'thẻ nhắc ống vỡ');
+  await page.getByRole('button', { name: /Dọn ngay/ }).click();
+  await expect(page.locator('.mg .steps')).toBeVisible();
+  await audit(page, 'mini-game dọn đổ vỡ');
 });

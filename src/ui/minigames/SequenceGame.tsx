@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import type { PlayerAction } from '../../sim';
 import { replaySpill, type SpillInput } from '../../sim/minigames/spillCleanup';
+import { useRevealOnShow } from '../scrollSheet';
 import { TimingGame } from './TimingGame';
 
 /** Thời gian (ms) kể từ thao tác đầu tiên. Chỉ gọi trong xử lý sự kiện. */
@@ -28,6 +29,8 @@ export function SequenceGame({
   const [wrong, setWrong] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const now = () => elapsedMs(t0);
+  const msgRef = useRef<HTMLDivElement>(null);
+  useRevealOnShow(msgRef, message !== null);
   const state = useMemo(() => replaySpill(input, actions), [input, actions]);
   const expected = input.correct[state.index];
   const holding = expected === 'wait' && actions.some((a) => a.type === 'tap' && a.id === 'wait');
@@ -63,9 +66,6 @@ export function SequenceGame({
       </div>
       <div className="progress" aria-hidden>
         <div style={{ width: `${(state.index / input.correct.length) * 100}%` }} />
-      </div>
-      <div className={`mg-msg ${message ? 'toast mistake' : ''}`} aria-live="polite">
-        {message}
       </div>
       <div className="steps">
         {input.steps.map((s) => {
@@ -106,6 +106,10 @@ export function SequenceGame({
           />
         </div>
       )}
+      {/* Dưới danh sách bước: phản hồi hiện/ẩn không làm dịch các nút phía trên, và không để khoảng trống lớn ở đầu màn. */}
+      <div ref={msgRef} className={`mg-msg ${message ? 'toast mistake' : ''}`} aria-live="polite">
+        {message}
+      </div>
     </div>
   );
 }

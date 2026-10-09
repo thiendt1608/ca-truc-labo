@@ -118,11 +118,11 @@
     },
     {
       "trigger": "qcFailed",
-      "text": "QC không đạt! Nhìn hình dạng biểu đồ để chọn cách khắc phục, đừng thử bừa vì mỗi cách tốn thời gian."
+      "text": "QC không đạt! Nhìn dạng biểu đồ để chọn cách khắc phục, mỗi cách tốn thời gian."
     },
     {
       "trigger": "start",
-      "text": "Hôm nay có lọ nước tiểu và cờ Δ. Mẫu nước tiểu không cần ly tâm: nhận rồi ra Bàn nước tiểu nhúng que, so màu."
+      "text": "Hôm nay có lọ nước tiểu và cờ Δ. Nước tiểu không ly tâm: nhận rồi ra Bàn nước tiểu."
     },
     {
       "trigger": "resultReady",
@@ -130,11 +130,11 @@
     },
     {
       "trigger": "deltaFlag",
-      "text": "Có cờ Δ: kết quả khác nhiều so với lần trước. Bấm Làm lại để kiểm tra; vẫn lệch mà nghi nhầm người thì Huỷ, lấy mẫu mới."
+      "text": "Cờ Δ: kết quả lệch nhiều so với lần trước. Làm lại để kiểm tra, nghi nhầm người thì Huỷ."
     },
     {
       "trigger": "overRange",
-      "text": "Thấy dấu > nghĩa là kết quả vượt dải đo: bấm Pha loãng mẫu rồi chọn tỉ lệ nhỏ nhất đưa được về dải đo."
+      "text": "Dấu > là vượt dải đo: bấm Pha loãng, chọn tỉ lệ nhỏ nhất đưa về dải đo."
     }
   ],
   "codexOnStart": ["ch-urine", "ch-delta"],

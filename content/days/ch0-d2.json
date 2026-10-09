@@ -124,15 +124,15 @@
   "tips": [
     {
       "trigger": "start",
-      "text": "Hôm nay mẫu không chỉ có ống máu mà còn lọ, chai, que đủ loại. Em xem xét nghiệm trên phiếu để chuyển đúng trong 5 khoa nhé."
+      "text": "Hôm nay có cả lọ, chai, que. Xem xét nghiệm trên phiếu để chọn đúng 1 trong 5 khoa."
     },
     {
       "trigger": "sampleOpened",
-      "text": "Nhìn cả giờ lấy mẫu: nước tiểu, phân, que tăm bông và chai cấy máu để quá 2 giờ thì từ chối. Đường hay điện giải trong ống thường cũng vậy."
+      "text": "Xem giờ lấy mẫu: nước tiểu, phân, que, chai cấy máu quá 2 giờ thì từ chối."
     },
     {
       "trigger": "sampleAccepted",
-      "text": "Hoá sinh nhận cả nước tiểu. Vi sinh nhận lọ phân, que cấy, chai cấy máu. Miễn dịch nhận ống đỏ làm test miễn dịch. Lọ mô đi Giải phẫu bệnh."
+      "text": "Hoá sinh nhận nước tiểu; Vi sinh: phân, que, chai cấy; Giải phẫu bệnh: lọ mô."
     },
     {
       "trigger": "mistake",

@@ -103,11 +103,11 @@
     },
     {
       "trigger": "qcFailed",
-      "text": "QC không đạt! Nhìn hình dạng biểu đồ để chọn cách khắc phục, đừng thử bừa vì mỗi cách tốn thời gian."
+      "text": "QC không đạt! Nhìn dạng biểu đồ để chọn cách khắc phục, mỗi cách tốn thời gian."
     },
     {
       "trigger": "start",
-      "text": "Hôm nay có mẫu nguy hiểm và mẫu vượt dải đo. Chạy QC trước, rồi xem kỹ cờ ‼️ và dấu > ở màn Kết quả."
+      "text": "Hôm nay có mẫu nguy hiểm và mẫu vượt dải. Chạy QC trước, rồi xem cờ ‼️ và dấu >."
     },
     {
       "trigger": "resultReady",
@@ -115,7 +115,7 @@
     },
     {
       "trigger": "overRange",
-      "text": "Thấy dấu > nghĩa là kết quả vượt dải đo: bấm Pha loãng mẫu rồi chọn tỉ lệ nhỏ nhất đưa được về dải đo."
+      "text": "Dấu > là vượt dải đo: bấm Pha loãng, chọn tỉ lệ nhỏ nhất đưa về dải đo."
     }
   ],
   "codexOnStart": ["ch-qc", "ch-westgard", "ch-dilution"],

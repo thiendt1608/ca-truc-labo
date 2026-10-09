@@ -18,6 +18,8 @@ const INTRO: Record<string, { icon: string; text: string }> = {
 /** S6 Mini-game toàn màn hình. Đồng hồ ca vẫn chạy (04-GDD mục 4). */
 export function MinigameHost() {
   const mg = useGame((s) => s.shift?.minigame ?? null);
+  // Mini-game tự bật chờ người chơi bấm "Dọn ngay" trên thẻ nhắc (MinigameNoticeSheet).
+  const pending = useGame((s) => s.mgNotice !== null);
   const difficulty = useGame((s) => s.shift?.difficulty ?? 'normal');
   const hints = useHints();
   const dispatch = useGame((s) => s.dispatch);
@@ -25,7 +27,7 @@ export function MinigameHost() {
     () => (mg ? MINIGAMES[mg.minigameId]!.generate(mg.seed, difficulty) : null),
     [mg, difficulty],
   );
-  if (!mg || !input) return null;
+  if (!mg || !input || pending) return null;
   const spec = MINIGAMES[mg.minigameId]!;
   const finish = (actions: PlayerAction[]) => {
     setTimeout(() => dispatch({ type: 'minigameResult', taskId: mg.taskId, actions }), 400);

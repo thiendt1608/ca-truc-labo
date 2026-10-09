@@ -84,11 +84,11 @@
   "tips": [
     {
       "trigger": "start",
-      "text": "Chào em, chị là Hạnh. Hôm nay em ngồi bàn Tiếp nhận: chạm vào từng ống trong khay để kiểm tra nhé."
+      "text": "Chào em, chị là Hạnh. Em chạm từng ống trong khay để kiểm tra nhé."
     },
     {
       "trigger": "sampleOpened",
-      "text": "So nhãn trên ống với phiếu: họ tên, năm sinh, mã bệnh nhân phải khớp. Khớp thì Nhận và chọn đúng khoa theo xét nghiệm."
+      "text": "So nhãn với phiếu: tên, năm sinh, mã BN phải khớp. Khớp thì Nhận, chọn đúng khoa."
     },
     {
       "trigger": "mistake",

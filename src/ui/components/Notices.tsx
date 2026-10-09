@@ -3,6 +3,22 @@ import { getContent } from '../../sim';
 import { t } from '../../i18n';
 import { useGame } from '../../store/game';
 
+/** Danh sách thông báo ngắn (✅/❌/ℹ️). Dùng ở đáy phòng và ngay trên đầu tấm đang mở (xem `Sheet`). */
+export function ToastList() {
+  const toasts = useGame((s) => s.toasts);
+  return (
+    <div className="toasts" aria-live="polite">
+      {toasts.map((x) => (
+        <div key={x.id} className={`toast ${x.kind}`}>
+          {x.kind === 'mistake' ? '❌ ' : x.kind === 'good' ? '✅ ' : 'ℹ️ '}
+          {x.text}
+          {x.count > 1 && ` ×${x.count}`}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /** Mẹo của người hướng dẫn (≤ 2 câu) và thông báo ngắn khi làm đúng/sai. */
 export function Notices() {
   const tips = useGame((s) => s.tips);
@@ -13,6 +29,8 @@ export function Notices() {
   // Mẹo chờ tới khi không còn lớp phủ, để không che nút của thẻ mẫu hay mini-game.
   const busy = useGame((s) => s.overlay !== null || s.shift?.minigame != null || s.paused);
   const inMinigame = useGame((s) => s.shift?.minigame != null);
+  // Có tấm đang mở: thông báo nằm ngay trên đầu tấm (Sheet), không đè lên nút của tấm.
+  const sheetOpen = useGame((s) => s.overlay !== null && s.shift?.minigame == null);
   const mentor = dayId ? getContent().dayById.get(dayId)?.mentor : undefined;
 
   // Mỗi thông báo có đồng hồ riêng, đặt đúng một lần: thông báo mới tới không làm các cái cũ sống lâu hơn.
@@ -56,18 +74,13 @@ export function Notices() {
         <button className="tip" onClick={() => dismissTip(tip.id)}>
           <b>💬 {mentor ? t(`mentor.${mentor}`) : 'Người hướng dẫn'}</b>
           {tip.text}
-          <span className="muted"> (chạm để đóng)</span>
+          <span className="muted" aria-hidden>
+            {' '}
+            ✕
+          </span>
         </button>
       )}
-      <div className="toasts" aria-live="polite">
-        {toasts.map((x) => (
-          <div key={x.id} className={`toast ${x.kind}`}>
-            {x.kind === 'mistake' ? '❌ ' : x.kind === 'good' ? '✅ ' : 'ℹ️ '}
-            {x.text}
-            {x.count > 1 && ` ×${x.count}`}
-          </div>
-        ))}
-      </div>
+      {!sheetOpen && <ToastList />}
     </div>
   );
 }

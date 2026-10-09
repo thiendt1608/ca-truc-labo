@@ -130,7 +130,13 @@ export interface SampleSpec {
 /** Sinh một phiếu + một mẫu (+ bệnh nhân mới). */
 export function makeArrival(ctx: Ctx, spec: SampleSpec): ScheduledArrival {
   const { rng, content, day } = ctx;
-  const ward = rng.pick(content.wards);
+  // Ưu tiên tự do: chọn khoa rồi tung theo tỉ lệ cấp cứu của khoa. Ưu tiên do kịch bản/sự kiện ép sẵn: chọn khoa theo
+  // đúng tỉ lệ đó (khoa Cấp cứu hầu như chỉ gửi mẫu khẩn, Phòng khám không bao giờ), vẫn đúng một lần tung rng.
+  const wardWeights = Object.fromEntries(
+    content.wards.map((w) => [w.id, spec.priority === 'stat' ? w.statRate : 1 - w.statRate]),
+  );
+  const wardId = spec.priority ? rng.weighted(wardWeights) : rng.pick(content.wards).id;
+  const ward = content.wards.find((w) => w.id === wardId)!;
   const priority: Priority = spec.priority ?? (rng.chance(ward.statRate) ? 'stat' : 'routine');
   const orderTypeId = spec.orderType ?? rng.weighted(day.orderTypes);
   const orderType = content.orderTypeById.get(orderTypeId);

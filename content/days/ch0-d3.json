@@ -126,15 +126,15 @@
   "tips": [
     {
       "trigger": "start",
-      "text": "Hôm nay có bệnh phẩm không lấy lại được và lọ rò rỉ. Em bình tĩnh, mỗi loại có cách xử lý riêng."
+      "text": "Hôm nay có bệnh phẩm không lấy lại được và lọ rò rỉ. Mỗi loại xử lý riêng."
     },
     {
       "trigger": "sampleOpened",
-      "text": "Lọ ướt, có dịch rỉ ra là lọ rò: từ chối rồi dọn an toàn. Còn bệnh phẩm sinh thiết có lỗi thì không bao giờ từ chối, em chọn Liên hệ."
+      "text": "Lọ rò rỉ dịch: từ chối rồi dọn. Bệnh phẩm sinh thiết có lỗi: chọn Liên hệ."
     },
     {
       "trigger": "irreplaceable",
-      "text": "Đây là bệnh phẩm không lấy lại được. Nếu nhãn, lượng formalin hay lọ có lỗi, em chọn Liên hệ khoa gửi, tuyệt đối không từ chối hay vứt."
+      "text": "Bệnh phẩm không lấy lại được mà có lỗi: chọn Liên hệ, không từ chối."
     },
     {
       "trigger": "mistake",
@@ -142,7 +142,7 @@
     },
     {
       "trigger": "spill",
-      "text": "Dọn theo thứ tự: rắc chất khử khuẩn, chờ đủ thời gian, lau từ ngoài vào trong, rồi bỏ vào thùng rác y tế."
+      "text": "Dọn theo thứ tự: rắc khử khuẩn, chờ, lau từ ngoài vào, bỏ thùng rác y tế."
     },
     {
       "trigger": "statArrived",

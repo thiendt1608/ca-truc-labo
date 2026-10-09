@@ -4,7 +4,7 @@ import { runProgress, useGame } from '../../store/game';
 import { HelpHost } from '../components/CodexHelp';
 import { Hud } from '../components/Hud';
 import { Notices } from '../components/Notices';
-import { CodexSheet, EventSheet, PhoneSheet } from '../components/EventSheets';
+import { CodexSheet, EventSheet, MinigameNoticeSheet, PhoneSheet } from '../components/EventSheets';
 import { SampleCard } from '../components/SampleCard';
 import { Tube } from '../components/Tube';
 import {
@@ -179,6 +179,7 @@ export function Room() {
       <QuietSuspense>
         <LazyMinigameHost />
       </QuietSuspense>
+      <MinigameNoticeSheet />
       <HelpHost />
       <Notices />
       <QuietSuspense>

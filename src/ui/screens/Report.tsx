@@ -13,7 +13,7 @@ const CRITERIA_COLOR = {
   skill: '#9b59b6',
 } as const;
 
-/** S10 Báo cáo giao ca: sao, 4 tiêu chí, "Chuyện hôm nay", Ngân sách. Nút chính cố định ở đáy. */
+/** S10 Báo cáo giao ca: sao, 4 tiêu chí, "Chuyện hôm nay". Nút chính cố định ở đáy. */
 export function Report() {
   const report = useGame((s) => s.report);
   const installHint = useGame((s) => s.installHint);
@@ -66,11 +66,9 @@ export function Report() {
           ))}
         </div>
 
+        {/* Ngân sách khoa (`report.budget`, `save.budget`) vẫn được tính nhưng ẩn khỏi giao diện cho tới khi có cửa hàng để tiêu. */}
         <div className="card row">
-          <span className="grow">
-            Ngân sách khoa <b>+{report.budget} điểm</b>
-          </span>
-          <span className="muted">Niềm tin cuối ca {Math.round(report.trust)}</span>
+          <span className="grow muted">Niềm tin cuối ca {Math.round(report.trust)}</span>
         </div>
 
         <div className="card stack">

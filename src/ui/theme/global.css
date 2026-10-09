@@ -437,20 +437,57 @@ button.small {
   box-shadow:
     0 -12px 28px rgba(93, 83, 74, 0.22),
     0 6px 0 #d4c3ae;
-  padding: 14px 14px calc(14px + env(safe-area-inset-bottom));
+  padding: 14px 14px 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+/* Dải đệm đáy (14px + vùng an toàn) là phần tử dính, đục màu giấy: nội dung cuộn không lộ ra dưới nút dính đáy. */
+.sheet::after {
+  content: '';
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  flex: none;
+  height: calc(14px + env(safe-area-inset-bottom, 0px));
+  margin: -10px -14px 0;
+  background: var(--panel);
+}
+/* Tấm làm việc: cột dọc dồn xuống đáy. Thông báo nằm ngay trên tấm (ngoài vùng cuộn) nên không đè nút nào;
+   chừa lại hàng HUD (đồng hồ, Niềm tin) ở trên cùng: tấm co lại khi có thông báo thay vì che nó. */
+.sheet-overlay {
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: stretch;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 66px);
+}
+.sheet-overlay > .toasts {
+  flex: none;
+  padding: 0 8px 8px;
+}
+.sheet-overlay > .sheet {
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: 100%;
 }
 .sheet-head {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-.sheet-head h2 {
+.sheet-title {
   flex: 1;
+  min-width: 0;
+}
+.sheet-head h2 {
   margin: 0;
   font-size: 20px;
+}
+.slow-chip {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-2);
 }
 
 /* Thẻ mẫu / phiếu y lệnh */
@@ -635,9 +672,11 @@ button.small {
   overflow-y: auto;
 }
 .mg-msg {
-  /* Chỗ cố định cho dòng phản hồi (tới 4 dòng ở 320px) để danh sách bước không nhảy khi nó hiện/ẩn */
-  min-height: 112px;
+  /* Nằm dưới danh sách bước nên hiện/ẩn không làm các bước dịch chỗ; rỗng thì không chiếm chỗ. */
   pointer-events: none;
+}
+.mg-msg:empty {
+  display: none;
 }
 .steps {
   display: grid;
@@ -696,6 +735,14 @@ button.small {
   touch-action: none;
 }
 
+/* Bảng giao ca: thân nội dung */
+.brief {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  /* Canh giữa theo chiều dọc khi màn cao; màn thấp thì cuộn bình thường (margin auto không cắt phần đầu). */
+  margin-block: auto;
+}
 /* Màn có thanh nút cố định ở đáy (Briefing, Báo cáo) */
 .screen-with-footer {
   flex: 1;
@@ -1076,6 +1123,21 @@ a:focus-visible,
   }
 }
 
+/* Nút chính của thẻ dài (Kết quả) dính đáy vùng cuộn của tấm, chừa vùng an toàn dưới. */
+.sticky-action {
+  position: sticky;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  padding: 6px 0 2px;
+  background: var(--panel);
+  box-shadow: 0 -8px 8px -6px rgba(93, 83, 74, 0.2);
+}
+.sticky-action button {
+  margin-bottom: 2px;
+}
+
 /* Kết quả: thẻ giá trị với nhãn Chuẩn/Cao/Thấp (không chỉ dựa vào màu) */
 .result-grid {
   display: grid;
@@ -1125,9 +1187,8 @@ a:focus-visible,
 /* Biểu đồ QC (Levey-Jennings) */
 .ljchart {
   flex-shrink: 0;
-  min-height: 180px;
   width: 100%;
-  height: auto;
+  height: clamp(150px, 26dvh, 210px);
   background: var(--panel-2);
   border-radius: var(--radius);
   box-shadow: inset 0 3px 3px rgba(93, 83, 74, 0.15);
@@ -1147,6 +1208,21 @@ a:focus-visible,
   color: #1d3a5f;
   box-shadow: 0 4px 0 #b6cdea;
   font-weight: 500;
+  padding: 8px 12px;
+}
+/* Cách khắc phục QC: hai cột để biểu đồ và cả danh sách vừa một màn hình ở 360×640. */
+.remedies {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.remedies button {
+  padding: 8px 10px;
+  font-size: 15px;
+  margin-bottom: 0;
+}
+.remedies button:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
 }
 .tip-inline b {
   display: block;
