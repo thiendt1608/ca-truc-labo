@@ -341,5 +341,5 @@ describe('ngày 1.5 luôn có phiếu Δ (mục tiêu của ngày)', () => {
       expect(deltaOrders.length, `seed d${i}`).toBeGreaterThanOrEqual(1);
       expect(st.tipsShown, `seed d${i}`).toContain('deltaFlag');
     }
-  });
+  }, 60_000); // 10 ca đầy đủ: ~7s trên runner CI, vượt mặc định 5s
 });
