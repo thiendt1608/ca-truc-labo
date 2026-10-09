@@ -4,9 +4,10 @@
 
 **CA TRỰC LABO** is a web-based, deterministic time-management simulation game modeling the shift of a clinical laboratory medical technologist (_Kỹ thuật viên xét nghiệm_).
 
-- **Current Milestone**: M3 in progress (M3-1 QC, M3-2 dilution/urine/Δ and M3-3 events E1–E10 + incoming phone calls and M3-7 save code + settings + PWA done; remaining: 8-day chapter config polish, Codex/difficulty polish; M3-5 real art/sound is deliberately dropped from M3 and deferred until the game is stable, art stays CSS/emoji and there is no audio). Playable shifts: `ch0-d1` Reception (2-identifier check, route to Chem/Heme), `ch0-d2` other sample types (urine cup, stool cup, swab, blood-culture bottle, tissue jar) + routing to all 5 departments + aged samples, `ch0-d3` irreplaceable samples (Contact) + leaking jars (biosafety cleanup) + stat rush, `ch1-d1` Clinical Biochemistry, `ch1-d2` hemolysis/aged samples, `ch1-d3` QC, `ch1-d4` critical values + dilution, `ch1-d5` urine strip + Δ (busiest day). The `DESIGN.md` + `stitch-design/` redesign (warm cozy "toycore", Quicksand + Be Vietnam Pro, chunky 3D pill buttons, per-department colors) is applied to all current screens; art is still CSS/emoji, not illustrations. Mockups include features not in the GDD (xu/EXP/level, coffee energy, shop); treat the GDD (`docs/04-GDD.md`) as the source of truth for mechanics. `docs/00-README.md` mentions "M1 next" which is outdated.
+- **Current Milestone**: M3 in progress (M3-1 QC, M3-2 dilution/urine/Δ and M3-3 events E1–E10 + incoming phone calls and M3-6 Codex + 3 difficulty levels and M3-7 save code + settings + PWA done; remaining: M3-8 phone testing; M3-5 real art/sound is deliberately dropped from M3 and deferred until the game is stable, art stays CSS/emoji and there is no audio). Playable shifts: `ch0-d1` Reception (2-identifier check, route to Chem/Heme), `ch0-d2` other sample types (urine cup, stool cup, swab, blood-culture bottle, tissue jar) + routing to all 5 departments + aged samples, `ch0-d3` irreplaceable samples (Contact) + leaking jars (biosafety cleanup) + stat rush, `ch1-d1` Clinical Biochemistry, `ch1-d2` hemolysis/aged samples, `ch1-d3` QC, `ch1-d4` critical values + dilution, `ch1-d5` urine strip + Δ (busiest day). The `DESIGN.md` + `stitch-design/` redesign (warm cozy "toycore", Quicksand + Be Vietnam Pro, chunky 3D pill buttons, per-department colors) is applied to all current screens; art is still CSS/emoji, not illustrations. Mockups include features not in the GDD (xu/EXP/level, coffee energy, shop); treat the GDD (`docs/04-GDD.md`) as the source of truth for mechanics. `docs/00-README.md` mentions "M1 next" which is outdated.
 - **Current Implementation Scope (Do not assume unimplemented features exist)**:
   - _Implemented_: Deterministic sim core (PRNG, command engine, replay), Trust meter, 4-pillar grading & shift report, post-centrifuge hemolysis/lipemia/icterus, critical values + phone reporting (`callCritical`), dilution (`chem/startDilution` opens the `dilution` minigame, kind `measure`, UI `MeasureGame`: pick ratio → machine re-reads → multiply by factor; `overRange` results show `>max`; seed `analyte|truth`; wasted re-runs add analyzer time, wrong multiply costs trust, release without dilution costs trust), Δ delta check (`Patient.previous`, `AnalyteResult.delta`, `Order.deltaChecked`, thresholds in `content/chem/rules.json`), events E1–E10 and incoming phone (`src/sim/core/events.ts`, data in `content/common/events.json`, per-day `events: [{id, at}]` scheduled deterministically at `createShift`; decision events E3 machine fault and E10 trainee quiz are `ShiftState.pending` and resolved by `resolveEvent`; calls are `ShiftState.phone` answered by `answerPhone`, 3 missed calls cost trust; E6/E9/E3 set `ShiftState.effects` read by `tickChem`; UI `PhoneSheet`/`EventSheet`, phone and event sheets pause the clock), urine strip minigame (`urineStrip`, kind `compare`, `UrineStripGame`; seed `profile|n` ties truth to the sample; reading of normal vs abnormal wrongly released costs trust; content in `content/chem/urine.json`), in-shift QC on day `ch1-d3` (commands `chem/runQC`, `chem/judgeQC`, `chem/qcAction` in `src/sim/departments/chemQc.ts`; scenarios/remedies in `content/chem/qc.json`; analyzer is gated until QC passes; false "Pass" taints results and costs trust at release; UI `QcSheet` with SVG Levey-Jennings chart), Westgard algorithms in `core/qc.ts`, minigame `spillCleanup` (`SequenceGame` hosting `TimingGame` button-hold step; `holdTimer` registered), 21 Codex cards, IndexedDB persistence, debug panel (`?debug=1`), balance bot (`pnpm balance`), Playwright 360/390. Reception chapter (`ch0-d1`–`ch0-d3`): all 5 departments routable (`routeAll` unlock; `routableDepts(day)` in `src/sim/content/load.ts` drives SampleCard + basket stations + engine validation), container kinds `tube|cup|swab|bottle|jar` drawn as inline SVG in `src/ui/components/Tube.tsx` (no real art), per-container aged-sample rules (`timeSensitiveTests`, `timeExemptContainers`, `delayedByContainer` in `content/common/reception-rules.json`), `OrderType.irreplaceable` (tissue jars: defects only roll once the day unlocks `contact`; a defect → expected decision is `contact`, rejecting costs −30), leaking jar (`leak`) rejected or contacted → `spillCleanup` minigame bound to the sample (`ActiveMinigame.sampleId`), tip trigger `irreplaceable`. Tests: `src/sim/departments/receptionDays.test.ts`. Save/settings/PWA (M3-7): `SaveData` v2 (`src/platform/save.ts`: `migrate` v1→v2, `exportCode`/`importCode` = JSON → lz-string → base64url, format `CTL1.<payload>.<crc32>`, strict validation with Vietnamese errors), Settings screen S13 (`src/ui/screens/Settings.tsx`; difficulty moved here from Home, reduced-motion switch → `html.reduce-motion`, export/import code, 2-step reset, about/disclaimer; reachable from Home ⚙ and from the pause menu where only the shift-safe parts show), one-time install/export reminder card on the first `ch0-d3` report (`SaveData.installHintShown`, store `installHint`), PWA (`public/manifest.webmanifest`, icons in `public/icons/`, `vite-plugin-pwa` generateSW precache incl. fonts, registered only in the production build by `src/platform/pwa.ts`; updates are never auto-applied, Home/Settings show `Có bản mới — Tải lại` only outside a shift).
+  - _Codex & difficulty (M3-6)_: Codex screen (`src/ui/screens/Codex.tsx`) shows total and per-department collection % with progress bars, department filter chips, accent-insensitive search, locked cards as `🔒 Chưa mở` + `unlockHint` ("Mở khi ..." from `content/codex`, never spoils the card), and a `Mới` badge on cards unlocked but not yet read (`SaveData.codexSeen`; `CodexCardView` marks a card read; the Home button shows the count). The `?` button (`CodexHelp`, `Sheet help="..."`, mini-game header) opens the most relevant card from `content/codex/help.json` (context → card id: sample, centrifuge, postspin, analyzer, results, qc, urine, spillCleanup, dilution, urineStrip); a locked card shows its hint instead. The card stacks on top of the current sheet/minigame (store `help`, `HelpHost` in `Room`), holds the clock while open, and closing returns to exactly where the player was. Difficulty knobs all live in `content/common/difficulty.json` (schema `DifficultySchema`, read as `content.difficulty.levels[difficulty]`): `clockSpeed` (0.6/1/1.2, applied by the store), `minTrust` (30/0/0), `hints` (Easy only: tube/jar needed on the sample card, unbalanced rotor slots, QC rule pills, next-step lines in minigames, urine read-time reminder), `advancedWestgard` (Easy none, Normal `4-1s`, Hard `4-1s`+`10x`, via `evaluateWestgard(runs, rules)`), `subtle` (share of one-digit patient-code errors, birth-year ±1, look-alike given names, weight of mild hemolysis level 1), `hold` (zone width/fill time) and `spillTraps`. Generator draws the same number of RNG values at every level, so one seed gives the same arrivals at all three levels and only the subtlety of defects differs. Out of scope for now (no such department yet): weak-D antigen, low-density parasites, faint T line, mixed colonies.
   - _Not Yet Implemented_: outgoing phone calls beyond `callCritical`/contact, equipment effects on events (maintenance contract), shifts after `ch1-d5`, processing Micro/Immuno/Patho samples (Reception only routes to those departments), Hematology department onwards, Free shift / Challenge mode, equipment purchasing (budget increments only, no store spending), audio/sound effects, dark mode toggle, large-text mode, campaign map. Commands from `docs/07-TDD.md` section 4.2 are only partially implemented.
 - **Domain Fidelity**: Strictly guided by professional laboratory rules ("Labo Xanh", SSOT in `docs/05-noi-dung-chuyen-mon.md` & `content/*.json`). Technologists never diagnose diseases. Critical samples marked as irreplaceable (e.g., CSF, surgical biopsy) must never be rejected outright (require `contact` action).
 - **Target Platform**: Client-side static web application with PWA/offline architecture, designed mobile-first (touch-first viewports: 360×640 to 390×844).
@@ -53,7 +54,7 @@ The codebase strictly decouples pure deterministic simulation from user interfac
 
 - React 19 components consuming Zustand state via `useGame()`.
 - Pure CSS with design variables (`src/ui/theme/global.css`) following greybox guidelines (touch targets $\ge 44\text{px}$).
-- Storage layer: `src/platform/save.ts` is pure (SaveData v2, `migrate`, save codes); `src/platform/storage.ts` saves player progression (IndexedDB key stays `save:v1`, the `version` field inside the data selects the migration) via `idb-keyval` with graceful fallback when storage is denied and old saves read through `migrate`. `src/platform/pwa.ts` registers the service worker (build only), captures `beforeinstallprompt` and exposes update/install state to `src/ui/components/PwaNotices.tsx`.
+- Storage layer: `src/platform/save.ts` is pure (SaveData v3, `migrate` v1→v2→v3, save codes); `src/platform/storage.ts` saves player progression (IndexedDB key stays `save:v1`, the `version` field inside the data selects the migration) via `idb-keyval` with graceful fallback when storage is denied and old saves read through `migrate`. `src/platform/pwa.ts` registers the service worker (build only), captures `beforeinstallprompt` and exposes update/install state to `src/ui/components/PwaNotices.tsx`.
 
 ---
 
@@ -62,10 +63,10 @@ The codebase strictly decouples pure deterministic simulation from user interfac
 ```
 ca-truc-labo/
 ├── content/               # JSON data: rules, shifts (days/), codex/, tests, i18n
-│   ├── common/            # Wards, containers, order types, reception rules
+│   ├── common/            # Wards, containers, order types, reception rules, difficulty.json (difficulty knobs)
 │   ├── chem/              # Biochemistry centrifuge & analyzer rules, tests
 │   ├── days/              # Shift definitions (waves, defects, scripts, goals)
-│   ├── codex/             # Knowledge handbook cards unlocked during play
+│   ├── codex/             # Knowledge handbook cards unlocked during play (+ help.json: `?` button map)
 │   └── i18n/vi.json       # Vietnamese copy, explanations, defect messages
 ├── src/
 │   ├── sim/               # Pure deterministic simulation engine
@@ -104,7 +105,7 @@ ca-truc-labo/
 | `pnpm test`          | Run Vitest unit tests    | Runs in Node environment without DOM mocks                                     |
 | `pnpm test:watch`    | Run Vitest in watch mode | Fast feedback loop for engine development                                      |
 | `pnpm content:check` | Validate content JSONs   | Runs Zod schema + cross-referential integrity checks                           |
-| `pnpm balance`       | Run balance simulation   | Headless Monte Carlo bot testing (`pnpm balance [count]`)                      |
+| `pnpm balance`       | Run balance simulation   | `pnpm balance [count] [--difficulty easy                                       | normal | hard | all]`; default Normal |
 | `pnpm test:e2e`      | Run Playwright tests     | Requires `pnpm exec playwright install chromium` first                         |
 | `pnpm icons`         | Regenerate PWA icons     | Renders `tools/icons/generate.ts` with Playwright Chromium; PNGs are committed |
 
@@ -174,23 +175,24 @@ Every minigame is split cleanly into two halves:
 
 ## Important Files
 
-| Path                             | Purpose                                                                                   |
-| :------------------------------- | :---------------------------------------------------------------------------------------- |
-| `src/sim/core/types.ts`          | Central domain types: `ShiftState`, `Command`, `SimEvent`, `Sample`, `Order`, `ChemState` |
-| `src/sim/core/engine.ts`         | Engine reducer: `createShift()`, `applyCommand()`, `advance()`, `replay()`, `hashState()` |
-| `src/sim/core/rng.ts`            | Deterministic PRNG (`mulberry32`, `cyrb53`) and random sampling helpers                   |
-| `src/sim/content/schema.ts`      | Comprehensive Zod schemas for all JSON files in `content/`                                |
-| `src/sim/content/load.ts`        | Content loader and cross-reference validation (`crossCheck`)                              |
-| `src/store/game.ts`              | Primary Zustand store (`useGame`), time scaling, overlay state, and dispatch logic        |
-| `src/store/loop.ts`              | Animation frame loop (`useGameLoop`) with document visibility handling                    |
-| `src/platform/save.ts`           | `SaveData` v2, `migrate`, `exportCode`/`importCode` (save codes, validation)              |
-| `src/platform/storage.ts`        | IndexedDB persistence wrapper using `idb-keyval` (`save:v1`)                              |
-| `src/platform/pwa.ts`            | Service worker registration (build only), install prompt, update-ready state              |
-| `src/ui/theme/global.css`        | Greybox design system, CSS variables, typography, and responsive layout                   |
-| `tools/content-check/index.ts`   | Content validation script executed by `pnpm content:check`                                |
-| `tools/balance-bot/index.ts`     | Automated headless shift simulation bot (`pnpm balance`)                                  |
-| `docs/05-noi-dung-chuyen-mon.md` | Authoritative domain handbook ("Labo Xanh") detailing clinical rules and reference tables |
-| `docs/07-TDD.md`                 | Technical Design Document specifying command contracts, events, and engine architecture   |
+| Path                             | Purpose                                                                                          |
+| :------------------------------- | :----------------------------------------------------------------------------------------------- |
+| `src/sim/core/types.ts`          | Central domain types: `ShiftState`, `Command`, `SimEvent`, `Sample`, `Order`, `ChemState`        |
+| `src/sim/core/engine.ts`         | Engine reducer: `createShift()`, `applyCommand()`, `advance()`, `replay()`, `hashState()`        |
+| `src/sim/core/rng.ts`            | Deterministic PRNG (`mulberry32`, `cyrb53`) and random sampling helpers                          |
+| `src/sim/content/schema.ts`      | Comprehensive Zod schemas for all JSON files in `content/`                                       |
+| `src/sim/content/load.ts`        | Content loader and cross-reference validation (`crossCheck`)                                     |
+| `src/store/game.ts`              | Primary Zustand store (`useGame`), time scaling, overlay state, and dispatch logic               |
+| `src/store/loop.ts`              | Animation frame loop (`useGameLoop`) with document visibility handling                           |
+| `src/platform/save.ts`           | `SaveData` v3, `migrate`, `exportCode`/`importCode` (save codes, validation)                     |
+| `content/common/difficulty.json` | The 3 difficulty levels: clock speed, min trust, hints, advanced Westgard, subtle-defect knobs   |
+| `src/platform/storage.ts`        | IndexedDB persistence wrapper using `idb-keyval` (`save:v1`)                                     |
+| `src/platform/pwa.ts`            | Service worker registration (build only), install prompt, update-ready state                     |
+| `src/ui/theme/global.css`        | Greybox design system, CSS variables, typography, and responsive layout                          |
+| `tools/content-check/index.ts`   | Content validation script executed by `pnpm content:check`                                       |
+| `tools/balance-bot/index.ts`     | Automated headless shift simulation bot (`pnpm balance`); `stats.ts` holds `measure`/`parseArgs` |
+| `docs/05-noi-dung-chuyen-mon.md` | Authoritative domain handbook ("Labo Xanh") detailing clinical rules and reference tables        |
+| `docs/07-TDD.md`                 | Technical Design Document specifying command contracts, events, and engine architecture          |
 
 ---
 
@@ -218,8 +220,10 @@ Every minigame is split cleanly into two halves:
   - `src/sim/core/events.test.ts`: each event kind (E1–E10 effects), phone answers/missed calls, quiz, determinism with events. Mechanic tests that must not be disturbed by events build a Content copy with `events: []` (see `chemExtras.test.ts`).
   - `src/sim/departments/chemExtras.test.ts`: dilution minigame (pure scoring, flow, too-small re-run, wrong multiply, premature release), Δ (flag, unverified release), urine strip (pure scoring, flow, misread penalty), bots on `ch1-d4`/`ch1-d5`.
   - `src/sim/departments/chemQc.test.ts`: QC gating, remedies, delayed consequence of a wrong Pass, determinism, bots on `ch1-d3`.
-  - `src/sim/content/content.test.ts`: Verifies bundled content integrity via Zod.
-  - `src/platform/save.test.ts`: save codes (round-trip, altered/truncated/junk codes, newer versions), save validation, `migrate` v1→v2. Runs in node without mocking IndexedDB (`save.ts` is IO-free).
+  - `src/sim/content/content.test.ts`: Verifies bundled content integrity via Zod; every Codex card has an `unlockHint` ("Mở khi ...") and an unlock path; `?` map points to real cards.
+  - `src/platform/save.test.ts`: save codes (round-trip, altered/truncated/junk codes, newer versions), save validation, `migrate` v1→v2→v3 (`codexSeen`), v2 codes still import.
+  - `src/sim/core/difficulty.test.ts`: difficulty knobs from content (clock/minTrust/hints/Westgard rules), same seed → same arrivals at every level, subtle-defect shares ordered Easy < Normal < Hard, mini-game zone/traps, container hint data for `ch0-d2`.
+  - `tools/balance-bot/balance.test.ts`: `pnpm balance` args and bots on 3 days × 3 levels (expert ≥ 4★, idle 1★, novice Easy ≥ Normal ≥ Hard). Runs in node without mocking IndexedDB (`save.ts` is IO-free).
 - **Pattern**: Pure function tests without mocks or browser shims.
 
 ### 2. End-to-End Testing (Playwright)
@@ -229,12 +233,14 @@ Every minigame is split cleanly into two halves:
   - `phone-360`: Galaxy S9+ ($360 \times 640$) Chromium.
   - `phone-390`: iPhone 13 ($390 \times 844$) Chromium.
 - **Web Server**: Auto-launches production preview on port 4173 (`pnpm build && pnpm preview --port 4173 --strictPort`).
-- **Save/PWA spec** (`tests/save-pwa.spec.ts`): export → reset → import round-trip, wrong codes, reduced-motion switch, install reminder (once), settings from pause menu, manifest validity, service worker ready + offline reload on `vite preview`. `tests/responsive.spec.ts` also audits the Settings screen.
+- **Save/PWA spec** (`tests/save-pwa.spec.ts`): export → reset → import round-trip, wrong codes, reduced-motion switch, install reminder (once), settings from pause menu, manifest validity, service worker ready + offline reload on `vite preview`. `tests/responsive.spec.ts` also audits the Settings screen and the Codex (progress, filter, search, card, `?` over the centrifuge sheet).
+- **Codex spec** (`tests/codex.spec.ts`): Codex from Home shows % and locked hints, `Mới` badge persists across reload, `?` in a shift opens a card, holds the clock and returns to the same sheet, locked card shows `Mở khi ...`, `?` inside a minigame keeps the game, Easy shows the needed container on `ch0-d2`.
 - **Debug Assistance**: E2E tests navigate with query parameter `?debug=1` to expose the Debug Panel (`Bảng debug`), allowing instant shift completion (`Kết thúc ca ngay`) without waiting for real-time timers.
 
 ### 3. Balance Bot Testing (`pnpm balance`)
 
-- Runs Monte Carlo simulations using 3 player archetypes:
+- `pnpm balance [count] [--difficulty easy|normal|hard|all]` runs Monte Carlo simulations using 3 player archetypes (default: Normal only, 200 shifts per day; `all` also prints a 3-level summary and checks: expert ≥ 4★ at every level, idle 1★, novice Easy ≥ Normal ≥ Hard in average score/stars). Bots model difficulty through content: reaction time scales with `clockSpeed`, `hints` make them spot wrong containers/QC verdicts/urine read time, subtle defects (one-digit code, ±1 year, look-alike name, mild hemolysis) are spotted less often by novices.
+- Archetypes:
   - `expert`: Skilled player making optimal decisions; expected $\ge 4$ stars.
   - `novice`: Imperfect player making typical beginner errors.
   - `idle`: Passive player performing no actions; expected 1 star.
@@ -249,6 +255,7 @@ Every minigame is split cleanly into two halves:
 ## Design Decisions (open questions)
 
 - **Clock vs. open sheets**: the shift clock is held only for mentor tips, full-screen minigames and the QC sheet (GDD §4: big decision screens pause time). Centrifuge, post-spin tray, results and sample-card sheets keep the clock running on purpose: they are the workspace, and pausing there would remove the time-management pressure (pillar 2). Decided against pausing more. Revisit only if M3-8 playtests show new players losing trust just by reading sheets; preferred remedy then is slowing the clock (about ×0.25) while a sheet is open, not pausing.
+- **`?` button vs. the `codex` overlay**: the in-shift Codex sheet (`overlay.kind === 'codex'`) is the full list opened from the bottom bar. The `?` button deliberately does NOT replace the current overlay with it: it sets store `help` (card id) and renders `CodexCardView` on top (`z-index: 70`, above `.mg`), so the sample card keeps its mode, the centrifuge keeps its selection and a minigame keeps its progress; `tickReal` holds the clock while `help !== null`. Phone and event sheets have no `?` (no matching Codex card exists; events carry their own quiz card).
 - Tips and toasts share one bottom container (`.floaters`, above the bottom bar) so they never cover the HUD or tray; tips tied to a sheet (`qcRun`, `qcFailed`, `eventDecision`) go to `inlineTips` and render inside that sheet.
 - Minigames pause the clock (GDD §4 says they run it); done because minigame screens show no clock. Revisit if a clock chip is added to the minigame frame.
 

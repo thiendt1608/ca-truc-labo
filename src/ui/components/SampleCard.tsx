@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { getContent, routableDepts, type RejectReason } from '../../sim';
 import { t } from '../../i18n';
-import { clockText, secondsOfDayText, useGame } from '../../store/game';
+import { clockText, secondsOfDayText, useGame, useHints } from '../../store/game';
 import { Sheet } from './Overlay';
 import { Tube } from './Tube';
 
@@ -10,7 +10,7 @@ const TRAY_REASONS: RejectReason[] = ['identity', 'container', 'volume', 'time',
 /** S5 Thẻ mẫu: phiếu chỉ định bên trái, nhãn ống bên phải để so; Nhận / Từ chối (lý do) / Liên hệ. */
 export function SampleCard({ sampleId }: { sampleId: string }) {
   const shift = useGame((s) => s.shift)!;
-  const difficulty = useGame((s) => s.difficulty);
+  const hints = useHints();
   const debug = useGame((s) => s.debug);
   const dispatch = useGame((s) => s.dispatch);
   const close = () => useGame.getState().setOverlay(null);
@@ -44,6 +44,7 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
           {order.priority === 'stat' && <span className="pill stat">🚑 Cấp cứu</span>}
         </>
       }
+      help="sample"
       onClose={close}
     >
       <div className="compare">
@@ -55,7 +56,7 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
           <Field k="Khoa gửi" v={order.ward} />
           <Field k="Xét nghiệm" v={testNames.join(', ')} />
           {sample.irreplaceable && <Field k="Ghi chú" v="🧬 Bệnh phẩm sinh thiết, không lấy lại được" />}
-          {difficulty === 'easy' && (
+          {hints && (
             <div className="field">
               <div className="k">Ống cần (gợi ý mức Dễ)</div>
               <div className="row">

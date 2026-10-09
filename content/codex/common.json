@@ -5,7 +5,8 @@
     "title": "Định danh bằng 2 thông tin",
     "body": "Trước khi nhận mẫu, so nhãn trên ống với phiếu chỉ định. Ít nhất 2 thông tin phải khớp: họ tên và năm sinh hoặc mã bệnh nhân. Lệch một chữ cũng phải từ chối.",
     "more": "Nhầm mẫu giữa hai người là lỗi nguy hiểm nhất ở phòng xét nghiệm, vì bác sĩ sẽ điều trị dựa trên kết quả của người khác.",
-    "source": ["WHO LQMS", "CLSI GP41"]
+    "source": ["WHO LQMS", "CLSI GP41"],
+    "unlockHint": "Mở khi em bắt đầu ngày đầu tiên ở bàn Tiếp nhận."
   },
   {
     "id": "rc-tubes",
@@ -13,7 +14,8 @@
     "title": "Mỗi xét nghiệm một loại ống",
     "body": "Màu nắp ống cho biết bên trong có chất gì. Mỗi xét nghiệm cần đúng chất đó, dùng sai ống thì kết quả sai.",
     "more": "Ví dụ ống tím chứa EDTA có Kali, nên nếu đo Kali trong ống tím sẽ ra Kali cao giả.",
-    "source": ["CLSI GP41", "PMC3936985"]
+    "source": ["CLSI GP41", "PMC3936985"],
+    "unlockHint": "Mở khi em bắt đầu ngày đầu tiên ở bàn Tiếp nhận."
   },
   {
     "id": "rc-tube-purple",
@@ -21,7 +23,8 @@
     "title": "Ống tím (E): EDTA",
     "body": "Ống tím chứa chất chống đông EDTA, giữ tế bào máu nguyên vẹn. Dùng cho công thức máu, HbA1c và định nhóm máu.",
     "more": "EDTA bắt giữ canxi nên máu không đông được.",
-    "source": ["CLSI GP41"]
+    "source": ["CLSI GP41"],
+    "unlockHint": "Mở khi em bắt đầu ngày đầu tiên ở bàn Tiếp nhận (làm quen các màu nắp ống)."
   },
   {
     "id": "rc-tube-lightblue",
@@ -29,7 +32,8 @@
     "title": "Ống xanh dương (C): Citrat",
     "body": "Ống xanh dương dùng cho xét nghiệm đông máu. Máu và chất chống đông phải đúng tỉ lệ 9 : 1, nên ống phải đầy tới vạch.",
     "more": "Thiếu máu thì chất chống đông bị thừa, kết quả đông máu sẽ kéo dài giả.",
-    "source": ["CLSI GP41"]
+    "source": ["CLSI GP41"],
+    "unlockHint": "Mở khi em bắt đầu ngày đầu tiên ở bàn Tiếp nhận (làm quen các màu nắp ống)."
   },
   {
     "id": "rc-tube-green",
@@ -37,7 +41,8 @@
     "title": "Ống xanh lá (H): Heparin",
     "body": "Ống xanh lá chống đông bằng heparin nên ly tâm được ngay. Ở Labo Xanh, phiếu hoá sinh cấp cứu dùng ống này.",
     "more": "Đơn giản hoá: nhiều bệnh viện dùng lẫn ống heparin và ống huyết thanh cho hoá sinh.",
-    "source": ["CLSI GP41"]
+    "source": ["CLSI GP41"],
+    "unlockHint": "Mở khi em bắt đầu ngày đầu tiên ở bàn Tiếp nhận (làm quen các màu nắp ống)."
   },
   {
     "id": "rc-tube-red",
@@ -45,7 +50,8 @@
     "title": "Ống đỏ (S): Huyết thanh",
     "body": "Ống đỏ để máu tự đông, ly tâm xong lấy phần nước trong ở trên gọi là huyết thanh. Dùng cho hoá sinh thường và miễn dịch.",
     "more": "Phải chờ máu đông hẳn rồi mới ly tâm.",
-    "source": ["CLSI GP41"]
+    "source": ["CLSI GP41"],
+    "unlockHint": "Mở khi em bắt đầu ngày đầu tiên ở bàn Tiếp nhận (làm quen các màu nắp ống)."
   },
   {
     "id": "rc-tube-grey",
@@ -53,7 +59,8 @@
     "title": "Ống xám (F): giữ đường",
     "body": "Ống xám có natri fluorid, chất ngăn tế bào máu tiêu thụ đường. Nhờ vậy Glucose trong ống xám vẫn đúng dù mẫu tới muộn.",
     "more": "Trong ống thường, tế bào máu vẫn 'ăn' đường, mỗi giờ Glucose giảm đi một chút.",
-    "source": ["PMC3936985"]
+    "source": ["PMC3936985"],
+    "unlockHint": "Mở khi em bắt đầu ngày đầu tiên ở bàn Tiếp nhận (làm quen các màu nắp ống)."
   },
   {
     "id": "rc-order-of-draw",
@@ -61,7 +68,8 @@
     "title": "Thứ tự lấy máu",
     "body": "Khi lấy nhiều ống, điều dưỡng lấy theo thứ tự: chai cấy máu, xanh dương, đỏ/vàng, xanh lá, tím, xám. Làm vậy để chất trong ống trước không dây sang ống sau.",
     "more": "Thứ tự này theo chuẩn CLSI GP41.",
-    "source": ["CLSI GP41"]
+    "source": ["CLSI GP41"],
+    "unlockHint": "Mở khi em gặp nhiều loại ống, lọ khác nhau trong cùng một ca ở bàn Tiếp nhận."
   },
   {
     "id": "rc-irreplaceable",
@@ -69,7 +77,8 @@
     "title": "Mẫu không lấy lại được",
     "body": "Mẫu mô sinh thiết, dịch não tuỷ, mẫu phẫu thuật không thể lấy lại lần hai. Nếu có lỗi, chọn Liên hệ để khoa gửi bổ sung, tuyệt đối không vứt.",
     "more": "Từ chối loại mẫu này nghĩa là bệnh nhân phải làm thủ thuật lại, có khi không làm lại được.",
-    "source": ["WHO LQMS"]
+    "source": ["WHO LQMS"],
+    "unlockHint": "Mở khi em gặp bệnh phẩm đặc biệt mà nếu mất thì không thể lấy lại."
   },
   {
     "id": "rc-leak",
@@ -77,7 +86,8 @@
     "title": "Lọ rò rỉ và an toàn sinh học",
     "body": "Lọ bị rò có thể làm lây bệnh cho người cầm và mẫu đã bị nhiễm bẩn. Từ chối và dọn theo quy trình an toàn.",
     "more": "Quy trình dọn: rắc chất khử khuẩn, chờ đủ thời gian, lau từ ngoài vào trong, bỏ vào thùng rác y tế.",
-    "source": ["WHO LQMS"]
+    "source": ["WHO LQMS"],
+    "unlockHint": "Mở khi em gặp một lọ bị ướt, có dịch chảy ra ngoài."
   },
   {
     "id": "rc-transport-time",
@@ -85,7 +95,8 @@
     "title": "Thời gian vận chuyển",
     "body": "Mẫu để lâu trước khi ly tâm sẽ bị biến đổi: đường giảm, Kali tăng. Ở Labo Xanh, mẫu có Glucose hoặc điện giải để quá 2 giờ thì từ chối.",
     "more": "Ngoại lệ: Glucose trong ống xám vẫn dùng được.",
-    "source": ["open-exam-prep ASCP PBT"]
+    "source": ["open-exam-prep ASCP PBT"],
+    "unlockHint": "Mở khi em gặp mẫu để quá lâu từ lúc lấy tới lúc tới phòng xét nghiệm."
   },
   {
     "id": "rc-volume",
@@ -93,7 +104,8 @@
     "title": "Thiếu thể tích",
     "body": "Ống lấy thiếu máu thì tỉ lệ máu và chất chống đông bị sai, hoặc không đủ mẫu để chạy. Từ chối và xin lấy lại.",
     "more": "Quan trọng nhất với ống xanh dương (đông máu) vì cần đúng tỉ lệ 9 : 1.",
-    "source": ["CLSI GP41"]
+    "source": ["CLSI GP41"],
+    "unlockHint": "Mở khi em gặp một ống lấy chưa đủ lượng cần thiết."
   },
   {
     "id": "rc-stat",
@@ -101,7 +113,8 @@
     "title": "Mẫu cấp cứu 🚑",
     "body": "Mẫu cấp cứu phải trả kết quả trong 60 phút, mẫu thường 120 phút. Luôn làm mẫu cấp cứu trước.",
     "more": "Đây là giá trị trong game; mỗi bệnh viện tự quy định thời gian trả kết quả.",
-    "source": ["WHO LQMS"]
+    "source": ["WHO LQMS"],
+    "unlockHint": "Mở khi em gặp phiếu có dấu 🚑 ở bàn Tiếp nhận."
   },
   {
     "id": "rc-spill",
@@ -109,7 +122,8 @@
     "title": "Dọn đổ vỡ",
     "body": "Ống vỡ có thể chứa mầm bệnh. Rắc chất khử khuẩn, chờ đủ thời gian, lau từ ngoài vào trong, rồi bỏ vào thùng rác y tế.",
     "more": "Lau từ ngoài vào trong để không kéo chất bẩn ra rộng hơn.",
-    "source": ["WHO LQMS"]
+    "source": ["WHO LQMS"],
+    "unlockHint": "Mở khi em phải dọn một vụ đổ vỡ mẫu."
   },
   {
     "id": "rc-routing",
@@ -117,7 +131,8 @@
     "title": "Chuyển mẫu đúng khoa",
     "body": "Xem xét nghiệm trên phiếu để biết khoa nào làm. Hoá sinh: máu hoá sinh và nước tiểu. Huyết học: công thức máu, đông máu. Vi sinh: lọ phân, que cấy, chai cấy máu. Miễn dịch: ống đỏ làm test miễn dịch, que mũi họng. Giải phẫu bệnh: lọ mô.",
     "more": "Cùng là que tăm bông nhưng cấy vi khuẩn thì sang Vi sinh, test nhanh cúm thì sang Miễn dịch. Vì vậy luôn nhìn tên xét nghiệm trên phiếu, đừng chỉ nhìn loại lọ.",
-    "source": ["SOP Labo Xanh", "05-noi-dung-chuyen-mon.md mục 1.2"]
+    "source": ["SOP Labo Xanh", "05-noi-dung-chuyen-mon.md mục 1.2"],
+    "unlockHint": "Mở khi em bắt đầu chuyển mẫu tới nhiều khoa khác nhau."
   },
   {
     "id": "rc-cup-urine",
@@ -125,7 +140,8 @@
     "title": "Lọ nước tiểu (U)",
     "body": "Lọ nước tiểu sạch dùng cho tổng phân tích nước tiểu, chuyển sang Hoá sinh. Phải gửi trong 2 giờ: để lâu thì vi khuẩn sinh sôi và tế bào bị phá huỷ, kết quả không còn đúng.",
     "more": "Nước tiểu để cấy vi khuẩn dùng lọ vô trùng riêng và đi Vi sinh. Nếu chưa gửi kịp thì giữ lạnh 2 đến 8°C.",
-    "source": ["SOP Labo Xanh", "05-noi-dung-chuyen-mon.md mục 1.2"]
+    "source": ["SOP Labo Xanh", "05-noi-dung-chuyen-mon.md mục 1.2"],
+    "unlockHint": "Mở khi em gặp lọ nước tiểu đầu tiên."
   },
   {
     "id": "rc-stool",
@@ -133,7 +149,8 @@
     "title": "Lọ phân (P)",
     "body": "Lọ phân dùng để soi tìm ký sinh trùng đường ruột, chuyển sang Vi sinh – Ký sinh trùng. Phải soi sớm và đủ lượng (khoảng bằng đầu ngón tay). Để quá 2 giờ thì từ chối.",
     "more": "Để lâu, ký sinh trùng trong phân bị biến dạng hoặc tiêu giải nên khi soi rất dễ bỏ sót.",
-    "source": ["SOP Labo Xanh", "05-noi-dung-chuyen-mon.md mục 1.2"]
+    "source": ["SOP Labo Xanh", "05-noi-dung-chuyen-mon.md mục 1.2"],
+    "unlockHint": "Mở khi em gặp lọ phân đầu tiên."
   },
   {
     "id": "rc-swab",
@@ -141,7 +158,8 @@
     "title": "Que tăm bông trong ống môi trường (Q)",
     "body": "Que tăm bông phải nằm trong ống môi trường vận chuyển và que không được khô. Que lấy dịch để cấy vi khuẩn đi Vi sinh; que mũi họng làm test nhanh cúm đi Miễn dịch. Để quá 2 giờ thì từ chối.",
     "more": "Que khô thì vi khuẩn chết dần, kết quả cấy sẽ sai. Test nhanh cúm cũng nên làm ngay.",
-    "source": ["SOP Labo Xanh", "05-noi-dung-chuyen-mon.md mục 1.2"]
+    "source": ["SOP Labo Xanh", "05-noi-dung-chuyen-mon.md mục 1.2"],
+    "unlockHint": "Mở khi em gặp que tăm bông đầu tiên."
   },
   {
     "id": "rc-bloodculture",
@@ -149,7 +167,8 @@
     "title": "Chai cấy máu (B)",
     "body": "Chai cấy máu là một cặp chai hiếu khí và kỵ khí, chuyển sang Vi sinh. Gửi ngay, không để tủ lạnh. Để quá 2 giờ thì từ chối.",
     "more": "Lạnh hoặc để lâu làm vi khuẩn chết hoặc chậm mọc, kết quả cấy máu có thể âm tính giả trong khi bệnh nhân vẫn đang nhiễm khuẩn.",
-    "source": ["SOP Labo Xanh", "05-noi-dung-chuyen-mon.md mục 1.2"]
+    "source": ["SOP Labo Xanh", "05-noi-dung-chuyen-mon.md mục 1.2"],
+    "unlockHint": "Mở khi em gặp chai cấy máu đầu tiên."
   },
   {
     "id": "rc-tissue",
@@ -157,6 +176,7 @@
     "title": "Lọ mô ngâm formalin (M)",
     "body": "Lọ mô ngâm formalin trung tính 10% chuyển sang Giải phẫu bệnh. Formalin phải khoảng 10 lần thể tích mô, mô ngập hoàn toàn, phiếu ghi vị trí lấy mô. Mô sinh thiết không lấy lại được: lọ có lỗi thì chọn Liên hệ.",
     "more": "Formalin giữ mô không bị phân huỷ để cắt lát và nhuộm. Formalin độc nên lọ rò phải dọn theo quy trình an toàn.",
-    "source": ["SOP Labo Xanh", "05-noi-dung-chuyen-mon.md mục 1.2 và 6"]
+    "source": ["SOP Labo Xanh", "05-noi-dung-chuyen-mon.md mục 1.2 và 6"],
+    "unlockHint": "Mở khi em gặp lọ chứa mô đầu tiên."
   }
 ]

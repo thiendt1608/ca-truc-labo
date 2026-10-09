@@ -1,15 +1,11 @@
 import { useRef, useState } from 'react';
-import type { Difficulty } from '../../sim';
+import { getContent, type Difficulty } from '../../sim';
 import { t } from '../../i18n';
 import { exportCode, importCode, type SaveData } from '../../platform/save';
 import { useGame } from '../../store/game';
 import { InstallInfo, UpdateNotice } from '../components/PwaNotices';
 
-const DIFFICULTIES: { id: Difficulty; name: string; note: string }[] = [
-  { id: 'easy', name: 'Dễ', note: 'Đồng hồ chậm, có gợi ý ống cần dùng, Niềm tin không dưới 30' },
-  { id: 'normal', name: 'Thường', note: 'Như một ca thật' },
-  { id: 'hard', name: 'Khó', note: 'Đồng hồ nhanh, lỗi tinh vi hơn' },
-];
+const IDS: Difficulty[] = ['easy', 'normal', 'hard'];
 
 const summary = (s: SaveData) => `${Object.keys(s.days).length} ngày, ${s.codex.length} thẻ`;
 
@@ -23,6 +19,7 @@ export function Settings() {
   const from = useGame((s) => s.settingsFrom);
   const { setDifficulty, setSetting, go } = useGame.getState();
   const inShift = from === 'room';
+  const levels = getContent().difficulty.levels;
   const osReduced =
     typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -36,22 +33,22 @@ export function Settings() {
           <section className="card stack" aria-labelledby="st-difficulty">
             <h3 id="st-difficulty">Độ khó</h3>
             <div className="row" role="radiogroup" aria-labelledby="st-difficulty">
-              {DIFFICULTIES.map((d) => (
+              {IDS.map((id) => (
                 <button
-                  key={d.id}
+                  key={id}
                   role="radio"
-                  aria-checked={difficulty === d.id}
-                  className={`grow ${difficulty === d.id ? 'primary' : ''}`}
-                  onClick={() => setDifficulty(d.id)}
+                  aria-checked={difficulty === id}
+                  className={`grow ${difficulty === id ? 'primary' : ''}`}
+                  onClick={() => setDifficulty(id)}
                 >
-                  {d.name}
+                  {levels[id].name}
                 </button>
               ))}
             </div>
             <ul className="muted notes">
-              {DIFFICULTIES.map((d) => (
-                <li key={d.id}>
-                  <b>{d.name}:</b> {d.note}
+              {IDS.map((id) => (
+                <li key={id}>
+                  <b>{levels[id].name}:</b> {levels[id].note}
                 </li>
               ))}
             </ul>

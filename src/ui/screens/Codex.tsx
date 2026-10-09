@@ -1,37 +1,127 @@
-import { useState } from 'react';
-import { getContent } from '../../sim';
+import { useEffect, useState } from 'react';
+import { getContent, type CodexCard, type RoomId } from '../../sim';
 import { t } from '../../i18n';
-import { useGame } from '../../store/game';
+import { isCardUnlocked, useGame } from '../../store/game';
 
-/** S12 Sổ tay KTV: thẻ đã mở theo khoa. */
+/** Bỏ dấu và chữ hoa để tìm "tim" ra cả "Tím". */
+const fold = (s: string) => s.normalize('NFD').replace(/\p{M}/gu, '').replace(/đ/g, 'd').toLowerCase();
+
+function Progress({ label, done, total }: { label: string; done: number; total: number }) {
+  const pct = total === 0 ? 0 : Math.round((100 * done) / total);
+  return (
+    <div className="stack codex-progress">
+      <div className="row">
+        <span className="grow">{label}</span>
+        <b>
+          {done}/{total} · {pct}%
+        </b>
+      </div>
+      <div
+        className="progress"
+        role="progressbar"
+        aria-label={label}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={pct}
+      >
+        <div style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
+}
+
+/** S12 Sổ tay KTV: % sưu tập tổng và theo khoa, lọc theo khoa, tìm kiếm, thẻ mới và gợi ý mở thẻ. */
 export function Codex() {
   const save = useGame((s) => s.save);
   const go = useGame((s) => s.go);
   const [open, setOpen] = useState<string | null>(null);
+  const [room, setRoom] = useState<RoomId | 'all'>('all');
+  const [query, setQuery] = useState('');
   const content = getContent();
   const rooms = [...new Set(content.codex.map((c) => c.dept))];
+  const opened = new Set(save.codex);
+  const seen = new Set(save.codexSeen);
+  const fresh = save.codex.filter((id) => !seen.has(id)).length;
+  const q = fold(query.trim());
+  const matches = (c: CodexCard) => {
+    if (q === '') return true;
+    // Thẻ chưa mở chỉ khớp theo gợi ý, không lộ tên thẻ qua ô tìm kiếm.
+    const text = opened.has(c.id) ? `${c.title} ${c.body} ${c.more}` : (c.unlockHint ?? '');
+    return fold(text).includes(q);
+  };
+  const shownRooms = rooms.filter((r) => room === 'all' || r === room);
+  const listed = shownRooms.flatMap((r) => content.codex.filter((c) => c.dept === r && matches(c)));
+
   return (
     <div className="screen">
       <h1>📖 Sổ tay KTV</h1>
       <p className="muted">
-        Đã mở {save.codex.length}/{content.codex.length} thẻ. Thẻ mở khi em gặp lần đầu hoặc khi làm sai.
+        Thẻ mở khi em gặp lần đầu hoặc khi làm sai.
+        {fresh > 0 && ` Có ${fresh} thẻ mới chưa đọc.`}
       </p>
-      {rooms.map((room) => {
-        const cards = content.codex.filter((c) => c.dept === room);
+
+      <section className="card stack" aria-label="Tiến độ sưu tập">
+        <Progress label="Tổng sưu tập" done={opened.size} total={content.codex.length} />
+        {rooms.map((r) => {
+          const cards = content.codex.filter((c) => c.dept === r);
+          return (
+            <Progress
+              key={r}
+              label={t(`room.${r}`)}
+              done={cards.filter((c) => opened.has(c.id)).length}
+              total={cards.length}
+            />
+          );
+        })}
+      </section>
+
+      <div className="chips" role="group" aria-label="Lọc theo khoa">
+        <button
+          className={`chip ${room === 'all' ? 'selected' : ''}`}
+          aria-pressed={room === 'all'}
+          onClick={() => setRoom('all')}
+        >
+          Tất cả
+        </button>
+        {rooms.map((r) => (
+          <button
+            key={r}
+            className={`chip ${room === r ? 'selected' : ''}`}
+            aria-pressed={room === r}
+            onClick={() => setRoom(r)}
+          >
+            {t(`room.${r}`)}
+          </button>
+        ))}
+      </div>
+      <input
+        className="search"
+        type="search"
+        inputMode="search"
+        placeholder="Tìm thẻ…"
+        aria-label="Tìm thẻ Sổ tay"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+
+      {listed.length === 0 && <p className="muted">Không có thẻ nào khớp.</p>}
+      {shownRooms.map((r) => {
+        const cards = content.codex.filter((c) => c.dept === r && matches(c));
+        if (cards.length === 0) return null;
         return (
-          <div key={room} className="card stack">
-            <b>
-              {t(`room.${room}`)} ({cards.filter((c) => save.codex.includes(c.id)).length}/{cards.length})
-            </b>
+          <div key={r} className="card stack">
+            <b>{t(`room.${r}`)}</b>
             {cards.map((c) =>
-              save.codex.includes(c.id) ? (
-                <button key={c.id} style={{ textAlign: 'left' }} onClick={() => setOpen(c.id)}>
-                  {c.title}
+              opened.has(c.id) ? (
+                <button key={c.id} className="codex-card" onClick={() => setOpen(c.id)}>
+                  <span className="grow">{c.title}</span>
+                  {!seen.has(c.id) && <span className="new-badge">Mới</span>}
                 </button>
               ) : (
-                <span key={c.id} className="muted">
-                  🔒 ???
-                </span>
+                <div key={c.id} className="codex-locked">
+                  <b>🔒 Chưa mở</b>
+                  <span className="muted">{c.unlockHint}</span>
+                </div>
               ),
             )}
           </div>
@@ -43,24 +133,38 @@ export function Codex() {
   );
 }
 
+/**
+ * Xem một thẻ: nội dung nếu đã mở (và đánh dấu đã đọc), còn chưa mở thì hiện "mở khi ..." (không lộ nội dung).
+ * Luôn nằm trên cùng (cả trên mini-game) để nút "?" dùng được ở mọi màn.
+ */
 export function CodexCardView({ id, onClose }: { id: string; onClose: () => void }) {
   const card = getContent().codexById.get(id);
+  const unlocked = useGame((s) => isCardUnlocked(s, id));
+  useEffect(() => {
+    if (unlocked) useGame.getState().markCodexSeen(id);
+  }, [id, unlocked]);
   if (!card) return null;
   return (
-    <div className="overlay" onClick={onClose}>
-      <div className="sheet" onClick={(e) => e.stopPropagation()}>
+    <div className="overlay top" onClick={onClose}>
+      <div className="sheet" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
         <div className="sheet-head">
-          <h2>📖 {card.title}</h2>
+          <h2>{unlocked ? `📖 ${card.title}` : '🔒 Thẻ chưa mở'}</h2>
           <button className="small" onClick={onClose} aria-label="Đóng">
             ✕
           </button>
         </div>
-        <p>{card.body}</p>
-        <details>
-          <summary>Biết thêm</summary>
-          <p>{card.more}</p>
-        </details>
-        <p className="muted">Nguồn: {card.source.join(' · ')}</p>
+        {unlocked ? (
+          <>
+            <p>{card.body}</p>
+            <details>
+              <summary>Biết thêm</summary>
+              <p>{card.more}</p>
+            </details>
+            <p className="muted">Nguồn: {card.source.join(' · ')}</p>
+          </>
+        ) : (
+          <p>{card.unlockHint}</p>
+        )}
       </div>
     </div>
   );

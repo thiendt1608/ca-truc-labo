@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { getContent, isBalanced } from '../../sim';
 import { t } from '../../i18n';
-import { clockText, runProgress, useGame } from '../../store/game';
+import { clockText, runProgress, useGame, useHints } from '../../store/game';
 import { Sheet } from './Overlay';
 import { Tube } from './Tube';
 
 /** Máy ly tâm: chọn ống ở bàn chờ rồi chạm vào ô trong rổ; ống nào cũng cần ống đối diện. */
 export function CentrifugeSheet() {
   const shift = useGame((s) => s.shift)!;
-  const difficulty = useGame((s) => s.difficulty);
+  const hints = useHints();
   const dispatch = useGame((s) => s.dispatch);
   const close = () => useGame.getState().setOverlay(null);
   const [selected, setSelected] = useState<string | null>(null);
@@ -30,7 +30,7 @@ export function CentrifugeSheet() {
   const tubes = c.slots.filter((x) => x && x !== 'water').length;
 
   return (
-    <Sheet title="🌀 Máy ly tâm" onClose={close}>
+    <Sheet title="🌀 Máy ly tâm" help="centrifuge" onClose={close}>
       {c.contaminated ? (
         <p>⚠️ Có ống vỡ trong máy. Cần dọn theo quy trình an toàn trước khi dùng lại.</p>
       ) : c.running ? (
@@ -62,7 +62,7 @@ export function CentrifugeSheet() {
           return (
             <button
               key={i}
-              className={`slot ${difficulty === 'easy' && missingPair(i) ? 'warn' : ''}`}
+              className={`slot ${hints && missingPair(i) ? 'warn' : ''}`}
               style={{ left: x, top: y }}
               onClick={() => onSlot(i)}
               disabled={c.running || c.contaminated}
@@ -73,7 +73,7 @@ export function CentrifugeSheet() {
           );
         })}
       </div>
-      {difficulty === 'easy' && tubes > 0 && !c.running && (
+      {hints && tubes > 0 && !c.running && (
         <p className="muted">
           {isBalanced(c.slots) ? '✅ Đã cân bằng' : '⚠️ Ô viền đỏ chưa có ống đối diện'}
         </p>
@@ -124,7 +124,7 @@ export function PostSpinSheet() {
   const check = day.unlocks.includes('postSpinCheck');
   const spun = Object.values(shift.samples).filter((s) => s.status === 'spun');
   return (
-    <Sheet title="🧫 Khay sau ly tâm" onClose={close}>
+    <Sheet title="🧫 Khay sau ly tâm" help="postspin" onClose={close}>
       {spun.length === 0 && <p className="muted">Chưa có ống nào. Ống ly tâm xong sẽ nằm ở đây.</p>}
       {!check && spun.length > 1 && (
         <button
@@ -187,7 +187,7 @@ export function AnalyzerSheet() {
     return `${o.sampleId.toUpperCase()} ${o.priority === 'stat' ? '🚑' : ''} · ${o.tests.join(', ')}`;
   };
   return (
-    <Sheet title="⚗️ Máy hoá sinh" onClose={close}>
+    <Sheet title="⚗️ Máy hoá sinh" help="analyzer" onClose={close}>
       {a.current ? (
         <div className="card stack">
           <b>Đang chạy: {label(a.current.orderId)}</b>
@@ -233,7 +233,7 @@ export function UrineSheet() {
   const close = () => useGame.getState().setOverlay(null);
   const cups = Object.values(shift.samples).filter((s) => s.status === 'urine');
   return (
-    <Sheet title="🧪 Bàn nước tiểu" onClose={close}>
+    <Sheet title="🧪 Bàn nước tiểu" help="urine" onClose={close}>
       {cups.length === 0 && <p className="muted">Chưa có lọ nước tiểu nào chờ. Nhận lọ ở khay trước.</p>}
       {cups.map((s) => {
         const o = shift.orders[s.orderId]!;

@@ -494,6 +494,7 @@ button.small {
 /* Máy ly tâm */
 .rotor {
   position: relative;
+  flex: 0 0 auto; /* không bị co trong sheet thấp (320x568) */
   width: 260px;
   height: 260px;
   margin: 4px auto;
@@ -1335,4 +1336,73 @@ a:focus-visible,
   padding-left: 8px;
   padding-right: 8px;
   min-width: 0;
+}
+
+/* Sổ tay: thẻ đọc được, tìm kiếm, dấu Mới, nút "?" */
+.overlay.top {
+  z-index: 70;
+}
+.chips {
+  gap: 8px;
+}
+.codex-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  text-align: left;
+  border-radius: var(--radius);
+}
+.codex-locked {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 4px;
+  border-top: 2px dotted var(--line);
+}
+.codex-locked .muted {
+  line-height: 1.4;
+}
+.codex-progress {
+  gap: 4px;
+}
+.new-badge {
+  flex: none;
+  padding: 2px 10px;
+  border-radius: 9999px;
+  background: var(--bad-strong);
+  color: #fff;
+  font-size: 14px;
+}
+.search {
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px; /* ≥16px để iOS không tự phóng to khi chạm vào ô nhập */
+  width: 100%;
+  box-sizing: border-box;
+}
+.search:focus-visible {
+  outline: 3px solid var(--info);
+  outline-offset: 2px;
+}
+.help-btn {
+  flex: none;
+  margin-bottom: 0;
+  background: #2b5d8c; /* chữ trắng trên nền này ≥ 4,5:1 */
+  color: #fff;
+  box-shadow: 0 4px 0 #1d4266;
+}
+
+/* Phần mở rộng trong thẻ Sổ tay: vùng chạm ≥44px */
+details > summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
 }

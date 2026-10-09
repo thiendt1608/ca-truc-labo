@@ -16,7 +16,7 @@ export function ResultsSheet() {
   const unflagged = ready.filter((o) => o.results?.every((r) => !r.flag && !r.critical));
 
   return (
-    <Sheet title={`📋 Kết quả (${ready.length} chờ duyệt)`} onClose={close}>
+    <Sheet title={`📋 Kết quả (${ready.length} chờ duyệt)`} help="results" onClose={close}>
       <p className="muted">
         Đã gửi {released} phiếu. Kỹ thuật viên chỉ kiểm tra và gửi kết quả; bác sĩ mới là người kết luận bệnh.
       </p>

@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
-import { MINIGAMES, type PlayerAction } from '../../sim';
+import { MINIGAMES, type HelpContext, type PlayerAction } from '../../sim';
 import type { SpillInput } from '../../sim/minigames/spillCleanup';
-import { useGame } from '../../store/game';
+import { useGame, useHints } from '../../store/game';
+import { CodexHelp } from '../components/CodexHelp';
 import type { UrineInput } from '../../sim/minigames/urineStrip';
 import type { DilutionInput } from '../../sim/minigames/dilution';
 import { MeasureGame } from './MeasureGame';
@@ -18,6 +19,7 @@ const INTRO: Record<string, { icon: string; text: string }> = {
 export function MinigameHost() {
   const mg = useGame((s) => s.shift?.minigame ?? null);
   const difficulty = useGame((s) => s.shift?.difficulty ?? 'normal');
+  const hints = useHints();
   const dispatch = useGame((s) => s.dispatch);
   const input = useMemo(
     () => (mg ? MINIGAMES[mg.minigameId]!.generate(mg.seed, difficulty) : null),
@@ -30,22 +32,27 @@ export function MinigameHost() {
   };
   return (
     <div className="mg" role="dialog" aria-label={spec.title} onContextMenu={(e) => e.preventDefault()}>
-      <div className="mg-head">
-        <span className="eyebrow">Thao tác kỹ thuật</span>
-        <h2>
-          {INTRO[spec.id]?.icon} {spec.title}
-        </h2>
-        <p className="muted">
-          {mg.context === 'spill' && mg.sampleId
-            ? 'Lọ rò rỉ! Chạm các bước theo đúng thứ tự để dọn an toàn sinh học.'
-            : INTRO[spec.id]?.text}
-        </p>
+      <div className="mg-head row">
+        <div className="grow">
+          <span className="eyebrow">Thao tác kỹ thuật</span>
+          <h2>
+            {INTRO[spec.id]?.icon} {spec.title}
+          </h2>
+          <p className="muted">
+            {mg.context === 'spill' && mg.sampleId
+              ? 'Lọ rò rỉ! Chạm các bước theo đúng thứ tự để dọn an toàn sinh học.'
+              : INTRO[spec.id]?.text}
+          </p>
+        </div>
+        <CodexHelp context={spec.id as HelpContext} />
       </div>
       <div className="mg-body">
-        {spec.id === 'dilution' && <MeasureGame input={input as DilutionInput} onDone={finish} />}
+        {spec.id === 'dilution' && (
+          <MeasureGame input={input as DilutionInput} hint={hints} onDone={finish} />
+        )}
         {spec.id === 'urineStrip' && <UrineStripGame input={input as UrineInput} onDone={finish} />}
         {spec.id === 'spillCleanup' && (
-          <SequenceGame input={input as SpillInput} hint={difficulty === 'easy'} onDone={finish} />
+          <SequenceGame input={input as SpillInput} hint={hints} onDone={finish} />
         )}
       </div>
     </div>

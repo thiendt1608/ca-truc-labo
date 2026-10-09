@@ -1,6 +1,7 @@
 import { changeTrust, recordMistake, tip, unlockCodex, type Ctx } from '../core/context';
 import { evaluateWestgard } from '../core/qc';
-import type { Command, QcState, QcVerdict } from '../core/types';
+import type { Content } from '../content/load';
+import type { Command, Difficulty, QcState, QcVerdict } from '../core/types';
 
 /**
  * QC của máy hoá sinh (04a mục 1, 05-noi-dung-chuyen-mon.md mục 2.5).
@@ -57,8 +58,8 @@ export function qcBias(ctx: Ctx): number {
 }
 
 /** Phán quyết đúng theo luật Westgard với các lần chạy hiện có. */
-export function expectedVerdict(qc: QcState, difficulty: Ctx['s']['difficulty']): QcVerdict {
-  const w = evaluateWestgard(qc.runs, difficulty);
+export function expectedVerdict(qc: QcState, content: Content, difficulty: Difficulty): QcVerdict {
+  const w = evaluateWestgard(qc.runs, content.difficulty.levels[difficulty].advancedWestgard);
   if (w.reject) return 'fail';
   return w.violations.length > 0 ? 'rerun' : 'pass';
 }
@@ -98,7 +99,7 @@ export function handleQc(ctx: Ctx, cmd: Command): boolean {
     }
     case 'chem/judgeQC': {
       if (qc.status !== 'judging') return invalid(ctx, 'Chưa có lần chạy control để phán quyết.');
-      const expected = expectedVerdict(qc, s.difficulty);
+      const expected = expectedVerdict(qc, ctx.content, s.difficulty);
       const right = cmd.verdict === expected;
       s.decisions.total++;
       if (right) s.decisions.correct++;
@@ -106,7 +107,7 @@ export function handleQc(ctx: Ctx, cmd: Command): boolean {
       if (cmd.verdict === 'pass') {
         // Báo Đạt nhầm không bị phạt ngay: hậu quả lộ ra khi trả kết quả (releaseOrder).
         qc.status = 'passed';
-        const w = evaluateWestgard(qc.runs, s.difficulty);
+        const w = evaluateWestgard(qc.runs, ctx.content.difficulty.levels[s.difficulty].advancedWestgard);
         const last = qc.runs[qc.runs.length - 1]!;
         qc.wrongPass =
           expected === 'fail' ? { clock: s.clock, z1: last.z1, z2: last.z2, rules: w.violations } : null;

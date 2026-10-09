@@ -1,5 +1,6 @@
+import { getContent } from '../content/bundled';
 import { rngFromSeed } from '../core/rng';
-import type { PlayerAction } from '../core/types';
+import type { Difficulty, PlayerAction } from '../core/types';
 import { clampSkill, type MinigameScore, type MinigameSpec } from './types';
 
 /** Khung "giữ đúng thời gian": nhấn giữ, thanh đầy dần, thả tay khi thanh nằm trong vùng xanh. */
@@ -16,11 +17,12 @@ export interface HoldScore extends MinigameScore {
   verdict: 'none' | 'early' | 'good' | 'late';
 }
 
-export function generateHold(seed: string, difficulty: 'easy' | 'normal' | 'hard'): HoldInput {
+/** Độ rộng vùng đúng và thời gian đầy thanh theo mức độ khó lấy từ `content/common/difficulty.json`. */
+export function generateHold(seed: string, difficulty: Difficulty): HoldInput {
   const rng = rngFromSeed(seed);
-  const width = difficulty === 'easy' ? 0.3 : difficulty === 'normal' ? 0.2 : 0.14;
+  const { zoneWidth: width, fillMs } = getContent().difficulty.levels[difficulty].hold;
   const start = 0.5 + rng.next() * (0.85 - width - 0.5);
-  return { fillMs: difficulty === 'hard' ? 3000 : 3600, zone: [round2(start), round2(start + width)] };
+  return { fillMs, zone: [round2(start), round2(start + width)] };
 }
 
 function round2(n: number) {

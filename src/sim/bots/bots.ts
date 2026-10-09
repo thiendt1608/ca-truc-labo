@@ -30,15 +30,43 @@ interface BotProfile {
   /** Xác suất phát hiện lỗi nhãn. */
   spotLabel: number;
   spotOther: number;
+  /** Nhân vào xác suất phát hiện khi lỗi tinh vi (sai 1 chữ số, tên gần giống, tan huyết nhẹ). */
+  spotSubtle: number;
   balanceRate: number;
   /** Số việc tối đa mỗi lần nhìn (người thật không làm được mọi thứ cùng lúc). */
   actionsPerLook: number;
 }
 
 const PROFILES: Record<Exclude<BotKind, 'idle'>, BotProfile> = {
-  expert: { thinkEvery: 20, spotLabel: 1, spotOther: 1, balanceRate: 1, actionsPerLook: 6 },
-  novice: { thinkEvery: 60, spotLabel: 0.55, spotOther: 0.6, balanceRate: 0.75, actionsPerLook: 2 },
+  expert: { thinkEvery: 20, spotLabel: 1, spotOther: 1, spotSubtle: 1, balanceRate: 1, actionsPerLook: 6 },
+  novice: {
+    thinkEvery: 60,
+    spotLabel: 0.75,
+    spotOther: 0.6,
+    spotSubtle: 0.5,
+    balanceRate: 0.75,
+    actionsPerLook: 2,
+  },
 };
+
+/** Lỗi nhãn tinh vi: sai đúng 1 chữ số của mã, lệch 1 năm sinh, hoặc tên gần giống (cùng cặp trong names.json). */
+function subtleLabel(state: ShiftState, content: Content, sampleId: string): boolean {
+  const sample = state.samples[sampleId]!;
+  const patient = state.patients[state.orders[sample.orderId]!.patientId];
+  const label = sample.label;
+  if (!patient || !label) return false;
+  const given = (name: string) => name.split(' ').pop()!;
+  if (label.name !== patient.name) {
+    return content.names.lookalike.some(
+      ([a, b]) =>
+        (a === given(patient.name) && b === given(label.name)) ||
+        (b === given(patient.name) && a === given(label.name)),
+    );
+  }
+  if (label.birthYear !== patient.birthYear) return Math.abs(label.birthYear - patient.birthYear) === 1;
+  const diff = [...label.patientCode].filter((ch, i) => ch !== patient.code[i]).length;
+  return diff === 1;
+}
 
 export function perfectSpillActions(seed: string, difficulty: Difficulty): PlayerAction[] {
   const input = spillCleanup.generate(seed, difficulty);
@@ -58,6 +86,8 @@ export function perfectSpillActions(seed: string, difficulty: Difficulty): Playe
 export function botCommands(state: ShiftState, content: Content, p: BotProfile, rng: Rng): Command[] {
   const t = state.clock;
   const cmds: Command[] = [];
+  const level = content.difficulty.levels[state.difficulty];
+  const hints = level.hints;
   if (state.minigame?.context === 'dilution') {
     const input = generateDilution(state.minigame.seed, state.difficulty);
     const smallest = smallestRatio(input);
@@ -79,8 +109,8 @@ export function botCommands(state: ShiftState, content: Content, p: BotProfile, 
     for (const pad of input.pads) {
       const truth = input.truth[pad.id]!;
       const level = rng.chance(1 - (1 - p.spotOther) * 0.4) ? truth : rng.int(0, pad.levels.length - 1);
-      // Bot thành thạo chờ đủ thời điểm đọc; bot mới đôi khi đọc sớm.
-      const at = rng.chance(p.spotOther) ? pad.readAtMs + 200 : Math.round(pad.readAtMs * 0.4);
+      // Bot thành thạo chờ đủ thời điểm đọc; bot mới đôi khi đọc sớm (mức Dễ có nhắc thời điểm đọc).
+      const at = hints || rng.chance(p.spotOther) ? pad.readAtMs + 200 : Math.round(pad.readAtMs * 0.4);
       actions.push({ t: at, type: 'tap', id: `${pad.id}:${level}` });
     }
     actions.push({ t: 13000, type: 'done' });
@@ -88,7 +118,9 @@ export function botCommands(state: ShiftState, content: Content, p: BotProfile, 
   }
   if (state.minigame) {
     const actions = perfectSpillActions(state.minigame.seed, state.difficulty);
-    if (p.spotOther < 1 && rng.chance(0.3))
+    // Bot mới hay hụt khi vùng giữ hẹp hoặc có bước bẫy; mức Dễ có gợi ý bước nên không hụt.
+    const fumble = hints ? 0 : 0.15 + 0.1 * level.spillTraps + (0.3 - level.hold.zoneWidth);
+    if (p.spotOther < 1 && rng.chance(fumble))
       actions.splice(
         1,
         3,
@@ -146,7 +178,12 @@ export function botCommands(state: ShiftState, content: Content, p: BotProfile, 
     let decision = exp.decision;
     if (exp.rule) {
       const isLabel = exp.rule.defect === 'labelMismatch' || exp.rule.defect === 'noLabel';
-      const spotted = exp.rule.defect === 'noLabel' || rng.chance(isLabel ? p.spotLabel : p.spotOther);
+      const subtle = exp.rule.defect === 'labelMismatch' && subtleLabel(state, content, id);
+      // Mức Dễ: phiếu hiện ống cần dùng nên ống sai loại bị thấy ngay.
+      const spotted =
+        exp.rule.defect === 'noLabel' ||
+        (hints && exp.rule.defect === 'wrongContainer') ||
+        rng.chance((isLabel ? p.spotLabel : p.spotOther) * (subtle ? p.spotSubtle : 1));
       if (!spotted) decision = { type: 'accept', target: order.dept };
     }
     if (decision.type === 'accept')
@@ -165,8 +202,9 @@ export function botCommands(state: ShiftState, content: Content, p: BotProfile, 
       cmds.push({ t, type: 'chem/runQC' });
     } else if (qc.status === 'judging') {
       budget--;
-      const exp = expectedVerdict(qc, state.difficulty);
-      cmds.push({ t, type: 'chem/judgeQC', verdict: rng.chance(p.spotOther) ? exp : 'pass' });
+      const exp = expectedVerdict(qc, content, state.difficulty);
+      // Mức Dễ: QC sheet hiện sẵn luật bị vi phạm.
+      cmds.push({ t, type: 'chem/judgeQC', verdict: hints || rng.chance(p.spotOther) ? exp : 'pass' });
     } else if (qc.status === 'failed') {
       budget--;
       const remedies = Object.keys(content.chemQc.remedies) as QcRemedy[];
@@ -208,7 +246,8 @@ export function botCommands(state: ShiftState, content: Content, p: BotProfile, 
   for (const sample of samples.filter((s) => s.status === 'spun')) {
     if (budget-- <= 0) break;
     const exp = expectedPostSpin(content, sample, state.orders[sample.orderId]!);
-    const spotted = rng.chance(p.spotOther);
+    const mild = sample.defects.some((d) => d.kind === 'hemolysis' && d.level === 1);
+    const spotted = rng.chance(p.spotOther * (mild ? p.spotSubtle : 1));
     if (exp === 'load' || !spotted) cmds.push({ t, type: 'chem/loadAnalyzer', sampleId: sample.id });
     else if (exp === 'highSpeedSpin') {
       cmds.push({ t, type: 'chem/highSpeedSpin', sampleId: sample.id });
@@ -265,6 +304,7 @@ export function runBot(
     return { state, commands };
   }
   const p = PROFILES[kind];
+  const level = content.difficulty.levels[difficulty];
   const rng = createRng(hashSeed(`bot:${kind}:${seed}`));
   while (!state.ended) {
     for (const cmd of botCommands(state, content, p, rng)) {
@@ -273,7 +313,8 @@ export function runBot(
     }
     // Mini-game mở giữa chừng (ống vỡ) → xử lý ngay ở lượt sau.
     if (state.minigame) continue;
-    state = advance(state, p.thinkEvery, content).state;
+    // Người chơi phản ứng sau một khoảng thời gian thực cố định; đồng hồ nhanh hay chậm đổi số giây game trôi qua.
+    state = advance(state, Math.max(1, Math.round(p.thinkEvery * level.clockSpeed)), content).state;
   }
   return { state, commands };
 }

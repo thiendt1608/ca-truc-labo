@@ -1,3 +1,4 @@
+import { getContent } from '../content/bundled';
 import { rngFromSeed } from '../core/rng';
 import type { Difficulty, PlayerAction } from '../core/types';
 import { generateHold, scoreHold, type HoldInput } from './holdTimer';
@@ -45,7 +46,7 @@ const TRAPS: SequenceStep[] = [
 
 export function generateSpill(seed: string, difficulty: Difficulty): SpillInput {
   const rng = rngFromSeed(seed);
-  const traps = difficulty === 'easy' ? [] : difficulty === 'normal' ? TRAPS.slice(0, 1) : TRAPS;
+  const traps = TRAPS.slice(0, getContent().difficulty.levels[difficulty].spillTraps);
   return {
     steps: rng.shuffle([...STEPS, ...traps]),
     correct: STEPS.map((s) => s.id),

@@ -1,4 +1,4 @@
-import type { Difficulty } from './types';
+import type { AdvancedWestgardRule } from '../content/schema';
 
 /**
  * Luật Westgard (05-noi-dung-chuyen-mon.md mục 2.5). Hàm thuần.
@@ -18,8 +18,11 @@ export interface WestgardResult {
   reject: boolean;
 }
 
-/** `runs` theo thời gian, phần tử cuối là lần chạy mới nhất. */
-export function evaluateWestgard(runs: QCRun[], difficulty: Difficulty): WestgardResult {
+/**
+ * `runs` theo thời gian, phần tử cuối là lần chạy mới nhất.
+ * `advanced`: luật nâng cao (4-1s, 10x) được tính ở mức độ khó hiện tại, lấy từ `content/common/difficulty.json`.
+ */
+export function evaluateWestgard(runs: QCRun[], advanced: readonly AdvancedWestgardRule[]): WestgardResult {
   const last = runs[runs.length - 1];
   if (!last) return { violations: [], reject: false };
   const v: WestgardRule[] = [];
@@ -38,13 +41,15 @@ export function evaluateWestgard(runs: QCRun[], difficulty: Difficulty): Westgar
   // R-4s: trong một lần chạy, một mức vượt +2SD và mức kia vượt −2SD.
   if ((last.z1 > 2 && last.z2 < -2) || (last.z1 < -2 && last.z2 > 2)) v.push('R-4s');
 
-  if (difficulty === 'hard') {
+  if (advanced.length > 0) {
     const series = runs.flatMap((r) => [r.z1, r.z2]);
     const tail = (n: number) => series.slice(-n);
     const t4 = tail(4);
-    if (t4.length === 4 && (t4.every((z) => z > 1) || t4.every((z) => z < -1))) v.push('4-1s');
+    if (advanced.includes('4-1s') && t4.length === 4 && (t4.every((z) => z > 1) || t4.every((z) => z < -1)))
+      v.push('4-1s');
     const t10 = tail(10);
-    if (t10.length === 10 && (t10.every((z) => z > 0) || t10.every((z) => z < 0))) v.push('10x');
+    if (advanced.includes('10x') && t10.length === 10 && (t10.every((z) => z > 0) || t10.every((z) => z < 0)))
+      v.push('10x');
   }
 
   return { violations: v, reject: v.some((r) => r !== '1-2s') };

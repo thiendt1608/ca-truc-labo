@@ -48,7 +48,7 @@ export function generateUrine(seed: string, difficulty: Difficulty): UrineInput 
     truth,
     timeLimitMs: rules.timeLimitMs,
     msPerSimSecond: rules.msPerSimSecond,
-    hint: difficulty === 'easy',
+    hint: getContent().difficulty.levels[difficulty].hints,
   };
 }
 

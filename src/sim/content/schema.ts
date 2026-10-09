@@ -200,6 +200,43 @@ export const UrineRulesSchema = z.object({
   profiles: z.record(z.string(), z.record(z.string(), UrineLevelRange)),
 });
 
+const Prob = z.number().min(0).max(1);
+export const DifficultyLevelSchema = z.object({
+  name: z.string(),
+  note: z.string(),
+  /** Số giây game trôi qua mỗi giây thực so với mức Thường. */
+  clockSpeed: z.number().positive(),
+  /** Niềm tin không xuống dưới mức này (không kết thúc ca sớm vì Niềm tin). */
+  minTrust: z.number().min(0).max(100),
+  /** Gợi ý ống cần dùng, bước tiếp theo, dải màu mini-game. */
+  hints: z.boolean(),
+  /** Luật Westgard nâng cao được tính thêm vào 1-2s/1-3s/2-2s/R-4s. */
+  advancedWestgard: z.array(z.enum(['4-1s', '10x'])),
+  /** Lỗi tinh vi: tỉ lệ lỗi nhãn khó thấy và tỉ trọng tan huyết nhẹ. */
+  subtle: z.object({
+    /** Lỗi mã bệnh nhân: sai đúng 1 chữ số (còn lại sai 3 chữ số, dễ thấy). */
+    codeOneDigit: Prob,
+    /** Lỗi năm sinh: lệch đúng 1 năm (còn lại lệch 5–9 năm). */
+    yearOffByOne: Prob,
+    /** Lỗi tên: đổi sang tên gần giống khi có (còn lại tên khác hẳn). */
+    nameLookalike: Prob,
+    /** Trọng số tan huyết mức 1 (nhẹ), 2, 3 khi mẫu có lỗi tan huyết. */
+    hemolysisWeights: z.tuple([z.number().min(0), z.number().min(0), z.number().min(0)]),
+  }),
+  /** Mini-game giữ đúng thời gian: độ rộng vùng đúng (0..1) và thời gian đầy thanh. */
+  hold: z.object({ zoneWidth: z.number().min(0.05).max(0.5), fillMs: z.number().positive() }),
+  /** Số bước bẫy trong mini-game dọn đổ vỡ (0..2). */
+  spillTraps: z.number().int().min(0).max(2),
+});
+export const DifficultySchema = z.object({
+  source: z.array(z.string()),
+  levels: z.object({
+    easy: DifficultyLevelSchema,
+    normal: DifficultyLevelSchema,
+    hard: DifficultyLevelSchema,
+  }),
+});
+
 export const EventIdSchema = z.enum(['E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'E7', 'E8', 'E9', 'E10']);
 
 export const EventsSchema = z.object({
@@ -350,7 +387,24 @@ export const CodexCardSchema = z.object({
   body: z.string(),
   more: z.string(),
   source: z.array(z.string()).min(1),
+  /** "Mở khi ..." cho thẻ chưa mở: nói tình huống gặp thẻ, không nêu đáp án. */
+  unlockHint: z.string().min(1).optional(),
 });
+
+/** Nơi có nút "?" (04-GDD mục 12): mỗi nơi mở một thẻ Sổ tay liên quan nhất. */
+export const HelpContextSchema = z.enum([
+  'sample',
+  'centrifuge',
+  'postspin',
+  'analyzer',
+  'results',
+  'qc',
+  'urine',
+  'spillCleanup',
+  'dilution',
+  'urineStrip',
+]);
+export const CodexHelpSchema = z.record(HelpContextSchema, z.string());
 
 export const I18nSchema = z.record(z.string(), z.string());
 
@@ -369,6 +423,8 @@ export const RawContentSchema = z.object({
   events: EventsSchema,
   days: z.array(DayConfigSchema),
   codex: z.array(CodexCardSchema),
+  codexHelp: CodexHelpSchema,
+  difficulty: DifficultySchema,
   i18n: I18nSchema,
 });
 
@@ -398,3 +454,6 @@ export type Unlock = z.infer<typeof UnlockSchema>;
 export type TipTrigger = z.infer<typeof TipTriggerSchema>;
 export type DayConfig = z.infer<typeof DayConfigSchema>;
 export type CodexCard = z.infer<typeof CodexCardSchema>;
+export type HelpContext = z.infer<typeof HelpContextSchema>;
+export type DifficultyLevel = z.infer<typeof DifficultyLevelSchema>;
+export type AdvancedWestgardRule = DifficultyLevel['advancedWestgard'][number];

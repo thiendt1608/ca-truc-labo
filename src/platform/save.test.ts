@@ -11,6 +11,7 @@ function sample(): SaveData {
       'ch0-d2': { stars: 2, score: 41, plays: 1 },
     },
     codex: content.codex.slice(0, 4).map((c) => c.id),
+    codexSeen: content.codex.slice(0, 2).map((c) => c.id),
     difficulty: 'hard',
     budget: 410,
     settings: { reducedMotion: true },
@@ -129,7 +130,7 @@ describe('kiểm tra nội dung bản lưu', () => {
 });
 
 describe('migrate', () => {
-  it('v1 → v2 giữ tiến trình, thêm cài đặt mặc định', () => {
+  it('v1 → v3 giữ tiến trình, thêm cài đặt mặc định và coi thẻ đã mở là đã đọc', () => {
     const v1 = {
       version: 1,
       days: { 'ch0-d1': { stars: 4, score: 80, plays: 2 } },
@@ -141,9 +142,10 @@ describe('migrate', () => {
     expect(r).toEqual({
       ok: true,
       save: {
-        version: 2,
+        version: 3,
         days: v1.days,
         codex: v1.codex,
+        codexSeen: v1.codex,
         difficulty: 'easy',
         budget: 140,
         settings: { reducedMotion: false },
@@ -152,7 +154,60 @@ describe('migrate', () => {
     });
   });
 
-  it('v1 rỗng cũng nâng cấp được; v2 hợp lệ giữ nguyên', () => {
+  it('v2 → v3: mọi thẻ đã mở coi như đã đọc, phần còn lại giữ nguyên', () => {
+    const codex = getContent()
+      .codex.slice(0, 5)
+      .map((c) => c.id);
+    const v2 = {
+      version: 2,
+      days: { 'ch0-d1': { stars: 4, score: 80, plays: 2 } },
+      codex,
+      difficulty: 'hard',
+      budget: 140,
+      settings: { reducedMotion: true },
+      installHintShown: true,
+    };
+    expect(migrate(v2)).toEqual({
+      ok: true,
+      save: { ...v2, version: 3, codexSeen: codex },
+    });
+  });
+
+  it('v2 hỏng (codex không phải mảng) bị từ chối, không crash', () => {
+    const v2 = { ...sample(), version: 2, codex: 'x' };
+    expect(migrate(v2).ok).toBe(false);
+  });
+
+  it('mã xuất từ dữ liệu v2 cũ vẫn nhập được và nâng lên v3', () => {
+    const codex = getContent()
+      .codex.slice(0, 3)
+      .map((c) => c.id);
+    const v2 = {
+      version: 2,
+      days: {},
+      codex,
+      difficulty: 'normal',
+      budget: 50,
+      settings: { reducedMotion: false },
+      installHintShown: false,
+    };
+    const r = importCode(exportCode(v2 as unknown as SaveData));
+    expect(r).toEqual({
+      ok: true,
+      save: { ...emptySave(), codex, codexSeen: codex, budget: 50 },
+    });
+  });
+
+  it('v3: codexSeen chỉ giữ thẻ đã mở và còn trong nội dung', () => {
+    const [a, b, c] = getContent().codex.map((x) => x.id) as [string, string, string];
+    const r = migrate({ ...sample(), codex: [a, b], codexSeen: [a, c, 'the-ma', a] });
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.save.codexSeen).toEqual([a]);
+    expect(migrate({ ...sample(), codexSeen: 'x' }).ok).toBe(false);
+    expect(migrate({ ...sample(), codexSeen: [1] }).ok).toBe(false);
+  });
+
+  it('v1 rỗng cũng nâng cấp được; v3 hợp lệ giữ nguyên', () => {
     const v1 = { version: 1, days: {}, codex: [], difficulty: 'normal', budget: 0 };
     expect(migrate(v1)).toEqual({ ok: true, save: emptySave() });
     expect(migrate(sample())).toEqual({ ok: true, save: sample() });

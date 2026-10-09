@@ -2,7 +2,7 @@ import { compressToUint8Array, decompressFromUint8Array } from 'lz-string';
 import { getContent, type Difficulty } from '../sim';
 
 /** Phiên bản hiện tại của dữ liệu lưu. Khoá IndexedDB vẫn là `save:v1`; `version` nằm trong nội dung. */
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 
 export interface Settings {
   reducedMotion: boolean;
@@ -13,6 +13,8 @@ export interface SaveData {
   version: typeof SAVE_VERSION;
   days: Record<string, { stars: number; score: number; plays: number }>;
   codex: string[];
+  /** Thẻ Sổ tay đã mở và đã đọc (phần còn lại của `codex` hiện dấu "Mới"). Luôn là tập con của `codex`. */
+  codexSeen: string[];
   difficulty: Difficulty;
   budget: number;
   settings: Settings;
@@ -25,6 +27,7 @@ export function emptySave(): SaveData {
     version: SAVE_VERSION,
     days: {},
     codex: [],
+    codexSeen: [],
     difficulty: 'normal',
     budget: 0,
     settings: { reducedMotion: false },
@@ -46,6 +49,7 @@ const isInt = (v: unknown, min: number, max: number): v is number =>
 /**
  * Nâng dữ liệu cũ lên bản mới nhất (vN → vN+1), rồi kiểm tra nội dung.
  * - v1 → v2: thêm `settings` và `installHintShown`.
+ * - v2 → v3: thêm `codexSeen` (mọi thẻ đã mở coi như đã đọc, không hiện "Mới" hàng loạt).
  * - Bản mới hơn bản hiện tại bị từ chối (không đoán cấu trúc lạ).
  * - Ngày/thẻ không còn trong nội dung bị bỏ; số liệu sai kiểu hoặc vô lý thì từ chối cả bản lưu.
  */
@@ -61,6 +65,9 @@ export function migrate(data: unknown): SaveResult {
   let cur: Record<string, unknown> = data;
   if (cur.version === 1) {
     cur = { ...cur, version: 2, settings: { reducedMotion: false }, installHintShown: false };
+  }
+  if (cur.version === 2) {
+    cur = { ...cur, version: 3, codexSeen: Array.isArray(cur.codex) ? cur.codex : [] };
   }
   return validate(cur);
 }
@@ -80,6 +87,11 @@ function validate(d: Record<string, unknown>): SaveResult {
     return { ok: false, error: 'Danh sách thẻ Sổ tay bị hỏng.' };
   }
   const codex = [...new Set(d.codex as string[])].filter((id) => content.codexById.has(id));
+  if (!Array.isArray(d.codexSeen) || d.codexSeen.some((c) => typeof c !== 'string')) {
+    return { ok: false, error: 'Danh sách thẻ Sổ tay đã đọc bị hỏng.' };
+  }
+  const opened = new Set(codex);
+  const codexSeen = [...new Set(d.codexSeen as string[])].filter((id) => opened.has(id));
   if (typeof d.difficulty !== 'string' || !DIFFICULTIES.includes(d.difficulty)) {
     return { ok: false, error: 'Độ khó trong dữ liệu không hợp lệ.' };
   }
@@ -96,6 +108,7 @@ function validate(d: Record<string, unknown>): SaveResult {
       version: SAVE_VERSION,
       days,
       codex,
+      codexSeen,
       difficulty: d.difficulty as Difficulty,
       budget: d.budget,
       settings: { reducedMotion: d.settings.reducedMotion },

@@ -150,7 +150,8 @@
     "rc-swab",
     "rc-bloodculture",
     "rc-tissue",
-    "rc-transport-time"
+    "rc-transport-time",
+    "rc-order-of-draw"
   ],
   "events": [
     {

@@ -20,6 +20,8 @@ import ch1d4 from '../../../content/days/ch1-d4.json';
 import ch1d5 from '../../../content/days/ch1-d5.json';
 import codexCommon from '../../../content/codex/common.json';
 import codexChem from '../../../content/codex/chem.json';
+import codexHelp from '../../../content/codex/help.json';
+import difficulty from '../../../content/common/difficulty.json';
 import i18n from '../../../content/i18n/vi.json';
 import { loadContent, type Content } from './load';
 
@@ -39,6 +41,8 @@ export const rawContent = {
   events,
   days: [ch0d1, ch0d2, ch0d3, ch1d1, ch1d2, ch1d3, ch1d4, ch1d5],
   codex: [...codexCommon, ...codexChem],
+  codexHelp,
+  difficulty,
   i18n,
 };
 

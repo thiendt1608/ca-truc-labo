@@ -67,3 +67,43 @@ test('Cài đặt gọn ở mọi kích thước (cả khi mở mã, xác nhận
   await page.getByRole('button', { name: 'Xóa tiến trình' }).click();
   await audit(page, 'cài đặt (mã, lỗi, xác nhận xóa)');
 });
+
+test('Sổ tay gọn ở mọi kích thước (tiến độ, lọc, tìm kiếm, thẻ mở và nút "?" trong ca)', async ({ page }) => {
+  await page.goto('/?debug=1');
+  await page.getByRole('button', { name: /Sổ tay/ }).click();
+  await expect(page.getByRole('heading', { name: /Sổ tay KTV/ })).toBeVisible();
+  await audit(page, 'sổ tay (khoá hết)');
+
+  await page.getByRole('button', { name: 'Hoá sinh', exact: true }).click();
+  await page.getByLabel('Tìm thẻ Sổ tay').fill('ly tam');
+  await audit(page, 'sổ tay (lọc, tìm)');
+  await page.getByLabel('Tìm thẻ Sổ tay').fill('zzzz');
+  await audit(page, 'sổ tay (không khớp)');
+  await page.getByRole('button', { name: /Về sảnh/ }).click();
+
+  // Có thẻ đã mở: chơi tới hết ca 0.1 bằng bảng debug rồi xem Sổ tay và một thẻ.
+  await page.getByRole('button', { name: /Ngày 0\.1/ }).click();
+  await page.getByRole('button', { name: 'Vào ca' }).click();
+  await page.locator('.tip').click();
+  await page.getByRole('button', { name: 'Bảng debug' }).click();
+  await page.getByRole('button', { name: 'Kết thúc ca ngay' }).click();
+  await expect(page.getByRole('heading', { name: 'Báo cáo giao ca' })).toBeVisible();
+  await page.getByRole('button', { name: /Về sảnh/ }).click();
+  await page.getByRole('button', { name: /Sổ tay/ }).click();
+  await audit(page, 'sổ tay (có thẻ mới)');
+  await page.locator('.codex-card').first().click();
+  await expect(page.getByText('Biết thêm')).toBeVisible();
+  await audit(page, 'thẻ Sổ tay');
+  await page.getByRole('dialog').getByRole('button', { name: 'Đóng' }).click();
+  await page.getByRole('button', { name: /Về sảnh/ }).click();
+
+  // Nút "?" trong ca: thẻ chồng lên sheet máy ly tâm.
+  await page.getByRole('button', { name: /Ngày 1\.1/ }).click();
+  await page.getByRole('button', { name: 'Vào ca' }).click();
+  await page.locator('.tip').click();
+  await page.getByRole('button', { name: /Máy ly tâm/ }).click();
+  await audit(page, 'máy ly tâm có nút ?');
+  await page.getByRole('button', { name: 'Mở thẻ Sổ tay liên quan' }).click();
+  await expect(page.getByRole('dialog').last().getByText('Biết thêm')).toBeVisible();
+  await audit(page, 'thẻ từ nút ?');
+});

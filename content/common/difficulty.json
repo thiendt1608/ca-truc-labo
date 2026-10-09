@@ -1,0 +1,53 @@
+{
+  "source": ["04-GDD.md mục 13.1 và 13.2", "06-UI-UX-va-mi-thuat.md mục 7"],
+  "levels": {
+    "easy": {
+      "name": "Dễ",
+      "note": "Đồng hồ chậm (0,6×), phiếu và máy có gợi ý, Niềm tin không dưới 30, ít lỗi tinh vi, chưa có luật QC nâng cao",
+      "clockSpeed": 0.6,
+      "minTrust": 30,
+      "hints": true,
+      "advancedWestgard": [],
+      "subtle": {
+        "codeOneDigit": 0.3,
+        "yearOffByOne": 0.2,
+        "nameLookalike": 0,
+        "hemolysisWeights": [1, 2, 2]
+      },
+      "hold": { "zoneWidth": 0.3, "fillMs": 3600 },
+      "spillTraps": 0
+    },
+    "normal": {
+      "name": "Thường",
+      "note": "Như một ca thật: đồng hồ 1×, không gợi ý, lỗi tinh vi vừa phải, QC có thêm luật 4-1s",
+      "clockSpeed": 1,
+      "minTrust": 0,
+      "hints": false,
+      "advancedWestgard": ["4-1s"],
+      "subtle": {
+        "codeOneDigit": 0.7,
+        "yearOffByOne": 0.5,
+        "nameLookalike": 0.3,
+        "hemolysisWeights": [1, 1, 1]
+      },
+      "hold": { "zoneWidth": 0.2, "fillMs": 3600 },
+      "spillTraps": 1
+    },
+    "hard": {
+      "name": "Khó",
+      "note": "Đồng hồ nhanh (1,2×), nhiều lỗi tinh vi (sai một chữ số, tên gần giống, tan huyết nhẹ), QC đủ luật 4-1s và 10x",
+      "clockSpeed": 1.2,
+      "minTrust": 0,
+      "hints": false,
+      "advancedWestgard": ["4-1s", "10x"],
+      "subtle": {
+        "codeOneDigit": 1,
+        "yearOffByOne": 0.85,
+        "nameLookalike": 1,
+        "hemolysisWeights": [3, 1, 1]
+      },
+      "hold": { "zoneWidth": 0.14, "fillMs": 3000 },
+      "spillTraps": 2
+    }
+  }
+}

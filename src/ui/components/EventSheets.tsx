@@ -47,19 +47,25 @@ export function PhoneSheet() {
 export function CodexSheet() {
   const shift = useGame((s) => s.shift)!;
   const saved = useGame((s) => s.save.codex);
+  const seenSaved = useGame((s) => s.save.codexSeen);
+  const seenNow = useGame((s) => s.seenInShift);
   const close = () => useGame.getState().setOverlay(null);
   const [open, setOpen] = useState<string | null>(null);
   const content = getContent();
   const unlocked = new Set([...saved, ...shift.codexUnlocked]);
+  const seen = new Set([...seenSaved, ...seenNow]);
   const cards = content.codex.filter((c) => unlocked.has(c.id));
   return (
     <Sheet title="📖 Sổ tay" onClose={close}>
       <p className="muted">
-        Đã mở {cards.length}/{content.codex.length} thẻ. Giờ ca tạm dừng khi em đọc.
+        Đã mở {cards.length}/{content.codex.length} thẻ (
+        {Math.round((100 * cards.length) / content.codex.length)}
+        %). Giờ ca tạm dừng khi em đọc.
       </p>
       {cards.map((c) => (
-        <button key={c.id} style={{ textAlign: 'left' }} onClick={() => setOpen(c.id)}>
-          {c.title}
+        <button key={c.id} className="codex-card" onClick={() => setOpen(c.id)}>
+          <span className="grow">{c.title}</span>
+          {!seen.has(c.id) && <span className="new-badge">Mới</span>}
         </button>
       ))}
       {open && <CodexCardView id={open} onClose={() => setOpen(null)} />}

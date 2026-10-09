@@ -20,6 +20,7 @@ export function Home() {
   const content = getContent();
   const days = content.days;
   const collected = save.codex.length;
+  const fresh = save.codex.filter((id) => !save.codexSeen.includes(id)).length;
   const totalCards = content.codex.length;
   // Nhiệm vụ hiện tại: ngày đầu tiên chưa chơi, hoặc ngày cuối nếu đã chơi hết.
   const current = days.find((d) => !save.days[d.id]) ?? days[days.length - 1]!;
@@ -121,6 +122,11 @@ export function Home() {
         </button>
         <button onClick={() => go('codex')}>
           📖 Sổ tay {collected}/{totalCards}
+          {fresh > 0 && (
+            <span className="dot" aria-label={`${fresh} thẻ mới`}>
+              {fresh}
+            </span>
+          )}
         </button>
       </nav>
     </>

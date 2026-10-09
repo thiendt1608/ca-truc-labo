@@ -40,27 +40,36 @@ export function makePatient(ctx: Ctx, profileId?: string): Patient {
   return patient;
 }
 
+/**
+ * Lỗi nhãn 1 trường. Số lần gọi rng không phụ thuộc mức độ khó (mọi nhánh đều rút đủ số giá trị),
+ * nên cùng hạt giống thì mọi mức độ khó cho cùng dãy mẫu và chỉ khác độ tinh vi của lỗi (GDD 13.1).
+ */
 function alterLabel(ctx: Ctx, label: Label, field: LabelField): Label {
   const { rng } = ctx;
+  const subtle = ctx.content.difficulty.levels[ctx.s.difficulty].subtle;
   const out = { ...label };
   if (field === 'birthYear') {
-    out.birthYear = label.birthYear + rng.pick([-3, -2, -1, 1, 2, 3]);
+    const small = rng.pick([-1, 1]);
+    const big = rng.pick([-9, -7, -5, 5, 7, 9]);
+    out.birthYear = label.birthYear + (rng.chance(subtle.yearOffByOne) ? small : big);
   } else if (field === 'patientCode') {
     const digits = label.patientCode.slice(2).split('');
     const i = rng.int(0, digits.length - 1);
-    digits[i] = String((Number(digits[i]) + rng.int(1, 8)) % 10);
+    const deltas = [rng.int(1, 8), rng.int(1, 8), rng.int(1, 8)];
+    const oneDigit = rng.chance(subtle.codeOneDigit);
+    const positions = oneDigit ? [i] : [i, (i + 2) % digits.length, (i + 4) % digits.length];
+    positions.forEach((pos, k) => {
+      digits[pos] = String((Number(digits[pos]) + deltas[k]!) % 10);
+    });
     out.patientCode = `BN${digits.join('')}`;
   } else {
     const parts = label.name.split(' ');
     const given = parts[parts.length - 1]!;
     const pair = ctx.content.names.lookalike.find(([a, b]) => a === given || b === given);
-    const hard = ctx.s.difficulty === 'hard';
-    if (hard && pair) {
-      parts[parts.length - 1] = pair[0] === given ? pair[1] : pair[0];
-    } else {
-      const sexPool = [...ctx.content.names.given.M, ...ctx.content.names.given.F].filter((g) => g !== given);
-      parts[parts.length - 1] = rng.pick(sexPool);
-    }
+    const sexPool = [...ctx.content.names.given.M, ...ctx.content.names.given.F].filter((g) => g !== given);
+    const other = rng.pick(sexPool);
+    const lookalike = rng.chance(subtle.nameLookalike);
+    parts[parts.length - 1] = lookalike && pair ? (pair[0] === given ? pair[1] : pair[0]) : other;
     out.name = parts.join(' ');
   }
   return out;
@@ -99,7 +108,10 @@ function rollDefects(ctx: Ctx): Defect[] {
     if (p > 0 && ctx.rng.chance(p)) {
       if (kind === 'labelMismatch')
         return [{ kind, field: ctx.rng.pick(['name', 'birthYear', 'patientCode'] as const) }];
-      if (kind === 'hemolysis') return [{ kind, level: ctx.rng.pick([1, 2, 3] as const) }];
+      if (kind === 'hemolysis') {
+        const [w1, w2, w3] = ctx.content.difficulty.levels[ctx.s.difficulty].subtle.hemolysisWeights;
+        return [{ kind, level: Number(ctx.rng.weighted({ '1': w1, '2': w2, '3': w3 })) as 1 | 2 | 3 }];
+      }
       return [{ kind } as Defect];
     }
   }

@@ -64,7 +64,7 @@ Game giờ có 6 khu và 27 mini-game — quá lớn để làm một lần. Cá
 - [ ] M3-3 Sự kiện chung E1–E10; điện thoại.
 - [ ] M3-4 Cấu hình 8 ngày (chương 0–1); hướng dẫn của chị Hạnh.
 - [~] M3-5 Hình ảnh thật cho Tiếp nhận + Hoá sinh; âm thanh. **Hoãn**: bỏ khỏi M3, làm sau khi game ổn định (giữ CSS/emoji, chưa có âm thanh).
-- [ ] M3-6 Sổ tay (thẻ Tiếp nhận + Hoá sinh); 3 mức độ khó.
+- [x] M3-6 Sổ tay (33 thẻ Tiếp nhận + Hoá sinh: % sưu tập tổng/theo khoa, lọc + tìm kiếm, gợi ý "Mở khi ..." cho thẻ khoá, dấu "Mới" tới khi đọc (SaveData v3 `codexSeen`), nút "?" ngữ cảnh mở thẻ liên quan và dừng giờ); 3 mức độ khó theo `content/common/difficulty.json` (đồng hồ 0,6/1/1,2×, Niềm tin tối thiểu 30, gợi ý ở Dễ, lỗi tinh vi ít/vừa/nhiều, Westgard nâng cao không/4-1s/4-1s+10x, vùng giữ và bẫy dọn đổ vỡ theo mức); `pnpm balance --difficulty all` kiểm expert ≥4★, idle 1★, novice Dễ ≥ Thường ≥ Khó. Phần chưa làm vì chưa có khoa: kháng nguyên yếu D, ký sinh trùng mật độ thấp, vạch T mờ, khuẩn lạc lẫn.
 - [x] M3-7 Lưu game, mã lưu (`CTL1.`), màn Cài đặt, nhắc lưu bền sau ngày 0.3, PWA (manifest, icon, service worker offline, bản mới chỉ nhắc ở Sảnh/Cài đặt); `prefers-reduced-motion` + công tắc Giảm chuyển động, focus-visible. Chế độ chữ lớn để sau.
 - [ ] M3-8 Kiểm tra trên điện thoại thật; chơi thử 8–10 người.
 

@@ -47,7 +47,7 @@ export function createShift({ content, dayId, seed, difficulty }: NewShiftOption
     dayStart: day.start,
     rngState: hashSeed(`${seed}:${dayId}`),
     trust: day.startTrust,
-    minTrust: difficulty === 'easy' ? 30 : 0,
+    minTrust: content.difficulty.levels[difficulty].minTrust,
     patients: {},
     orders: {},
     samples: {},

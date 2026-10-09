@@ -5,7 +5,8 @@
     "title": "Vì sao phải ly tâm",
     "body": "Máy ly tâm quay rất nhanh để tế bào máu nặng chìm xuống đáy. Phần nước trong ở trên (huyết thanh hoặc huyết tương) mới là thứ máy hoá sinh đo.",
     "more": "Ống tím cho HbA1c thì không ly tâm, vì HbA1c nằm ngay trong hồng cầu.",
-    "source": ["WHO LQMS"]
+    "source": ["WHO LQMS"],
+    "unlockHint": "Mở khi em lần đầu vào phòng Hoá sinh và dùng máy ly tâm."
   },
   {
     "id": "ch-balance",
@@ -13,7 +14,8 @@
     "title": "Cân bằng máy ly tâm",
     "body": "Mỗi ống trong máy ly tâm phải có một ống đối diện nặng bằng nó. Thiếu thì thêm ống nước. Lệch cân máy sẽ rung, có thể làm vỡ ống.",
     "more": "Giống như máy giặt rung mạnh khi quần áo dồn một bên.",
-    "source": ["WHO LQMS"]
+    "source": ["WHO LQMS"],
+    "unlockHint": "Mở khi em lần đầu vào phòng Hoá sinh và dùng máy ly tâm."
   },
   {
     "id": "ch-hemolysis",
@@ -21,7 +23,8 @@
     "title": "Tan huyết",
     "body": "Hồng cầu bị vỡ làm huyết thanh có màu hồng đỏ. Trong hồng cầu có nhiều Kali và AST, nên khi vỡ ra các chỉ số này tăng giả.",
     "more": "Tan huyết nhẹ chỉ ảnh hưởng Kali và AST; tan huyết nặng ảnh hưởng gần như mọi xét nghiệm.",
-    "source": ["open-exam-prep ASCP PBT"]
+    "source": ["open-exam-prep ASCP PBT"],
+    "unlockHint": "Mở khi em gặp mẫu máu có màu hồng hoặc đỏ lạ sau khi ly tâm."
   },
   {
     "id": "ch-lipemia",
@@ -29,7 +32,8 @@
     "title": "Mẫu đục (mỡ máu)",
     "body": "Huyết thanh đục như sữa do nhiều mỡ, làm nhiễu ánh sáng của máy. Nhận mẫu rồi ly tâm tốc độ cao để tách mỡ, vì lấy lại máu vẫn đục.",
     "more": "Hay gặp khi bệnh nhân vừa ăn nhiều đồ béo hoặc có mỡ máu cao.",
-    "source": ["open-exam-prep ASCP PBT"]
+    "source": ["open-exam-prep ASCP PBT"],
+    "unlockHint": "Mở khi em gặp mẫu huyết thanh có màu đục như sữa."
   },
   {
     "id": "ch-icterus",
@@ -37,7 +41,8 @@
     "title": "Mẫu vàng",
     "body": "Huyết thanh vàng đậm do bilirubin cao, thường vì bệnh nhân vàng da. Vẫn nhận mẫu, máy sẽ gắn cờ để bác sĩ biết.",
     "more": "Lấy lại máu thì vẫn vàng, nên từ chối không giúp gì.",
-    "source": ["open-exam-prep ASCP PBT"]
+    "source": ["open-exam-prep ASCP PBT"],
+    "unlockHint": "Mở khi em gặp mẫu huyết thanh có màu vàng đậm."
   },
   {
     "id": "ch-flags",
@@ -45,7 +50,8 @@
     "title": "Cờ H và L",
     "body": "H nghĩa là kết quả cao hơn khoảng tham chiếu, L là thấp hơn. Cờ chỉ báo cho bác sĩ chú ý, kỹ thuật viên không kết luận bệnh.",
     "more": "Khoảng tham chiếu là khoảng giá trị của phần lớn người khoẻ mạnh.",
-    "source": ["WHO LQMS"]
+    "source": ["WHO LQMS"],
+    "unlockHint": "Mở khi em lần đầu xem kết quả của máy hoá sinh."
   },
   {
     "id": "ch-wrong-patient",
@@ -53,7 +59,8 @@
     "title": "Trả kết quả nhầm người",
     "body": "Nếu nhận một ống có nhãn lệch phiếu rồi trả kết quả, bác sĩ sẽ đọc kết quả của người khác. Đó là lý do phải kiểm tra nhãn trước khi làm.",
     "more": "Ở bệnh viện thật, lỗi định danh là nhóm lỗi trước xét nghiệm được theo dõi chặt nhất.",
-    "source": ["WHO LQMS"]
+    "source": ["WHO LQMS"],
+    "unlockHint": "Mở khi em lỡ trả kết quả của một ống mang nhãn không đúng người."
   },
   {
     "id": "ch-qc",
@@ -61,7 +68,8 @@
     "title": "QC: kiểm tra máy trước khi tin kết quả",
     "body": "Trước khi chạy mẫu bệnh nhân, ta chạy control: mẫu đã biết trước giá trị. Nếu máy đo control đúng thì mới tin kết quả bệnh nhân.",
     "more": "Mỗi ngày chạy control 2 mức (thấp và cao). Kết quả vẽ lên biểu đồ Levey-Jennings để nhìn xu hướng.",
-    "source": ["WHO LQMS", "05-noi-dung-chuyen-mon.md mục 2.5"]
+    "source": ["WHO LQMS", "05-noi-dung-chuyen-mon.md mục 2.5"],
+    "unlockHint": "Mở khi em làm quen với việc kiểm tra máy trước khi chạy mẫu bệnh nhân."
   },
   {
     "id": "ch-westgard",
@@ -69,7 +77,8 @@
     "title": "Luật Westgard",
     "body": "1-2s: một điểm vượt 2SD, chỉ là cảnh báo. 1-3s: một điểm vượt 3SD, loại. 2-2s: hai điểm liên tiếp cùng vượt 2SD một phía, loại. R-4s: hai mức lệch ngược chiều trên 4SD, loại.",
     "more": "Mức Khó thêm 4-1s (4 điểm liên tiếp cùng phía vượt 1SD) và 10x (10 điểm cùng một phía của trung bình).",
-    "source": ["Westgard rules (westgard.com)"]
+    "source": ["Westgard rules (westgard.com)"],
+    "unlockHint": "Mở khi em làm quen với việc kiểm tra máy trước khi chạy mẫu bệnh nhân."
   },
   {
     "id": "ch-qc-causes",
@@ -77,7 +86,8 @@
     "title": "Đọc hình dạng biểu đồ để tìm nguyên nhân",
     "body": "Một điểm lệch rồi hết: ngẫu nhiên, chạy lại control. Chỉ một mức lệch: lọ control hỏng. Cả hai mức lệch cùng hướng và vượt 3SD: hoá chất. Trôi dần: hiệu chuẩn. Hai mức lệch ngược chiều: phần cứng.",
     "more": "Trong thực tế nhiều nguyên nhân có thể chồng nhau; game đơn giản hoá thành một nguyên nhân cho mỗi hình dạng.",
-    "source": ["05-noi-dung-chuyen-mon.md mục 2.5"]
+    "source": ["05-noi-dung-chuyen-mon.md mục 2.5"],
+    "unlockHint": "Mở khi kiểm tra máy báo lỗi và em phải chọn cách khắc phục."
   },
   {
     "id": "ch-dilution",
@@ -85,7 +95,8 @@
     "title": "Pha loãng mẫu",
     "body": "Máy chỉ đo chính xác trong một dải. Kết quả hiện dấu \">\" nghĩa là vượt dải: pha loãng mẫu (1:2, 1:5, 1:10), chạy lại, rồi nhân kết quả với hệ số pha loãng.",
     "more": "Chọn tỉ lệ nhỏ nhất đưa kết quả vào dải đo. Pha loãng quá nhiều làm sai số nhân lên.",
-    "source": ["05-noi-dung-chuyen-mon.md mục 2.3"]
+    "source": ["05-noi-dung-chuyen-mon.md mục 2.3"],
+    "unlockHint": "Mở khi em gặp kết quả vượt quá dải đo của máy."
   },
   {
     "id": "ch-delta",
@@ -93,7 +104,8 @@
     "title": "Delta check (Δ)",
     "body": "So kết quả với lần xét nghiệm trước của cùng bệnh nhân. Nếu khác nhiều bất thường thì nghi nhầm người hoặc lỗi đo: làm lại, và nếu vẫn lệch thì huỷ, lấy mẫu mới.",
     "more": "Đôi khi bệnh nhân thật sự thay đổi (mất nước, bệnh nặng lên). Làm lại giúp phân biệt lỗi với thay đổi thật.",
-    "source": ["05-noi-dung-chuyen-mon.md mục 2.1", "CLSI EP33 (delta check)"]
+    "source": ["05-noi-dung-chuyen-mon.md mục 2.1", "CLSI EP33 (delta check)"],
+    "unlockHint": "Mở khi em bắt đầu so kết quả với lần xét nghiệm trước của bệnh nhân."
   },
   {
     "id": "ch-urine",
@@ -101,6 +113,7 @@
     "title": "Que thử nước tiểu 10 thông số",
     "body": "Nhúng que vào nước tiểu rồi so màu từng ô với bảng màu. Mỗi ô có thời điểm đọc riêng: glucose và bilirubin sớm nhất (30 giây), bạch cầu muộn nhất (2 phút). Đọc sớm thì màu chưa lên, đọc muộn thì màu đã đổi.",
     "more": "Máy đọc que nước tiểu tự động làm việc này, nhưng vẫn phải biết đọc bằng mắt để kiểm tra khi máy lỗi.",
-    "source": ["05-noi-dung-chuyen-mon.md mục 2.4"]
+    "source": ["05-noi-dung-chuyen-mon.md mục 2.4"],
+    "unlockHint": "Mở khi em lần đầu đọc que thử nước tiểu."
   }
 ]

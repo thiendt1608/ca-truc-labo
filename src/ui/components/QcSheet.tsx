@@ -85,10 +85,11 @@ export function QcSheet() {
   const rules = getContent().chemQc;
   const last = qc.runs[qc.runs.length - 1];
   const busy = shift.clock < qc.blockedUntil;
-  const hint = shift.difficulty === 'easy' ? evaluateWestgard(qc.runs, shift.difficulty) : null;
+  const level = getContent().difficulty.levels[shift.difficulty];
+  const hint = level.hints ? evaluateWestgard(qc.runs, level.advancedWestgard) : null;
 
   return (
-    <Sheet title="🧪 Kiểm tra chất lượng (QC)" onClose={close}>
+    <Sheet title="🧪 Kiểm tra chất lượng (QC)" help="qc" onClose={close}>
       <p className="muted">
         {qc.status === 'passed'
           ? '✅ QC đạt: máy hoá sinh được chạy mẫu bệnh nhân.'

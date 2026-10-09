@@ -36,9 +36,12 @@ function Gauge({ reading, max, over }: { reading: number; max: number; over: boo
  */
 export function MeasureGame({
   input,
+  hint,
   onDone,
 }: {
   input: DilutionInput;
+  /** Mức Dễ: nhắc bước tiếp theo. */
+  hint: boolean;
   onDone: (actions: PlayerAction[]) => void;
 }) {
   const t0 = useRef<number | null>(null);
@@ -96,6 +99,7 @@ export function MeasureGame({
       {ratio === null && (
         <>
           <b>1. Chọn tỉ lệ pha loãng</b>
+          {hint && <p className="note-inline">👉 Bước tiếp theo: chạm một tỉ lệ để máy chạy lại mẫu.</p>}
           <p className="muted">
             Chọn tỉ lệ nhỏ nhất đưa kết quả vào dải đo. Pha loãng quá nhiều làm sai số nhân lên.
           </p>
@@ -124,6 +128,7 @@ export function MeasureGame({
       {ratio !== null && (
         <>
           <b>2. Nhân lại hệ số để ra kết quả thật</b>
+          {hint && <p className="note-inline">👉 Bước tiếp theo: lấy số máy đọc nhân với hệ số pha loãng.</p>}
           <p className="muted">
             Số đọc {reading!.toFixed(analyte.decimals)} × hệ số {ratio} = ?
           </p>

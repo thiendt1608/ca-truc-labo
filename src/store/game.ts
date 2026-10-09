@@ -7,6 +7,7 @@ import {
   getContent,
   type Command,
   type Difficulty,
+  type HelpContext,
   type ShiftReport,
   type ShiftState,
   type SimEvent,
@@ -48,7 +49,6 @@ export const TARGET_REAL_SECONDS = 360;
 export function timeScale(durationSeconds: number): number {
   return durationSeconds / TARGET_REAL_SECONDS;
 }
-const DIFFICULTY_SPEED: Record<Difficulty, number> = { easy: 0.6, normal: 1, hard: 1.2 };
 /** Ngày sau đó hiện thẻ nhắc lưu bền một lần (07-TDD mục 7). */
 const INSTALL_HINT_DAY = 'ch0-d3';
 const MAX_TOASTS = 2;
@@ -91,6 +91,10 @@ interface GameStore {
   report: ShiftReport | null;
   debug: { enabled: boolean; showHidden: boolean };
   carry: number;
+  /** Thẻ Sổ tay đang mở bằng nút "?" (chồng lên màn/lớp phủ hiện tại, dừng giờ trong lúc đọc). */
+  help: string | null;
+  /** Thẻ đã đọc trong ca này nhưng chưa nằm trong bản lưu (lưu vào `codexSeen` khi hết ca). */
+  seenInShift: string[];
 
   init(): Promise<void>;
   go(screen: Screen): void;
@@ -109,6 +113,11 @@ interface GameStore {
   dismissTip(id: number): void;
   dropToast(id: number): void;
   setDebug(patch: Partial<GameStore['debug']>): void;
+  /** Nút "?": mở thẻ Sổ tay liên quan nhất tới `context` (map trong content/codex/help.json). */
+  openHelp(context: HelpContext): void;
+  closeHelp(): void;
+  /** Đánh dấu thẻ đã đọc (bỏ dấu "Mới"). */
+  markCodexSeen(id: string): void;
 }
 
 let toastId = 0;
@@ -178,10 +187,24 @@ export const useGame = create<GameStore>((set, getState) => {
         },
       },
       codex: [...new Set([...save.codex, ...state.codexUnlocked])],
+      codexSeen: [
+        ...new Set([
+          ...save.codexSeen,
+          ...state.codexUnlocked.filter((id) => getState().seenInShift.includes(id)),
+        ]),
+      ],
       budget: save.budget + report.budget,
     };
     void writeSave(next);
-    set({ report, save: next, screen: 'report', overlay: null, paused: false, installHint: showHint });
+    set({
+      report,
+      save: next,
+      screen: 'report',
+      overlay: null,
+      help: null,
+      paused: false,
+      installHint: showHint,
+    });
   };
 
   return {
@@ -203,6 +226,8 @@ export const useGame = create<GameStore>((set, getState) => {
     report: null,
     debug: { enabled: false, showHidden: false },
     carry: 0,
+    help: null,
+    seenInShift: [],
 
     async init() {
       const save = await loadSave();
@@ -210,7 +235,7 @@ export const useGame = create<GameStore>((set, getState) => {
       set({ save, difficulty: save.difficulty, debug: { enabled, showHidden: false } });
     },
     go(screen) {
-      set({ screen, overlay: null });
+      set({ screen, overlay: null, help: null });
     },
     setDifficulty(difficulty) {
       set((st) => ({ difficulty, save: { ...st.save, difficulty } }));
@@ -253,6 +278,8 @@ export const useGame = create<GameStore>((set, getState) => {
         toasts: [],
         report: null,
         overlay: null,
+        help: null,
+        seenInShift: [],
         paused: false,
         speed: 1,
         carry: 0,
@@ -270,16 +297,23 @@ export const useGame = create<GameStore>((set, getState) => {
       return absorb(applyCommand(shift, cmd, getContent()));
     },
     tickReal(ms) {
-      const { shift, paused, speed, difficulty, carry, screen, overlay, tips } = getState();
+      const { shift, paused, speed, difficulty, carry, screen, overlay, tips, help } = getState();
       if (!shift || shift.ended || paused || screen !== 'room') return;
-      // Dừng giờ khi đọc lời hướng dẫn, làm mini-game toàn màn, hoặc xem biểu đồ QC (04-GDD mục 4: màn quyết định lớn dừng giờ).
+      // Dừng giờ khi đọc lời hướng dẫn, làm mini-game toàn màn, xem biểu đồ QC (04-GDD mục 4: màn quyết định lớn dừng giờ)
+      // hoặc đọc thẻ Sổ tay mở từ nút "?".
       if (
+        help !== null ||
         shift.minigame ||
         (overlay !== null && DECISION_SCREENS.includes(overlay.kind)) ||
         (overlay === null && tips.length > 0)
       )
         return;
-      const total = carry + (ms / 1000) * timeScale(shift.duration) * DIFFICULTY_SPEED[difficulty] * speed;
+      const total =
+        carry +
+        (ms / 1000) *
+          timeScale(shift.duration) *
+          getContent().difficulty.levels[difficulty].clockSpeed *
+          speed;
       const whole = Math.floor(total);
       set({ carry: total - whole });
       if (whole > 0) absorb(advance(shift, Math.min(whole, 600), getContent()));
@@ -305,8 +339,34 @@ export const useGame = create<GameStore>((set, getState) => {
     setDebug(patch) {
       set((st) => ({ debug: { ...st.debug, ...patch } }));
     },
+    openHelp(context) {
+      const card = getContent().codexHelp[context];
+      if (card) set({ help: card });
+    },
+    closeHelp() {
+      set({ help: null });
+    },
+    markCodexSeen(id) {
+      const { save, seenInShift } = getState();
+      if (!seenInShift.includes(id)) set({ seenInShift: [...seenInShift, id] });
+      if (save.codex.includes(id) && !save.codexSeen.includes(id)) {
+        const next = { ...save, codexSeen: [...save.codexSeen, id] };
+        set({ save: next });
+        void writeSave(next);
+      }
+    },
   };
 });
+
+/** Mức độ khó của ca đang chơi có gợi ý (ống cần dùng, bước tiếp theo, ô chưa cân bằng...) không. */
+export function useHints(): boolean {
+  return useGame((s) => getContent().difficulty.levels[s.shift?.difficulty ?? s.difficulty].hints);
+}
+
+/** Thẻ đã mở: nằm trong bản lưu hoặc vừa mở trong ca đang chơi. */
+export function isCardUnlocked(st: Pick<GameStore, 'save' | 'shift'>, id: string): boolean {
+  return st.save.codex.includes(id) || (st.shift?.codexUnlocked.includes(id) ?? false);
+}
 
 /** Giờ hiển thị HH:MM từ đồng hồ ca. */
 export function clockText(state: ShiftState, at = state.clock): string {

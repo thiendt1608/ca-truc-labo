@@ -2,6 +2,7 @@ import { getContent, routableDepts } from '../../sim';
 import { t } from '../../i18n';
 import { runProgress, useGame } from '../../store/game';
 import { AnalyzerSheet, CentrifugeSheet, PostSpinSheet, UrineSheet } from '../components/ChemStations';
+import { HelpHost } from '../components/CodexHelp';
 import { DebugPanel } from '../components/DebugPanel';
 import { Hud } from '../components/Hud';
 import { Notices } from '../components/Notices';
@@ -139,6 +140,7 @@ export function Room() {
         </div>
       )}
       <MinigameHost />
+      <HelpHost />
       <Notices />
       <DebugPanel />
     </>

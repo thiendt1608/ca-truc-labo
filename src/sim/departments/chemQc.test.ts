@@ -40,7 +40,7 @@ describe('QC Westgard trong ca (ngày 1.3)', () => {
   it('lỗi hoá chất cho biểu đồ vi phạm 1-3s: phán quyết đúng là Không đạt', () => {
     const s = run(start('chart'), { type: 'chem/runQC' });
     expect(s.chem!.qc!.status).toBe('judging');
-    expect(expectedVerdict(s.chem!.qc!, 'normal')).toBe('fail');
+    expect(expectedVerdict(s.chem!.qc!, content, 'normal')).toBe('fail');
   });
 
   it('khắc phục đúng (thay hoá chất) rồi chạy lại control thì được Đạt và +Niềm tin', () => {
@@ -52,7 +52,7 @@ describe('QC Westgard trong ca (ngày 1.3)', () => {
     expect(s.trust).toBe(trust + 5);
     s = advance(s, 1000, content).state;
     s = run(s, { type: 'chem/runQC' });
-    expect(expectedVerdict(s.chem!.qc!, 'normal')).toBe('pass');
+    expect(expectedVerdict(s.chem!.qc!, content, 'normal')).toBe('pass');
     s = run(s, { type: 'chem/judgeQC', verdict: 'pass' });
     expect(s.chem!.qc!.status).toBe('passed');
   });

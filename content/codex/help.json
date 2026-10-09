@@ -1,0 +1,12 @@
+{
+  "sample": "rc-identity",
+  "centrifuge": "ch-balance",
+  "postspin": "ch-hemolysis",
+  "analyzer": "ch-qc",
+  "results": "ch-flags",
+  "qc": "ch-westgard",
+  "urine": "ch-urine",
+  "spillCleanup": "rc-spill",
+  "dilution": "ch-dilution",
+  "urineStrip": "ch-urine"
+}

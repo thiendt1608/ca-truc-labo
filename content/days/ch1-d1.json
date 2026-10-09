@@ -99,7 +99,7 @@
       "text": "Việc này cần em quyết định. Giờ ca tạm dừng trong lúc em chọn, đọc kỹ rồi trả lời nhé."
     }
   ],
-  "codexOnStart": ["ch-why-spin", "ch-balance"],
+  "codexOnStart": ["ch-why-spin", "ch-balance", "ch-flags"],
   "events": [
     {
       "id": "E2",

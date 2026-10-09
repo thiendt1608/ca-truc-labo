@@ -127,6 +127,7 @@ export function crossCheck(c: Content): ContentProblem[] {
     ['chem/rules/hemolysis', c.chemRules.hemolysis.codex],
     ['chem/rules/lipemia', c.chemRules.lipemia.codex],
     ['chem/rules/icterus', c.chemRules.icterus.codex],
+    ...Object.entries(c.codexHelp).map(([ctx, id]) => [`codex-help/${ctx}`, id] as [string, string]),
   ];
   const i18nRefs: [string, string][] = [
     ...c.receptionRules.defects.map(
