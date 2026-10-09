@@ -17,12 +17,14 @@
     "test:watch": "vitest",
     "content:check": "tsx tools/content-check/index.ts",
     "balance": "tsx tools/balance-bot/index.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "icons": "tsx tools/icons/generate.ts"
   },
   "dependencies": {
     "@fontsource-variable/quicksand": "^5.3.0",
     "@fontsource/be-vietnam-pro": "^5.3.0",
     "idb-keyval": "^6.3.0",
+    "lz-string": "^1.5.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "zod": "^4.6.5",
@@ -43,7 +45,10 @@
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.71.1",
     "vite": "^8.3.3",
-    "vitest": "^5.0.3"
+    "vite-plugin-pwa": "^2.0.0",
+    "vitest": "^5.0.3",
+    "workbox-build": "^7.4.1",
+    "workbox-window": "^7.4.1"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

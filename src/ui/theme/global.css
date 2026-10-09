@@ -845,6 +845,62 @@ button.small {
     transition: none !important;
   }
 }
+/* Công tắc "Giảm chuyển động" trong Cài đặt: cùng hiệu ứng như prefers-reduced-motion của máy. */
+html.reduce-motion * {
+  animation: none !important;
+  transition: none !important;
+}
+/* Vòng focus rõ cho bàn phím trên mọi phần tử tương tác (nút đã có quy tắc riêng). */
+textarea:focus-visible,
+summary:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--info);
+  outline-offset: 2px;
+}
+/* Cài đặt */
+.codebox {
+  width: 100%;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink);
+  background: var(--well);
+  border: 2px solid var(--edge);
+  border-radius: 12px;
+  padding: 10px;
+  resize: vertical;
+  overflow-wrap: anywhere;
+  /* Đây là nội dung để đọc và sao chép: phải chọn được chữ (Mobile Web UI Rules mục 6). */
+  -webkit-user-select: text;
+  user-select: text;
+}
+.notes {
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.45;
+}
+.callout {
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: var(--panel-2);
+  border: 2px solid var(--line);
+  overflow-wrap: anywhere;
+}
+.callout.bad {
+  background: var(--bad-soft);
+  color: #8f2418;
+  border-color: #e8b5ae;
+}
+.callout.good {
+  background: #dff3e6;
+  color: #11602f;
+  border-color: #b9dfc8;
+}
+.update-notice {
+  background: #dff3e6;
+  border-color: #b9dfc8;
+}
 /* Nút chuyển khoa mang màu của khoa đích (DESIGN.md: màu khoa luôn khác biệt). */
 .dept-btn {
   background: var(--dept);
@@ -1272,4 +1328,11 @@ button.small {
     padding-left: env(safe-area-inset-left, 0px);
     padding-right: env(safe-area-inset-right, 0px);
   }
+}
+
+/* Nhóm lựa chọn 3 nút: bớt lề ngang để chữ không bị cắt ở 320px */
+[role='radiogroup'] button {
+  padding-left: 8px;
+  padding-right: 8px;
+  min-width: 0;
 }

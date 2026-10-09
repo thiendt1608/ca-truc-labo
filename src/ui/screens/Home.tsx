@@ -1,12 +1,7 @@
-import { getContent, type Difficulty } from '../../sim';
+import { getContent } from '../../sim';
 import { t } from '../../i18n';
 import { useGame } from '../../store/game';
-
-const DIFFICULTIES: { id: Difficulty; name: string; note: string }[] = [
-  { id: 'easy', name: 'Dễ', note: 'Đồng hồ chậm, có gợi ý ống cần dùng, Niềm tin không dưới 30' },
-  { id: 'normal', name: 'Thường', note: 'Như một ca thật' },
-  { id: 'hard', name: 'Khó', note: 'Đồng hồ nhanh, lỗi tinh vi hơn' },
-];
+import { UpdateNotice } from '../components/PwaNotices';
 
 const CHAPTERS = [
   'Tiếp nhận',
@@ -21,8 +16,7 @@ const CHAPTERS = [
 /** S1 Mở đầu + S2 Bản đồ chiến dịch (bản hiện tại: chỉ các ngày đã có nội dung). */
 export function Home() {
   const save = useGame((s) => s.save);
-  const difficulty = useGame((s) => s.difficulty);
-  const { setDifficulty, openDay, go } = useGame.getState();
+  const { openDay, go, openSettings } = useGame.getState();
   const content = getContent();
   const days = content.days;
   const collected = save.codex.length;
@@ -46,7 +40,12 @@ export function Home() {
               Năm đầu đi làm · {played}/{days.length} ngày trong bản này đã chơi
             </span>
           </div>
+          <button onClick={() => openSettings('home')} aria-label="Cài đặt">
+            <span aria-hidden>⚙️</span>
+          </button>
         </header>
+
+        <UpdateNotice />
 
         <section className="card mission stack" aria-label="Nhiệm vụ hiện tại">
           <span className="eyebrow">Nhiệm vụ hiện tại</span>
@@ -112,22 +111,6 @@ export function Home() {
               </div>
             );
           })}
-        </section>
-
-        <section className="card stack">
-          <b>Độ khó</b>
-          <div className="row">
-            {DIFFICULTIES.map((d) => (
-              <button
-                key={d.id}
-                className={`grow ${difficulty === d.id ? 'primary' : ''}`}
-                onClick={() => setDifficulty(d.id)}
-              >
-                {d.name}
-              </button>
-            ))}
-          </div>
-          <span className="muted">{DIFFICULTIES.find((d) => d.id === difficulty)?.note}</span>
         </section>
 
         <p className="muted">{t('disclaimer')}</p>

@@ -65,7 +65,7 @@ Game giờ có 6 khu và 27 mini-game — quá lớn để làm một lần. Cá
 - [ ] M3-4 Cấu hình 8 ngày (chương 0–1); hướng dẫn của chị Hạnh.
 - [~] M3-5 Hình ảnh thật cho Tiếp nhận + Hoá sinh; âm thanh. **Hoãn**: bỏ khỏi M3, làm sau khi game ổn định (giữ CSS/emoji, chưa có âm thanh).
 - [ ] M3-6 Sổ tay (thẻ Tiếp nhận + Hoá sinh); 3 mức độ khó.
-- [ ] M3-7 Lưu game, mã lưu, PWA; khả năng tiếp cận.
+- [x] M3-7 Lưu game, mã lưu (`CTL1.`), màn Cài đặt, nhắc lưu bền sau ngày 0.3, PWA (manifest, icon, service worker offline, bản mới chỉ nhắc ở Sảnh/Cài đặt); `prefers-reduced-motion` + công tắc Giảm chuyển động, focus-visible. Chế độ chữ lớn để sau.
 - [ ] M3-8 Kiểm tra trên điện thoại thật; chơi thử 8–10 người.
 
 ### M4. Chương 2: Huyết học – Truyền máu

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { getContent } from '../../sim';
 import { t } from '../../i18n';
 import { useGame } from '../../store/game';
+import { InstallInfo } from '../components/PwaNotices';
 import { CodexCardView } from './Codex';
 
 /** Màu thanh theo tiêu chí, lấy từ bảng màu khoa (DESIGN.md). */
@@ -15,8 +16,9 @@ const CRITERIA_COLOR = {
 /** S10 Báo cáo giao ca: sao, 4 tiêu chí, "Chuyện hôm nay", Ngân sách. Nút chính cố định ở đáy. */
 export function Report() {
   const report = useGame((s) => s.report);
+  const installHint = useGame((s) => s.installHint);
   const shift = useGame((s) => s.shift);
-  const { startShift, go, openDay } = useGame.getState();
+  const { startShift, go, openDay, openSettings } = useGame.getState();
   const [card, setCard] = useState<string | null>(null);
   if (!report || !shift) return null;
   const content = getContent();
@@ -92,6 +94,18 @@ export function Report() {
           )}
           {card && <CodexCardView id={card} onClose={() => setCard(null)} />}
         </div>
+
+        {installHint && (
+          <section className="card stack" aria-label="Giữ tiến trình an toàn">
+            <h3>📲 Giữ tiến trình an toàn</h3>
+            <p>
+              Tiến trình chỉ lưu trên trình duyệt này và có thể mất nếu xóa dữ liệu duyệt web. Thêm game vào
+              màn hình chính và xuất mã lưu để cất riêng.
+            </p>
+            <InstallInfo />
+            <button onClick={() => openSettings('home')}>Xuất mã lưu</button>
+          </section>
+        )}
 
         <div className="row wrap">
           <button className="grow" onClick={() => startShift(shift.seed)}>

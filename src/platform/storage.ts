@@ -1,25 +1,17 @@
 import { get, set } from 'idb-keyval';
-import type { Difficulty } from '../sim';
+import { emptySave, migrate, type SaveData } from './save';
 
-/** Tiến trình người chơi (07-TDD mục 7). Lưu trong IndexedDB, khoá `save:v1`. */
-export interface SaveData {
-  version: 1;
-  days: Record<string, { stars: number; score: number; plays: number }>;
-  codex: string[];
-  difficulty: Difficulty;
-  budget: number;
-}
-
+/** Khoá IndexedDB giữ nguyên `save:v1` cho mọi phiên bản dữ liệu; số phiên bản nằm trong nội dung (`SaveData.version`). */
 const KEY = 'save:v1';
 
-export function emptySave(): SaveData {
-  return { version: 1, days: {}, codex: [], difficulty: 'normal', budget: 0 };
-}
-
+/** Đọc tiến trình; save cũ (v1) được nâng cấp qua `migrate`. Dữ liệu hỏng hoặc không đọc được → bản lưu rỗng. */
 export async function loadSave(): Promise<SaveData> {
   try {
-    const data = (await get(KEY)) as SaveData | undefined;
-    if (data?.version === 1) return { ...emptySave(), ...data };
+    const raw = await get(KEY);
+    if (raw !== undefined) {
+      const r = migrate(raw);
+      if (r.ok) return r.save;
+    }
   } catch {
     // Trình duyệt chặn IndexedDB (chế độ riêng tư...) → chơi không lưu.
   }

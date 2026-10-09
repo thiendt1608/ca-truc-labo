@@ -52,3 +52,18 @@ test('sảnh, phòng làm việc, thẻ mẫu và máy ly tâm đều gọn ở 
   await expect(page.locator('.rotor .slot')).toHaveCount(12);
   await audit(page, 'máy ly tâm');
 });
+
+test('Cài đặt gọn ở mọi kích thước (cả khi mở mã, xác nhận ghi đè và xóa)', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Cài đặt', exact: true }).click();
+  await expect(page.getByRole('heading', { name: /Cài đặt/ })).toBeVisible();
+  await audit(page, 'cài đặt');
+
+  await page.getByRole('button', { name: 'Xuất mã lưu' }).click();
+  await expect(page.getByLabel('Mã lưu', { exact: true })).toBeVisible();
+  await page.getByLabel('Mã lưu cần nhập').fill('CTL1.sai.00000000');
+  await page.getByRole('button', { name: 'Nhập', exact: true }).click();
+  await expect(page.getByRole('alert')).toBeVisible();
+  await page.getByRole('button', { name: 'Xóa tiến trình' }).click();
+  await audit(page, 'cài đặt (mã, lỗi, xác nhận xóa)');
+});

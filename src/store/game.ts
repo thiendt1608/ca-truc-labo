@@ -13,12 +13,13 @@ import {
   type StepResult,
 } from '../sim';
 import { t } from '../i18n';
-import { emptySave, loadSave, writeSave, type SaveData } from '../platform/storage';
+import { emptySave, type SaveData, type Settings } from '../platform/save';
+import { loadSave, writeSave } from '../platform/storage';
 
 /** Phân phối lệnh không có `t`: store tự gắn đồng hồ hiện tại. */
 type CommandInput = Command extends infer C ? (C extends Command ? Omit<C, 't'> : never) : never;
 
-export type Screen = 'home' | 'briefing' | 'room' | 'report' | 'codex';
+export type Screen = 'home' | 'briefing' | 'room' | 'report' | 'codex' | 'settings';
 export type Overlay =
   | null
   | { kind: 'sample'; sampleId: string }
@@ -48,6 +49,8 @@ export function timeScale(durationSeconds: number): number {
   return durationSeconds / TARGET_REAL_SECONDS;
 }
 const DIFFICULTY_SPEED: Record<Difficulty, number> = { easy: 0.6, normal: 1, hard: 1.2 };
+/** Ngày sau đó hiện thẻ nhắc lưu bền một lần (07-TDD mục 7). */
+const INSTALL_HINT_DAY = 'ch0-d3';
 const MAX_TOASTS = 2;
 /** Màn quyết định lớn: dừng giờ khi đang mở (04-GDD mục 4). */
 const DECISION_SCREENS: readonly string[] = ['qc', 'phone', 'event', 'codex'];
@@ -81,6 +84,10 @@ interface GameStore {
   /** Mẹo gắn với một lớp phủ (QC), chỉ hiện trong lớp phủ đó và mất khi đóng nó. */
   inlineTips: { id: number; text: string }[];
   toasts: Toast[];
+  /** Màn đã mở Cài đặt (để nút Quay lại trở về đúng chỗ). */
+  settingsFrom: 'home' | 'room';
+  /** Thẻ nhắc "Thêm vào màn hình chính / xuất mã lưu" ở báo cáo (hiện đúng một lần, sau ngày 0.3). */
+  installHint: boolean;
   report: ShiftReport | null;
   debug: { enabled: boolean; showHidden: boolean };
   carry: number;
@@ -88,6 +95,10 @@ interface GameStore {
   init(): Promise<void>;
   go(screen: Screen): void;
   setDifficulty(d: Difficulty): void;
+  setSetting(patch: Partial<Settings>): void;
+  openSettings(from: 'home' | 'room'): void;
+  importSave(save: SaveData): void;
+  resetSave(): void;
   openDay(dayId: string): void;
   startShift(seed?: string): void;
   dispatch(cmd: CommandInput): SimEvent[];
@@ -153,8 +164,10 @@ export const useGame = create<GameStore>((set, getState) => {
     const report = computeReport(state);
     const { save, difficulty } = getState();
     const prev = save.days[state.dayId];
+    const showHint = state.dayId === INSTALL_HINT_DAY && !save.installHintShown;
     const next: SaveData = {
       ...save,
+      installHintShown: save.installHintShown || showHint,
       difficulty,
       days: {
         ...save.days,
@@ -168,7 +181,7 @@ export const useGame = create<GameStore>((set, getState) => {
       budget: save.budget + report.budget,
     };
     void writeSave(next);
-    set({ report, save: next, screen: 'report', overlay: null, paused: false });
+    set({ report, save: next, screen: 'report', overlay: null, paused: false, installHint: showHint });
   };
 
   return {
@@ -185,6 +198,8 @@ export const useGame = create<GameStore>((set, getState) => {
     tips: [],
     inlineTips: [],
     toasts: [],
+    settingsFrom: 'home',
+    installHint: false,
     report: null,
     debug: { enabled: false, showHidden: false },
     carry: 0,
@@ -200,6 +215,30 @@ export const useGame = create<GameStore>((set, getState) => {
     setDifficulty(difficulty) {
       set((st) => ({ difficulty, save: { ...st.save, difficulty } }));
       void writeSave({ ...getState().save, difficulty });
+    },
+    setSetting(patch) {
+      const save = { ...getState().save, settings: { ...getState().save.settings, ...patch } };
+      set({ save });
+      void writeSave(save);
+    },
+    openSettings(settingsFrom) {
+      set({ settingsFrom, screen: 'settings', overlay: null });
+    },
+    importSave(save) {
+      set({ save, difficulty: save.difficulty });
+      void writeSave(save);
+    },
+    resetSave() {
+      // Xóa tiến trình (ngày, Sổ tay, ngân sách); giữ độ khó và cài đặt vì đó là tuỳ chọn, không phải tiến trình.
+      const { save } = getState();
+      const next: SaveData = {
+        ...emptySave(),
+        difficulty: save.difficulty,
+        settings: save.settings,
+        installHintShown: save.installHintShown,
+      };
+      set({ save: next });
+      void writeSave(next);
     },
     openDay(dayId) {
       set({ dayId, screen: 'briefing' });
@@ -217,6 +256,7 @@ export const useGame = create<GameStore>((set, getState) => {
         paused: false,
         speed: 1,
         carry: 0,
+        installHint: false,
         seed: null,
       });
       absorb(createShift({ content: getContent(), dayId, seed: s, difficulty }));

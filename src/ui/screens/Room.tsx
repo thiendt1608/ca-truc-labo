@@ -125,6 +125,7 @@ export function Room() {
             <button className="primary" onClick={() => setPaused(false)}>
               ▶ Tiếp tục
             </button>
+            <button onClick={() => useGame.getState().openSettings('room')}>⚙️ Cài đặt</button>
             <button onClick={() => useGame.getState().startShift(shift.seed)}>🔁 Chơi lại ca này</button>
             <button
               onClick={() => {

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="112" fill="#f5efe6"/>
+  <circle cx="256" cy="256" r="186" fill="#dbe8c8"/>
+  <defs>
+    <clipPath id="glass"><path d="M-44 -140 V70 a44 44 0 0 0 88 0 V-140 Z"/></clipPath>
+  </defs>
+  <g transform="translate(256 262) rotate(24)">
+    <path d="M-44 -140 V70 a44 44 0 0 0 88 0 V-140 Z" fill="#faf8f5"/>
+    <g clip-path="url(#glass)">
+      <rect x="-60" y="-10" width="120" height="160" fill="#6b9f4f"/>
+      <circle cx="-14" cy="30" r="9" fill="#faf8f5" opacity="0.85"/>
+      <circle cx="16" cy="58" r="6" fill="#faf8f5" opacity="0.85"/>
+      <circle cx="8" cy="12" r="5" fill="#faf8f5" opacity="0.85"/>
+    </g>
+    <path d="M-44 -140 V70 a44 44 0 0 0 88 0 V-140" fill="none" stroke="#5d534a" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="-58" y="-160" width="116" height="26" rx="13" fill="#5d534a"/>
+    <path d="M-26 -100 V-30" stroke="#ffffff" stroke-width="9" stroke-linecap="round" opacity="0.8"/>
+  </g>
+  <g fill="#6b9f4f">
+    <path d="M388 150 l7 20 l20 7 l-20 7 l-7 20 l-7 -20 l-20 -7 l20 -7 z"/>
+  </g>
+  <circle cx="132" cy="352" r="9" fill="#6b9f4f"/>
+</svg>
