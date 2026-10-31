@@ -1,7 +1,8 @@
-import { getContent, overAgeHint, routableDepts } from '../../sim';
+import { getContent, overAgeHint, routableDepts, type ContainerId } from '../../sim';
 import { t } from '../../i18n';
 import { runProgress, useGame } from '../../store/game';
 import { HelpHost } from '../components/CodexHelp';
+import { FxLayer } from '../components/FxLayer';
 import { Hud } from '../components/Hud';
 import { Notices } from '../components/Notices';
 import { CodexSheet, EventSheet, MinigameNoticeSheet, PhoneSheet } from '../components/EventSheets';
@@ -55,12 +56,16 @@ export function Room() {
           const o = shift.orders[s.orderId]!;
           const who = shift.patients[o.patientId]?.name.split(' ').slice(-2).join(' ') ?? s.id;
           const overAge = hints && overAgeHint(content, s, o, shift.dayStart + shift.clock);
-          const waited = Math.floor((shift.clock - s.arrivedAt) / 60);
+          const limit = shift.room === 'reception' ? day.tat.reception : o.deadline - s.arrivedAt;
+          const patience = Math.min(1, Math.max(0, (shift.clock - s.arrivedAt) / Math.max(60, limit)));
+          const mood = s.lateCharged || patience >= 0.8 ? 'late' : patience >= 0.5 ? 'warn' : 'ok';
           return (
             <button
               key={s.id}
-              className={`tray-item ${s.lateCharged ? 'late' : ''}`}
+              data-sample={s.id}
+              className={`tray-item ${s.lateCharged ? 'late' : ''} ${o.priority === 'stat' ? 'is-stat' : ''}`}
               onClick={() => openSample(s.id)}
+              aria-label={`Mẫu ${s.id.toUpperCase()} của ${who}${o.priority === 'stat' ? ', cấp cứu' : ''}`}
             >
               {o.priority === 'stat' && <span className="stat">🚑 KHẨN</span>}
               {overAge && (
@@ -75,11 +80,13 @@ export function Room() {
                 leak={s.defects.some((d) => d.kind === 'leak')}
               />
               <span className="who">{who}</span>
-              <span className="age">
-                <span className="letter-chip">
-                  {getContent().containers.find((c) => c.id === s.container)?.letter}
-                </span>{' '}
-                {s.id.toUpperCase()} · {waited}′
+              {/* Thanh kiên nhẫn thay cho số phút: đầy dần, xanh → vàng → đỏ khi sắp/đã trễ hạn. */}
+              <span
+                className={`patience ${mood}`}
+                role="img"
+                aria-label={mood === 'late' ? 'Sắp trễ' : 'Còn kịp'}
+              >
+                <span style={{ transform: `scaleX(${patience})` }} />
               </span>
             </button>
           );
@@ -179,6 +186,7 @@ export function Room() {
       <QuietSuspense>
         <LazyMinigameHost />
       </QuietSuspense>
+      <FxLayer />
       <MinigameNoticeSheet />
       <HelpHost />
       <Notices />
@@ -188,21 +196,21 @@ export function Room() {
     </>
   );
 }
-/** Biển hiệu của phòng: màu khoa, tên phòng, tiến độ ca. */
+/** Biển hiệu của phòng: màu khoa, tên phòng, ngày, tiến độ ca. Gợi ý chạm chỉ hiện tới quyết định đầu tiên. */
 function RoomBanner({ day }: { day: { chapter: number; day: number; title: string; room: string } }) {
   const shift = useGame((s) => s.shift)!;
-  const waiting = Object.values(shift.samples).filter((s) => s.status === 'tray').length;
   const pct = Math.min(100, Math.round((shift.clock / shift.duration) * 100));
+  const firstTime = shift.room === 'reception' && shift.decisions.total === 0;
   return (
     <section className="banner" aria-label="Thông tin phòng">
       <h2>{t(`room.${day.room}`)}</h2>
       <span>
-        Ngày {day.chapter}.{day.day} · {waiting} ống đang chờ · {shift.decisions.total} quyết định
+        Ngày {day.chapter}.{day.day}
       </span>
       <div className="banner-progress" aria-label={`Ca đã qua ${pct}%`}>
-        <div style={{ width: `${pct}%` }} />
+        <div style={{ transform: `scaleX(${pct / 100})` }} />
       </div>
-      <span className="banner-hint">Chạm vào ống trong khay để kiểm tra</span>
+      {firstTime && <span className="banner-hint">👆 Chạm vào ống trong khay để kiểm tra</span>}
     </section>
   );
 }
@@ -212,41 +220,54 @@ function Orb({ state }: { state: 'ready' | 'busy' | 'error' }) {
   return <span className={`orb ${state}`} role="img" aria-label={label} title={label} />;
 }
 
+/** Giỏ ống nhỏ: tối đa 5 ống vẽ thật, còn lại gộp "+N". */
+function Pile({ containers }: { containers: ContainerId[] }) {
+  const shown = containers.slice(-5);
+  return (
+    <span className="pile">
+      {shown.map((c, i) => (
+        <Tube key={containers.length - shown.length + i} container={c} size={16} />
+      ))}
+      {containers.length > shown.length && <span className="more">+{containers.length - shown.length}</span>}
+    </span>
+  );
+}
+
+/** Bàn tiếp nhận: mỗi khoa một giỏ, thùng từ chối và khay liên hệ. Ống bay vào đúng chỗ khi quyết định (FxLayer). */
 function ReceptionStations() {
   const shift = useGame((s) => s.shift)!;
   const day = getContent().dayById.get(shift.dayId)!;
-  const count = (pred: (s: (typeof shift.samples)[string]) => boolean) =>
-    Object.values(shift.samples).filter(pred).length;
+  const pick = (pred: (s: (typeof shift.samples)[string]) => boolean) =>
+    Object.values(shift.samples)
+      .filter(pred)
+      .sort((a, b) => (a.decidedAt ?? 0) - (b.decidedAt ?? 0))
+      .map((s) => s.container);
   return (
     <>
-      {routableDepts(day).map((d) => (
-        <div key={d} data-room={d} className="station card">
-          <span className="station-head">
-            <span className="name">🧺 Giỏ {t(`dept.${d}`)}</span>
-          </span>
-          <span className="status">{count((s) => s.status === 'routed' && s.routedTo === d)} ống</span>
-        </div>
-      ))}
-      <div className="station card">
-        <span className="station-head">
-          <span className="name">🚫 Đã từ chối</span>
-        </span>
-        <span className="status">{count((s) => s.status === 'rejected')} ống</span>
+      {routableDepts(day).map((d) => {
+        const list = pick((s) => s.status === 'routed' && s.routedTo === d);
+        return (
+          <div
+            key={d}
+            data-room={d}
+            className="station card basket"
+            aria-label={`Giỏ ${t(`dept.${d}`)}: ${list.length} ống`}
+          >
+            <span className="name">🧺 {t(`dept.${d}`)}</span>
+            <Pile containers={list} />
+          </div>
+        );
+      })}
+      <div data-bin="rejected" className="station card basket bin" aria-label="Từ chối">
+        <span className="name">🗑️ Từ chối</span>
+        <Pile containers={pick((s) => s.status === 'rejected')} />
       </div>
       {day.unlocks.includes('contact') && (
-        <div className="station card">
-          <span className="station-head">
-            <span className="name">📞 Đã liên hệ</span>
-          </span>
-          <span className="status">{count((s) => s.status === 'contacted')} ống</span>
+        <div data-bin="contacted" className="station card basket" aria-label="Đã liên hệ">
+          <span className="name">📞 Liên hệ</span>
+          <Pile containers={pick((s) => s.status === 'contacted')} />
         </div>
       )}
-      <div className="station card">
-        <span className="station-head">
-          <span className="name">✔️ Đã xử lý</span>
-        </span>
-        <span className="status">{shift.decisions.total} quyết định</span>
-      </div>
     </>
   );
 }

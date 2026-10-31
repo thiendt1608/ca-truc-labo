@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { getContent } from '../../sim';
 import { t } from '../../i18n';
 import { useGame } from '../../store/game';
@@ -38,7 +38,11 @@ export function Report() {
         <div className="card stack">
           <div className="stars-row big" aria-label={`${report.stars} trên 5 sao`}>
             {[1, 2, 3, 4, 5].map((n) => (
-              <span key={n} className={n <= report.stars ? 'star on' : 'star'}>
+              <span
+                key={n}
+                className={n <= report.stars ? 'star on' : 'star'}
+                style={{ '--i': n } as CSSProperties}
+              >
                 ★
               </span>
             ))}

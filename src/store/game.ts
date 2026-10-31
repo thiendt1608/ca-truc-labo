@@ -16,6 +16,7 @@ import {
 import { t } from '../i18n';
 import { emptySave, type SaveData, type Settings } from '../platform/save';
 import { loadSave, writeSave } from '../platform/storage';
+import { emitFx, fxFromEvents } from './fx';
 
 /** Phân phối lệnh không có `t`: store tự gắn đồng hồ hiện tại. */
 type CommandInput = Command extends infer C ? (C extends Command ? Omit<C, 't'> : never) : never;
@@ -126,7 +127,6 @@ interface GameStore {
   installHint: boolean;
   report: ShiftReport | null;
   debug: { enabled: boolean; showHidden: boolean };
-  carry: number;
   /** Thẻ Sổ tay đang mở bằng nút "?" (chồng lên màn/lớp phủ hiện tại, dừng giờ trong lúc đọc). */
   help: string | null;
   /** Thẻ nhắc trước mini-game tự bật (ống vỡ, sự kiện rơi vỡ); null khi không có hoặc người chơi đã xác nhận. */
@@ -161,6 +161,8 @@ interface GameStore {
 }
 
 let toastId = 0;
+/** Phần lẻ giây game chưa trôi; để ngoài store vì đổi mỗi khung hình mà không ai cần vẽ lại theo nó. */
+let carry = 0;
 
 export const useGame = create<GameStore>((set, getState) => {
   /** Nhận kết quả một bước của lõi: cập nhật state, biến events thành mẹo/thông báo, kết thúc ca. */
@@ -194,8 +196,6 @@ export const useGame = create<GameStore>((set, getState) => {
           kind: 'mistake',
           text: `${t(e.entry.explanationKey)}${detail}${delta}`,
         });
-      } else if (e.type === 'trustChanged' && e.delta > 0) {
-        toasts.push({ id: ++toastId, kind: 'good', text: `+${e.delta} Niềm tin` });
       } else if (e.type === 'tubeBroken') {
         if (!notice) toasts.push({ id: ++toastId, kind: 'mistake', text: 'Một ống bị vỡ trong máy ly tâm!' });
       } else if (e.type === 'eventStarted') {
@@ -209,6 +209,8 @@ export const useGame = create<GameStore>((set, getState) => {
       }
     }
     const ended = r.events.find((e) => e.type === 'shiftEnded');
+    // Niềm tin tăng không còn là chữ: số bay lên cạnh thanh Niềm tin (FxLayer).
+    const fx = fxFromEvents(getState().shift, r.state, r.events);
     set((st) => ({
       shift: r.state,
       tips: [...st.tips, ...tips].slice(-3),
@@ -219,6 +221,7 @@ export const useGame = create<GameStore>((set, getState) => {
         ? { mgNotice: { ...notice, taskId: started.minigame.taskId } }
         : {}),
     }));
+    emitFx(fx);
     if (ended) finish(r.state);
     return r.events;
   };
@@ -265,7 +268,7 @@ export const useGame = create<GameStore>((set, getState) => {
   return {
     screen: 'home',
     save: emptySave(),
-    difficulty: 'normal',
+    difficulty: 'easy',
     dayId: 'ch0-d1',
     seed: null,
     shift: null,
@@ -280,7 +283,6 @@ export const useGame = create<GameStore>((set, getState) => {
     installHint: false,
     report: null,
     debug: { enabled: false, showHidden: false },
-    carry: 0,
     help: null,
     mgNotice: null,
     seenInShift: [],
@@ -329,6 +331,7 @@ export const useGame = create<GameStore>((set, getState) => {
     startShift(seed) {
       const { dayId, difficulty } = getState();
       const s = seed ?? getState().seed ?? `${dayId}-${Date.now().toString(36)}`;
+      carry = 0;
       set({
         log: [],
         tips: [],
@@ -341,7 +344,6 @@ export const useGame = create<GameStore>((set, getState) => {
         seenInShift: [],
         paused: false,
         speed: 1,
-        carry: 0,
         installHint: false,
         seed: null,
       });
@@ -356,7 +358,7 @@ export const useGame = create<GameStore>((set, getState) => {
       return absorb(applyCommand(shift, cmd, getContent()));
     },
     tickReal(ms) {
-      const { shift, paused, speed, difficulty, carry, screen, overlay, tips, help, mgNotice } = getState();
+      const { shift, paused, speed, difficulty, screen, overlay, tips, help, mgNotice } = getState();
       if (!shift || shift.ended || paused || screen !== 'room') return;
       const content = getContent();
       const factor = clockFactor(
@@ -377,7 +379,7 @@ export const useGame = create<GameStore>((set, getState) => {
           speed *
           factor;
       const whole = Math.floor(total);
-      set({ carry: total - whole });
+      carry = total - whole;
       if (whole > 0) absorb(advance(shift, Math.min(whole, 600), content), true);
     },
     ackMinigame() {

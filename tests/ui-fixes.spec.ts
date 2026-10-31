@@ -45,7 +45,7 @@ test('mã lưu đang hiện tự cập nhật khi đổi độ khó', async ({ p
   const before = await box.inputValue();
   await page.getByRole('radio', { name: 'Khó' }).click();
   await expect(box).not.toHaveValue(before);
-  await page.getByRole('radio', { name: 'Thường' }).click();
+  await page.getByRole('radio', { name: 'Dễ' }).click();
   await expect(box).toHaveValue(before);
 });
 
@@ -190,7 +190,7 @@ test('Bảng giao ca: nội dung canh giữa khi màn cao, không cắt đầu k
   expect(r.top).toBeGreaterThanOrEqual(0);
   if (r.free > 80) expect(Math.abs(r.top - r.bottom)).toBeLessThanOrEqual(2);
   await expect(page.getByText(/mẫu dự kiến/)).toBeVisible();
-  await expect(page.getByText(/Mức Thường/)).toBeVisible();
+  await expect(page.getByText(/Mức Dễ/)).toBeVisible();
 });
 
 test('mini-game: phản hồi nằm dưới danh sách bước, các bước không dịch chỗ khi hiện lỗi (320px)', async ({
@@ -226,8 +226,8 @@ test('thẻ mẫu nêu mức ưu tiên cho mọi phiếu; báo cáo không còn 
   const tube = page.locator('.tray-item').first();
   await expect(tube).toBeVisible({ timeout: 10_000 });
   await tube.click();
-  await expect(page.locator('.compare .col').first().getByText('Mức ưu tiên')).toBeVisible();
-  await expect(page.locator('.compare .col').first()).toContainText(/Thường|Cấp cứu/);
+  await expect(page.locator('.sample-meta').getByText('Mức ưu tiên')).toBeVisible();
+  await expect(page.locator('.sample-meta')).toContainText(/Thường|Cấp cứu/);
   await page.getByRole('button', { name: 'Đóng' }).click();
 
   await page.getByRole('button', { name: 'Bảng debug' }).click();

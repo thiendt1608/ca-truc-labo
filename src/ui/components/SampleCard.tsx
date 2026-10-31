@@ -5,16 +5,24 @@ import { clockText, secondsOfDayText, useGame, useHints } from '../../store/game
 import { Sheet } from './Overlay';
 import { Tube } from './Tube';
 
-const TRAY_REASONS: RejectReason[] = ['identity', 'container', 'volume', 'time', 'leak'];
+/** Lỗi nằm ở chính ống/lọ: chạm vào ống để chọn một trong ba. */
+const TUBE_REASONS: { reason: RejectReason; icon: string }[] = [
+  { reason: 'container', icon: '🧪' },
+  { reason: 'volume', icon: '📉' },
+  { reason: 'leak', icon: '💧' },
+];
 
-/** S5 Thẻ mẫu: phiếu chỉ định bên trái, nhãn ống bên phải để so; Nhận / Từ chối (lý do) / Liên hệ. */
+/**
+ * S5 Thẻ mẫu: phiếu và nhãn đặt cạnh nhau theo từng hàng để so; Nhận / Từ chối / Liên hệ.
+ * Từ chối = chạm vào chỗ sai (hàng tên/năm/mã, giờ lấy, hoặc chính cái ống) thay vì chọn chữ trong danh sách.
+ */
 export function SampleCard({ sampleId }: { sampleId: string }) {
   const shift = useGame((s) => s.shift)!;
   const hints = useHints();
   const debug = useGame((s) => s.debug);
   const dispatch = useGame((s) => s.dispatch);
   const close = () => useGame.getState().setOverlay(null);
-  const [mode, setMode] = useState<'main' | 'route' | 'reject'>('main');
+  const [mode, setMode] = useState<'main' | 'route' | 'reject' | 'tube'>('main');
   const content = getContent();
   const day = content.dayById.get(shift.dayId)!;
   const sample = shift.samples[sampleId];
@@ -27,6 +35,7 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
   const depts = routableDepts(day);
   const overAge = hints && overAgeHint(content, sample, order, shift.dayStart + shift.clock);
   const leaking = sample.defects.some((d) => d.kind === 'leak');
+  const pointing = mode === 'reject' || mode === 'tube';
 
   const act = (fn: () => void) => {
     fn();
@@ -36,6 +45,8 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
     if (shift.room === 'reception') setMode('route');
     else act(() => dispatch({ type: 'acceptSample', sampleId }));
   };
+  const reject = (reason: RejectReason) => act(() => dispatch({ type: 'rejectSample', sampleId, reason }));
+  const label = sample.label;
 
   return (
     <Sheet
@@ -48,55 +59,94 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
       help="sample"
       onClose={close}
     >
-      <div className="compare">
-        <div className="col">
-          <h3>Phiếu chỉ định</h3>
-          <Field k="Họ tên" v={patient.name} />
-          <Field k="Năm sinh" v={patient.birthYear} />
-          <Field k="Mã bệnh nhân" v={patient.code} />
-          <Field k="Khoa gửi" v={order.ward} />
-          <Field k="Mức ưu tiên" v={order.priority === 'stat' ? '🚑 Cấp cứu (khẩn)' : 'Thường'} />
-          <Field k="Xét nghiệm" v={testNames.join(', ')} />
-          {sample.irreplaceable && <Field k="Ghi chú" v="🧬 Bệnh phẩm sinh thiết, không lấy lại được" />}
-          {hints && (
-            <div className="field">
-              <div className="k">Ống cần (gợi ý mức Dễ)</div>
-              <div className="row">
-                <Tube container={order.container} size={22} />
-                <span className="v">{content.containers.find((c) => c.id === order.container)?.name}</span>
-              </div>
+      <div className="sample-meta">
+        <Field k="Khoa gửi" v={order.ward} />
+        <Field k="Mức ưu tiên" v={order.priority === 'stat' ? '🚑 Cấp cứu' : 'Thường'} />
+        <Field k="Xét nghiệm" v={testNames.join(', ')} />
+        {sample.irreplaceable && <p className="v">🧬 Sinh thiết: không lấy lại được</p>}
+        {hints && (
+          <div className="field">
+            <div className="k">Ống cần (gợi ý mức Dễ)</div>
+            <div className="row">
+              <Tube container={order.container} size={22} />
+              <span className="v">{content.containers.find((c) => c.id === order.container)?.name}</span>
             </div>
-          )}
-        </div>
-        <div className="col">
-          <h3>Nhãn trên ống</h3>
-          {sample.label ? (
-            <>
-              <Field k="Họ tên" v={sample.label.name} />
-              <Field k="Năm sinh" v={sample.label.birthYear} />
-              <Field k="Mã bệnh nhân" v={sample.label.patientCode} />
-              <Field k="Giờ lấy mẫu" v={secondsOfDayText(sample.label.collectedAt)} />
-            </>
-          ) : (
-            <p className="v">⚠️ Ống không có nhãn</p>
-          )}
-          <div className="row">
-            <Tube
-              container={sample.container}
-              size={30}
-              underfill={sample.defects.some((d) => d.kind === 'underfill')}
-              leak={leaking}
-            />
-            <span className="muted">
-              {container.name} ({container.letter})
-              <br />
-              Bây giờ: {clockText(shift)}
-            </span>
           </div>
-          {overAge && <span className="pill overage">⏰ Để quá giờ</span>}
-          {leaking && <p className="v">💧 Lọ ướt, có dịch rỉ ra ngoài</p>}
-        </div>
+        )}
       </div>
+
+      {pointing && <p className="point-hint">👆 Chạm vào chỗ sai</p>}
+      <div className={`match ${pointing ? 'pointing' : ''}`}>
+        <div className="mrow mhead">
+          <span />
+          <span>📄 Phiếu</span>
+          <span>🏷️ Nhãn ống</span>
+        </div>
+        {label ? (
+          <>
+            <Row
+              k="Họ tên"
+              a={patient.name}
+              b={label.name}
+              on={pointing ? () => reject('identity') : undefined}
+            />
+            <Row
+              k="Năm sinh"
+              a={patient.birthYear}
+              b={label.birthYear}
+              on={pointing ? () => reject('identity') : undefined}
+            />
+            <Row
+              k="Mã BN"
+              a={patient.code}
+              b={label.patientCode}
+              on={pointing ? () => reject('identity') : undefined}
+            />
+            <Row
+              k="Giờ"
+              a={`bây giờ ${clockText(shift)}`}
+              b={`lấy lúc ${secondsOfDayText(label.collectedAt)}`}
+              on={pointing ? () => reject('time') : undefined}
+            />
+          </>
+        ) : (
+          <Row k="Nhãn" a="" b="⚠️ Không có nhãn" on={pointing ? () => reject('identity') : undefined} />
+        )}
+      </div>
+
+      <button
+        type="button"
+        className={`tube-spot ${pointing ? 'pointable' : ''}`}
+        disabled={!pointing}
+        onClick={() => setMode(mode === 'tube' ? 'reject' : 'tube')}
+        aria-label={pointing ? 'Lỗi ở chính ống' : undefined}
+      >
+        <Tube
+          container={sample.container}
+          size={34}
+          underfill={sample.defects.some((d) => d.kind === 'underfill')}
+          leak={leaking}
+        />
+        <span className="muted">
+          {container.name} ({container.letter})
+          {leaking && (
+            <>
+              <br />
+              💧 Lọ ướt, dịch rỉ ra
+            </>
+          )}
+        </span>
+        {overAge && <span className="pill overage">⏰ Để quá giờ</span>}
+      </button>
+      {mode === 'tube' && (
+        <div className="choices tube-reasons">
+          {TUBE_REASONS.map(({ reason, icon }) => (
+            <button key={reason} className="danger" onClick={() => reject(reason)}>
+              {icon} {t(`reason.${reason}`)}
+            </button>
+          ))}
+        </div>
+      )}
 
       {debug.showHidden && (
         <div className="hidden-info">
@@ -105,7 +155,7 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
       )}
 
       {mode === 'main' && (
-        <div className="choices">
+        <div className="choices sample-actions">
           <button className="primary" onClick={accept}>
             ✅ Nhận
           </button>
@@ -119,7 +169,7 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
       )}
       {mode === 'route' && (
         <>
-          <p className="muted">Chuyển tới khoa nào? (xem xét nghiệm trên phiếu)</p>
+          <p className="muted">Chuyển tới khoa nào?</p>
           <div className="choices">
             {depts.map((d) => (
               <button
@@ -135,24 +185,30 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
           </div>
         </>
       )}
-      {mode === 'reject' && (
-        <>
-          <p className="muted">Lý do từ chối?</p>
-          <div className="choices">
-            {TRAY_REASONS.map((r) => (
-              <button
-                key={r}
-                className="danger"
-                onClick={() => act(() => dispatch({ type: 'rejectSample', sampleId, reason: r }))}
-              >
-                {t(`reason.${r}`)}
-              </button>
-            ))}
-            <button onClick={() => setMode('main')}>↩ Quay lại</button>
-          </div>
-        </>
+      {pointing && (
+        <div className="choices">
+          <button onClick={() => setMode('main')}>↩ Quay lại</button>
+        </div>
       )}
     </Sheet>
+  );
+}
+
+/** Một hàng so khớp: tên trường | phiếu | nhãn. Khi đang chỉ lỗi, cả hàng là một nút. */
+function Row({ k, a, b, on }: { k: string; a: string | number; b: string | number; on?: () => void }) {
+  const cells = (
+    <>
+      <span className="k">{k}</span>
+      <span className="v">{a}</span>
+      <span className="v">{b}</span>
+    </>
+  );
+  return on ? (
+    <button type="button" className="mrow" onClick={on} aria-label={`Sai ở ${k}`}>
+      {cells}
+    </button>
+  ) : (
+    <div className="mrow">{cells}</div>
   );
 }
 

@@ -194,7 +194,7 @@ describe('migrate', () => {
     const r = importCode(exportCode(v2 as unknown as SaveData));
     expect(r).toEqual({
       ok: true,
-      save: { ...emptySave(), codex, codexSeen: codex, budget: 50 },
+      save: { ...emptySave(), difficulty: 'normal', codex, codexSeen: codex, budget: 50 },
     });
   });
 
@@ -209,7 +209,9 @@ describe('migrate', () => {
 
   it('v1 rỗng cũng nâng cấp được; v3 hợp lệ giữ nguyên', () => {
     const v1 = { version: 1, days: {}, codex: [], difficulty: 'normal', budget: 0 };
-    expect(migrate(v1)).toEqual({ ok: true, save: emptySave() });
+    // Bản lưu cũ giữ độ khó đã chọn; chỉ người chơi mới bắt đầu ở mức Dễ (playtest 10/2026).
+    expect(migrate(v1)).toEqual({ ok: true, save: { ...emptySave(), difficulty: 'normal' } });
+    expect(emptySave().difficulty).toBe('easy');
     expect(migrate(sample())).toEqual({ ok: true, save: sample() });
   });
 

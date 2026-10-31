@@ -6,6 +6,8 @@ export default defineConfig({
   timeout: 60_000,
   use: {
     baseURL: 'http://localhost:4173',
+    // Test đo bố cục ở trạng thái nghỉ: tắt chuyển động (tấm trượt, thông báo trượt) để không đo giữa chừng.
+    reducedMotion: 'reduce',
     launchOptions: process.env.PW_CHROMIUM_PATH ? { executablePath: process.env.PW_CHROMIUM_PATH } : {},
   },
   projects: [

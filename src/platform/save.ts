@@ -28,7 +28,7 @@ export function emptySave(): SaveData {
     days: {},
     codex: [],
     codexSeen: [],
-    difficulty: 'normal',
+    difficulty: 'easy',
     budget: 0,
     settings: { reducedMotion: false },
     installHintShown: false,
