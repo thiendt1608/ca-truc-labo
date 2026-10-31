@@ -620,11 +620,32 @@ button.small {
   min-height: auto;
   text-align: left;
   font-weight: 500;
+  position: relative;
+  overflow: hidden;
 }
 .tip b {
   display: block;
   font-family: var(--font-head);
   font-size: 15px;
+}
+/* Thanh đếm ngược: mẹo tự đóng khi chạy hết, đồng hồ chạy lại. */
+.tip-timer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: #8fb1de;
+  transform-origin: left;
+  animation: tip-timer var(--tip-ms, 5s) linear forwards;
+}
+@keyframes tip-timer {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
 }
 
 /* Mini-game */
