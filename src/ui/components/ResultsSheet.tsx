@@ -1,6 +1,6 @@
 import { getContent, type Order } from '../../sim';
 import { clockText, useGame } from '../../store/game';
-import { Sheet } from './Overlay';
+import { Sheet, useCloseWhenEmptied } from './Overlay';
 
 /** S8 Kết quả (LIS): xem cờ, duyệt và gửi, làm lại, huỷ và lấy mẫu mới, gọi báo ‼️. */
 export function ResultsSheet() {
@@ -14,6 +14,7 @@ export function ResultsSheet() {
     .sort((a, b) => (a.priority === b.priority ? a.deadline - b.deadline : a.priority === 'stat' ? -1 : 1));
   const released = Object.values(shift.orders).filter((o) => o.status === 'released').length;
   const unflagged = ready.filter((o) => o.results?.every((r) => !r.flag && !r.critical));
+  useCloseWhenEmptied(ready.length);
 
   return (
     <Sheet title={`📋 Kết quả (${ready.length} chờ duyệt)`} help="results" onClose={close}>

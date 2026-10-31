@@ -96,12 +96,14 @@ export function Tube({
     );
   }
   if (c.kind === 'jar') {
-    const top = underfill ? 28 : 18;
+    // Thiếu formol: mặt dịch hạ xuống dưới mẩu mô, mẩu mô nhô lên khỏi dịch (nhìn ra được cả ở cỡ nhỏ).
+    const top = underfill ? 36 : 18;
     return draw(
       <svg width={size} height={size * 1.2} viewBox="0 0 40 48" role="img" aria-label={label}>
         <rect x="5" y="13" width="30" height="31" rx="6" fill="#ffffff" stroke="#8a96a3" strokeWidth="1.5" />
-        <rect x="6" y={top} width="28" height={43 - top} rx="5" fill="#e3f1f6" />
+        <rect x="6" y={top} width="28" height={43 - top} rx="5" fill="#b9dcec" />
         <ellipse cx="20" cy="34" rx="8" ry="5" fill="#d98ca0" stroke="#b5657b" />
+        <line x1="6" y1={top} x2="34" y2={top} stroke="#6fa9c4" strokeWidth="1.5" />
         <rect x="3" y="5" width="34" height="10" rx="3" fill={c.color} stroke="#00000033" />
         <text x="20" y="13" textAnchor="middle" fontSize="9" fontWeight="700" fill="#ffffff">
           {c.letter}

@@ -13,7 +13,7 @@ test('ngày 0.1: vào ca, xử lý một mẫu, kết thúc ca và xem báo cáo
   await expect(firstTube).toBeVisible({ timeout: 10_000 });
   await firstTube.click();
   await expect(page.getByText('📄 Phiếu')).toBeVisible();
-  await page.getByRole('button', { name: '✅ Nhận' }).click();
+  // Một chạm: nút khoa nằm ngay trên thẻ (không còn bước "Nhận" riêng).
   await page.getByRole('button', { name: 'Hoá sinh' }).click();
 
   await page.getByRole('button', { name: 'Bảng debug' }).click();

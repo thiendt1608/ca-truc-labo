@@ -1,9 +1,21 @@
-import type { ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import type { HelpContext } from '../../sim';
 import { useClockFactor, useGame } from '../../store/game';
 import { useEscape } from '../useEscape';
 import { CodexHelp } from './CodexHelp';
 import { ToastList } from './Notices';
+
+/**
+ * Tấm làm việc vừa hết việc (người chơi nạp/duyệt món cuối) thì tự đóng, để không phải bấm ✕ và giờ chạy lại
+ * bình thường. Mở ra lúc đã trống thì vẫn giữ để đọc dòng "Chưa có...".
+ */
+export function useCloseWhenEmptied(count: number): void {
+  const prev = useRef(count);
+  useEffect(() => {
+    if (prev.current > 0 && count === 0) useGame.getState().setOverlay(null);
+    prev.current = count;
+  }, [count]);
+}
 
 /**
  * Lớp phủ dạng tấm. `help` thêm nút "?" mở thẻ Sổ tay liên quan (04-GDD mục 12).
