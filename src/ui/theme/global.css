@@ -297,6 +297,16 @@ button.small {
   color: var(--ink-2);
   align-self: center;
   font-size: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+/* Nút tua khi khay trống: đang tua thì đổi màu để biết giờ đang chạy nhanh. */
+.tray-empty .rush.on {
+  background: #ffe2ad;
+  box-shadow: 0 4px 0 var(--warn-edge);
+  color: var(--ink);
 }
 .tray-item {
   flex: 0 0 auto;
@@ -1652,6 +1662,10 @@ details > summary {
 .fx-stamp.bad {
   background: var(--bad-strong);
 }
+.fx-stamp.sent {
+  background: #6b9bd8;
+  font-size: 48px;
+}
 @keyframes stamp {
   0% {
     transform: scale(1.8);
@@ -1838,6 +1852,22 @@ button.mrow:active {
   }
 }
 /* Nút Nhận / Từ chối / Liên hệ dính đáy tấm: thẻ dài ở 320×568 vẫn thấy nút mà không phải cuộn. */
+/* Tiếp nhận: nút khoa nằm ngay trong hàng hành động. Nhiều khoa thì 3 cột, nút thấp hơn để không che bảng so khớp. */
+.sample-actions .route-label {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+.sample-actions.dense {
+  grid-template-columns: repeat(3, 1fr);
+}
+.sample-actions.dense button {
+  min-height: 48px;
+  padding: 4px 6px;
+  font-size: 14px;
+}
 .sample-actions {
   position: sticky;
   bottom: calc(14px + env(safe-area-inset-bottom, 0px));

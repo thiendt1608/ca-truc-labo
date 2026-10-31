@@ -3,6 +3,7 @@ import { getContent, type ShiftState } from '../sim';
 import {
   clockFactor,
   pushToasts,
+  RUSH_SPEED,
   runProgress,
   timeScale,
   useGame,
@@ -92,6 +93,48 @@ describe('giờ chậm khi mở tấm làm việc', () => {
     expect(slow).toBeGreaterThanOrEqual(Math.floor(free * W) - 1);
     expect(slow).toBeLessThanOrEqual(Math.ceil(free * W) + 1);
     expect(elapsed({ kind: 'qc' })).toBe(0);
+  });
+});
+
+describe('tua tới mẫu kế (khay trống)', () => {
+  const st = () => useGame.getState();
+  /** Ca tiếp nhận mới, khay còn trống (mẫu đầu chưa tới). */
+  const fresh = () => {
+    st().openDay('ch0-d1');
+    st().startShift('rush');
+    useGame.setState({ tips: [], overlay: null, paused: false });
+  };
+
+  it('giờ chạy gấp RUSH_SPEED lần khi không có lớp phủ, bình thường khi mở tấm', () => {
+    fresh();
+    const step = (rush: boolean, overlay: Overlay = null) => {
+      useGame.setState({ rush, overlay, tips: [] });
+      const before = st().shift!.clock;
+      st().tickReal(2000);
+      return st().shift!.clock - before;
+    };
+    const normal = step(false);
+    const fast = step(true);
+    expect(normal).toBeGreaterThan(10);
+    expect(fast).toBeGreaterThanOrEqual(normal * RUSH_SPEED - 1);
+    expect(fast).toBeLessThanOrEqual(normal * RUSH_SPEED + 1);
+    // Mở tấm thì nút tua không còn tác dụng: tấm làm việc vẫn ×0,25, Sổ tay vẫn dừng hẳn.
+    expect(step(true, { kind: 'results' })).toBeLessThanOrEqual(Math.ceil(normal * 0.25) + 1);
+    expect(step(true, { kind: 'codex' })).toBe(0);
+  });
+
+  it('mẫu mới tới thì tự thôi tua; ca mới bắt đầu không tua', () => {
+    fresh();
+    st().setRush(true);
+    for (let i = 0; i < 400 && st().rush; i++) {
+      useGame.setState({ tips: [], overlay: null });
+      st().tickReal(250);
+    }
+    expect(st().rush).toBe(false);
+    expect(Object.values(st().shift!.samples).some((x) => x.status === 'tray')).toBe(true);
+    st().setRush(true);
+    st().startShift('again');
+    expect(st().rush).toBe(false);
   });
 });
 

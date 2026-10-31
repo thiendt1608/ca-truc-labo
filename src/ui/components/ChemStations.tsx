@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { getContent, isBalanced } from '../../sim';
 import { t } from '../../i18n';
 import { clockText, runProgress, useGame, useHints } from '../../store/game';
-import { Sheet } from './Overlay';
+import { Sheet, useCloseWhenEmptied } from './Overlay';
 import { Tube } from './Tube';
 
 /** Máy ly tâm: chọn ống ở bàn chờ rồi chạm vào ô trong rổ; ống nào cũng cần ống đối diện. */
@@ -14,6 +14,10 @@ export function CentrifugeSheet() {
   const [selected, setSelected] = useState<string | null>(null);
   const c = shift.chem!.centrifuge;
   const bench = Object.values(shift.samples).filter((s) => s.status === 'bench');
+  // Ống đã đặt vẫn giữ chỗ trong dãy (mờ, ghi số ô) để các ống còn lại không dồn chỗ dưới ngón tay.
+  const chips = Object.values(shift.samples).filter(
+    (s) => s.status === 'bench' || (s.status === 'centrifuge' && c.slots.includes(s.id)),
+  );
   const n = c.slots.length;
   const half = n / 2;
   const radius = 100;
@@ -73,24 +77,32 @@ export function CentrifugeSheet() {
           );
         })}
       </div>
-      {hints && tubes > 0 && !c.running && (
-        <p className="muted">
-          {isBalanced(c.slots) ? '✅ Đã cân bằng' : '⚠️ Ô viền đỏ chưa có ống đối diện'}
+      {/* Dòng trạng thái luôn chiếm chỗ (kể cả khi trống) để rổ và dãy ống không nhảy khi đặt ống đầu tiên. */}
+      {hints && !c.running && !c.contaminated && (
+        <p className="muted rotor-status">
+          {tubes === 0
+            ? 'Rổ đang trống.'
+            : isBalanced(c.slots)
+              ? '✅ Đã cân bằng'
+              : '⚠️ Ô viền đỏ chưa có ống đối diện'}
         </p>
       )}
       {!c.running && !c.contaminated && (
         <>
           <div className="chips">
-            {bench.map((s) => {
+            {chips.map((s) => {
               const o = shift.orders[s.orderId]!;
+              const slot = c.slots.indexOf(s.id);
               return (
                 <button
                   key={s.id}
-                  className={`chip ${selected === s.id ? 'selected' : ''}`}
+                  className={`chip ${selected === s.id ? 'selected' : ''} ${slot >= 0 ? 'placed' : ''}`}
                   onClick={() => setSelected(s.id)}
+                  disabled={slot >= 0}
                 >
                   <Tube container={s.container} size={14} />
                   {s.id.toUpperCase()} {o.priority === 'stat' ? '🚑' : ''}
+                  {slot >= 0 && ` → ô ${slot + 1}`}
                 </button>
               );
             })}
@@ -123,6 +135,7 @@ export function PostSpinSheet() {
   const day = getContent().dayById.get(shift.dayId)!;
   const check = day.unlocks.includes('postSpinCheck');
   const spun = Object.values(shift.samples).filter((s) => s.status === 'spun');
+  useCloseWhenEmptied(spun.length);
   return (
     <Sheet title="🧫 Khay sau ly tâm" help="postspin" onClose={close}>
       {spun.length === 0 && <p className="muted">Chưa có ống nào. Ống ly tâm xong sẽ nằm ở đây.</p>}
@@ -232,6 +245,7 @@ export function UrineSheet() {
   const dispatch = useGame((s) => s.dispatch);
   const close = () => useGame.getState().setOverlay(null);
   const cups = Object.values(shift.samples).filter((s) => s.status === 'urine');
+  useCloseWhenEmptied(cups.length);
   return (
     <Sheet title="🧪 Bàn nước tiểu" help="urine" onClose={close}>
       {cups.length === 0 && <p className="muted">Chưa có lọ nước tiểu nào chờ. Nhận lọ ở khay trước.</p>}

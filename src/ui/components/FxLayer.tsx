@@ -5,6 +5,7 @@ import { Tube } from './Tube';
 
 type Item =
   | { id: number; kind: 'stamp'; ok: boolean }
+  | { id: number; kind: 'sent' }
   | { id: number; kind: 'fly'; container: ContainerId; dx: number; dy: number; target: string }
   | { id: number; kind: 'trust'; delta: number; x: number; y: number };
 
@@ -28,7 +29,7 @@ function targetSelector(fx: Extract<Fx, { kind: 'decision' }>): string {
 }
 
 /**
- * Lớp hiệu ứng phủ cả phòng (không nhận chạm): dấu ✓/✗ to giữa màn, ống bay vào giỏ rồi giỏ nảy,
+ * Lớp hiệu ứng phủ cả phòng (không nhận chạm): dấu ✓/✗ to giữa màn (📨 khi gửi phiếu), ống bay vào giỏ rồi giỏ nảy,
  * số Niềm tin bay lên cạnh thanh Niềm tin. Chỉ dùng transform/opacity (chạy trên compositor).
  */
 export function FxLayer() {
@@ -78,6 +79,10 @@ export function FxLayer() {
           );
         return;
       }
+      if (fx.kind === 'sent') {
+        add({ id: ++fxId, kind: 'sent' }, STAMP_MS);
+        return;
+      }
       add({ id: ++fxId, kind: 'stamp', ok: fx.ok }, STAMP_MS);
       const target = document.querySelector<HTMLElement>(targetSelector(fx));
       if (!target || still) return;
@@ -106,6 +111,10 @@ export function FxLayer() {
         it.kind === 'stamp' ? (
           <div key={it.id} className={`fx-stamp ${it.ok ? 'ok' : 'bad'}`}>
             {it.ok ? '✓' : '✗'}
+          </div>
+        ) : it.kind === 'sent' ? (
+          <div key={it.id} className="fx-stamp sent">
+            📨
           </div>
         ) : it.kind === 'trust' ? (
           <div

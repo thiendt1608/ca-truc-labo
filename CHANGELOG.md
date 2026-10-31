@@ -10,11 +10,20 @@
 - Thẻ mẫu: bảng so khớp theo hàng (Phiếu | Nhãn). Từ chối bằng cách chạm vào chỗ sai (hàng tên/năm/mã, hàng giờ,
   hoặc chính cái ống) thay vì chọn lý do trong danh sách chữ.
 - Niềm tin tăng/giảm hiện bằng số bay cạnh thanh Niềm tin thay cho thông báo "+N Niềm tin".
+- Playtest lần 2: ở bàn tiếp nhận, thẻ mẫu cho bấm thẳng khoa nhận (một chạm thay cho "Nhận" rồi chọn khoa).
+- Các tấm khay sau ly tâm, bàn nước tiểu và kết quả tự đóng khi vừa xử lý hết; bỏ ô "Kết quả" trùng với nút ở thanh
+  dưới.
+- Máy ly tâm: ống đã đặt vẫn giữ chỗ trong dãy (mờ, ghi số ô) nên các ống còn lại không dồn dưới ngón tay; dòng
+  trạng thái rổ luôn chiếm chỗ để rổ không nhảy.
+- Que nước tiểu: nhúng ngay khi mở, bỏ bước bấm "Nhúng que" lần hai.
+- Lọ mô thiếu dịch nhìn rõ hơn: mức dịch thấp, mẫu mô nhô lên khỏi mặt dịch.
 
 ### Added
 
 - Chuyển động: tấm trượt lên, ống nảy vào khay, tem KHẨN lắc, thông báo trượt vào, sao ở báo cáo bật lần lượt.
 - Hiệu ứng quyết định ở bàn tiếp nhận: dấu ✓/✗, ống bay vào đúng giỏ/thùng. Tắt khi bật Giảm chuyển động.
+- Nút "⏩ Tua tới mẫu kế" khi khay trống: giờ chạy ×4 tới khi có mẫu mới, máy xong, điện thoại reo hay sự cố.
+- Dấu 📨 khi gửi kết quả ở phòng khoa (trung tính, không lộ đúng/sai).
 
 ### Fixed
 

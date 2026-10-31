@@ -52,4 +52,23 @@ describe('hiệu ứng quyết định (FxLayer)', () => {
     const fake = [{ type: 'sampleMoved', sampleId: 'x', to: 'bench' }] as const;
     expect(fxFromEvents(state, state, [...fake])).toEqual([]);
   });
+
+  it('gửi phiếu ở phòng khoa: dấu 📨 trung tính, không có ✓/✗', () => {
+    let state = createShift({ content, dayId: 'ch1-d1', seed: 'fx', difficulty: 'normal' }).state;
+    for (let i = 0; i < 200 && Object.keys(state.orders).length === 0; i++)
+      state = advance(state, 30, content).state;
+    const order = Object.values(state.orders)[0]!;
+    const before = {
+      ...state,
+      orders: { ...state.orders, [order.id]: { ...order, status: 'resulted' as const } },
+    };
+    const after = {
+      ...state,
+      orders: { ...state.orders, [order.id]: { ...order, status: 'released' as const } },
+    };
+    const fx = fxFromEvents(before, after, []);
+    expect(fx).toEqual([{ kind: 'sent', orderId: order.id }]);
+    // Đã gửi từ trước thì không vẽ lại.
+    expect(fxFromEvents(after, after, [])).toEqual([]);
+  });
 });

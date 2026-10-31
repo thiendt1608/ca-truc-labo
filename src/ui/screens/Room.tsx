@@ -25,7 +25,8 @@ export function Room() {
   const shift = useGame((s) => s.shift);
   const overlay = useGame((s) => s.overlay);
   const paused = useGame((s) => s.paused);
-  const { setOverlay, dispatch, setPaused, go } = useGame.getState();
+  const rush = useGame((s) => s.rush);
+  const { setOverlay, dispatch, setPaused, setRush, go } = useGame.getState();
   if (!shift) return null;
   const content = getContent();
   const day = content.dayById.get(shift.dayId)!;
@@ -51,7 +52,15 @@ export function Room() {
       <Hud />
       <RoomBanner day={day} />
       <div className="tray" aria-label="Khay mẫu">
-        {tray.length === 0 && <span className="tray-empty">Khay trống, chờ mẫu tới...</span>}
+        {tray.length === 0 && (
+          <div className="tray-empty">
+            <span>{rush ? 'Đang tua tới việc kế...' : 'Khay trống, chờ mẫu tới...'}</span>
+            {/* Rảnh tay thì không bắt ngồi chờ: tua nhanh, có việc mới là tự thôi (store `RUSH_STOPS`). */}
+            <button className={`small rush ${rush ? 'on' : ''}`} onClick={() => setRush(!rush)}>
+              {rush ? '⏸ Thôi tua' : '⏩ Tua tới mẫu kế'}
+            </button>
+          </div>
+        )}
         {tray.map((s) => {
           const o = shift.orders[s.orderId]!;
           const who = shift.patients[o.patientId]?.name.split(' ').slice(-2).join(' ') ?? s.id;
@@ -280,7 +289,6 @@ function ChemStations() {
   const bench = samples.filter((s) => s.status === 'bench').length;
   const spun = samples.filter((s) => s.status === 'spun').length;
   const urineCount = samples.filter((s) => s.status === 'urine').length;
-  const resulted = Object.values(shift.orders).filter((o) => o.status === 'resulted').length;
   const c = chem.centrifuge;
   const spin = getContent().chemRules.centrifuge.spinSeconds;
   const per = getContent().chemRules.analyzer.secondsPerSample;
@@ -376,16 +384,6 @@ function ChemStations() {
             <div style={{ width: `${runProgress(shift, a.current.endsAt, per)}%` }} />
           </div>
         )}
-      </button>
-      <button className="station card" onClick={() => setOverlay({ kind: 'results' })}>
-        <span className="station-head">
-          <span className="name">📋 Kết quả</span>
-          <Orb state={resulted > 0 ? 'busy' : 'ready'} />
-        </span>
-        {resulted > 0 && <span className="badge">{resulted}</span>}
-        <span className="status">
-          {Object.values(shift.orders).filter((o) => o.status === 'released').length} phiếu đã gửi
-        </span>
       </button>
     </>
   );

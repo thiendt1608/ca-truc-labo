@@ -31,14 +31,18 @@ export function UrineStripGame({
   onDone: (actions: PlayerAction[]) => void;
 }) {
   const dipAt = useRef<number | null>(null);
-  const [started, setStarted] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const actionsRef = useRef<PlayerAction[]>([]);
   const doneRef = useRef(false);
 
+  // Người chơi đã bấm "Nhúng que" ở bàn nước tiểu: que nhúng ngay khi mở, không bắt bấm lần hai.
   useEffect(() => {
-    if (!started) return;
+    dipAt.current = performance.now();
+    actionsRef.current = [{ t: 0, type: 'tap', id: 'dip' }];
+  }, []);
+
+  useEffect(() => {
     const id = window.setInterval(() => {
       const e = sinceDip(dipAt);
       setElapsed(e);
@@ -49,13 +53,8 @@ export function UrineStripGame({
       }
     }, 80);
     return () => window.clearInterval(id);
-  }, [started, input.timeLimitMs, onDone]);
+  }, [input.timeLimitMs, onDone]);
 
-  const dip = () => {
-    dipAt.current = performance.now();
-    setStarted(true);
-    actionsRef.current = [{ t: 0, type: 'tap', id: 'dip' }];
-  };
   const answer = (padId: string, level: number) => {
     const t = sinceDip(dipAt);
     actionsRef.current = [...actionsRef.current, { t, type: 'tap', id: `${padId}:${level}` }];
@@ -67,20 +66,6 @@ export function UrineStripGame({
     const t = sinceDip(dipAt);
     onDone([...actionsRef.current, { t, type: 'done' }]);
   };
-
-  if (!started) {
-    return (
-      <div className="stack">
-        <p>
-          Nhúng que vào nước tiểu rồi so màu từng ô với bảng màu. Mỗi ô có thời điểm đọc riêng: đọc sớm thì
-          màu chưa lên đủ.
-        </p>
-        <button className="primary" onClick={dip}>
-          🧪 Nhúng que
-        </button>
-      </div>
-    );
-  }
 
   const answered = input.pads.every((p) => answers[p.id] !== undefined);
   const simSeconds = Math.round(elapsed / input.msPerSimSecond);

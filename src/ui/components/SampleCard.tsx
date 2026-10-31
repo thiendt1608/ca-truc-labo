@@ -13,7 +13,7 @@ const TUBE_REASONS: { reason: RejectReason; icon: string }[] = [
 ];
 
 /**
- * S5 Thẻ mẫu: phiếu và nhãn đặt cạnh nhau theo từng hàng để so; Nhận / Từ chối / Liên hệ.
+ * S5 Thẻ mẫu: phiếu và nhãn đặt cạnh nhau theo từng hàng để so; Nhận (ở tiếp nhận: bấm thẳng khoa) / Từ chối / Liên hệ.
  * Từ chối = chạm vào chỗ sai (hàng tên/năm/mã, giờ lấy, hoặc chính cái ống) thay vì chọn chữ trong danh sách.
  */
 export function SampleCard({ sampleId }: { sampleId: string }) {
@@ -22,7 +22,7 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
   const debug = useGame((s) => s.debug);
   const dispatch = useGame((s) => s.dispatch);
   const close = () => useGame.getState().setOverlay(null);
-  const [mode, setMode] = useState<'main' | 'route' | 'reject' | 'tube'>('main');
+  const [mode, setMode] = useState<'main' | 'reject' | 'tube'>('main');
   const content = getContent();
   const day = content.dayById.get(shift.dayId)!;
   const sample = shift.samples[sampleId];
@@ -41,10 +41,7 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
     fn();
     close();
   };
-  const accept = () => {
-    if (shift.room === 'reception') setMode('route');
-    else act(() => dispatch({ type: 'acceptSample', sampleId }));
-  };
+  const reception = shift.room === 'reception';
   const reject = (reason: RejectReason) => act(() => dispatch({ type: 'rejectSample', sampleId, reason }));
   const label = sample.label;
 
@@ -155,23 +152,11 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
       )}
 
       {mode === 'main' && (
-        <div className="choices sample-actions">
-          <button className="primary" onClick={accept}>
-            ✅ Nhận
-          </button>
-          <button className="danger" onClick={() => setMode('reject')}>
-            ❌ Từ chối
-          </button>
-          {day.unlocks.includes('contact') && (
-            <button onClick={() => act(() => dispatch({ type: 'contactWard', sampleId }))}>📞 Liên hệ</button>
-          )}
-        </div>
-      )}
-      {mode === 'route' && (
-        <>
-          <p className="muted">Chuyển tới khoa nào?</p>
-          <div className="choices">
-            {depts.map((d) => (
+        // Ở tiếp nhận, nhận = chọn luôn khoa nhận (một chạm thay cho "Nhận" rồi chọn khoa).
+        <div className={`choices sample-actions ${reception && depts.length > 2 ? 'dense' : ''}`}>
+          {reception && <p className="route-label">✅ Nhận, chuyển tới:</p>}
+          {reception ? (
+            depts.map((d) => (
               <button
                 key={d}
                 data-room={d}
@@ -180,10 +165,22 @@ export function SampleCard({ sampleId }: { sampleId: string }) {
               >
                 {t(`dept.${d}`)}
               </button>
-            ))}
-            <button onClick={() => setMode('main')}>↩ Quay lại</button>
-          </div>
-        </>
+            ))
+          ) : (
+            <button
+              className="primary"
+              onClick={() => act(() => dispatch({ type: 'acceptSample', sampleId }))}
+            >
+              ✅ Nhận
+            </button>
+          )}
+          <button className="danger" onClick={() => setMode('reject')}>
+            ❌ Từ chối
+          </button>
+          {day.unlocks.includes('contact') && (
+            <button onClick={() => act(() => dispatch({ type: 'contactWard', sampleId }))}>📞 Liên hệ</button>
+          )}
+        </div>
       )}
       {pointing && (
         <div className="choices">

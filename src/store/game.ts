@@ -82,6 +82,22 @@ const MAX_TOASTS = 2;
 const DECISION_SCREENS: readonly string[] = ['qc', 'phone', 'event', 'codex'];
 /** Mẹo chỉ có nghĩa khi đang mở QC sheet, nên không xếp hàng chung với mẹo của phòng. */
 const INLINE_TIPS: readonly string[] = ['qcRun', 'qcFailed', 'eventDecision'];
+/** Tua nhanh khi khay trống: giờ chạy gấp chừng này lần (chỉ khi không có lớp phủ). */
+export const RUSH_SPEED = 4;
+/** Có việc mới cho người chơi thì thôi tua: mẫu tới, máy xong, kết quả, điện thoại, sự kiện, mẹo, mini-game. */
+const RUSH_STOPS: readonly SimEvent['type'][] = [
+  'sampleArrived',
+  'centrifugeDone',
+  'centrifugeShake',
+  'tubeBroken',
+  'resultReady',
+  'phoneRing',
+  'eventStarted',
+  'minigameStarted',
+  'tip',
+  'mistakeRecorded',
+  'shiftEnded',
+];
 
 /** Nội dung thẻ nhắc trước mini-game tự bật. */
 export interface MinigameNotice {
@@ -116,6 +132,8 @@ interface GameStore {
   log: Command[];
   paused: boolean;
   speed: number;
+  /** Người chơi bấm "⏩ Tua tới mẫu kế" lúc khay trống; tự tắt khi có việc mới (`RUSH_STOPS`). */
+  rush: boolean;
   overlay: Overlay;
   tips: { id: number; text: string }[];
   /** Mẹo gắn với một lớp phủ (QC), chỉ hiện trong lớp phủ đó và mất khi đóng nó. */
@@ -147,6 +165,7 @@ interface GameStore {
   tickReal(ms: number): void;
   setPaused(p: boolean): void;
   setSpeed(s: number): void;
+  setRush(on: boolean): void;
   setOverlay(o: Overlay): void;
   dismissTip(id: number): void;
   dropToast(id: number): void;
@@ -211,8 +230,10 @@ export const useGame = create<GameStore>((set, getState) => {
     const ended = r.events.find((e) => e.type === 'shiftEnded');
     // Niềm tin tăng không còn là chữ: số bay lên cạnh thanh Niềm tin (FxLayer).
     const fx = fxFromEvents(getState().shift, r.state, r.events);
+    const stopRush = r.events.some((e) => RUSH_STOPS.includes(e.type));
     set((st) => ({
       shift: r.state,
+      ...(stopRush ? { rush: false } : {}),
       tips: [...st.tips, ...tips].slice(-3),
       inlineTips: inlineTips.length > 0 ? inlineTips.slice(-1) : st.inlineTips,
       toasts: pushToasts(st.toasts, toasts),
@@ -261,6 +282,7 @@ export const useGame = create<GameStore>((set, getState) => {
       help: null,
       mgNotice: null,
       paused: false,
+      rush: false,
       installHint: showHint,
     });
   };
@@ -275,6 +297,7 @@ export const useGame = create<GameStore>((set, getState) => {
     log: [],
     paused: false,
     speed: 1,
+    rush: false,
     overlay: null,
     tips: [],
     inlineTips: [],
@@ -344,6 +367,7 @@ export const useGame = create<GameStore>((set, getState) => {
         seenInShift: [],
         paused: false,
         speed: 1,
+        rush: false,
         installHint: false,
         seed: null,
       });
@@ -358,7 +382,7 @@ export const useGame = create<GameStore>((set, getState) => {
       return absorb(applyCommand(shift, cmd, getContent()));
     },
     tickReal(ms) {
-      const { shift, paused, speed, difficulty, screen, overlay, tips, help, mgNotice } = getState();
+      const { shift, paused, speed, rush, difficulty, screen, overlay, tips, help, mgNotice } = getState();
       if (!shift || shift.ended || paused || screen !== 'room') return;
       const content = getContent();
       const factor = clockFactor(
@@ -377,6 +401,7 @@ export const useGame = create<GameStore>((set, getState) => {
           timeScale(shift.duration) *
           content.difficulty.levels[difficulty].clockSpeed *
           speed *
+          (rush && overlay === null ? RUSH_SPEED : 1) *
           factor;
       const whole = Math.floor(total);
       carry = total - whole;
@@ -390,6 +415,9 @@ export const useGame = create<GameStore>((set, getState) => {
     },
     setSpeed(speed) {
       set({ speed });
+    },
+    setRush(rush) {
+      set({ rush });
     },
     setOverlay(overlay) {
       set(overlay?.kind === 'qc' || overlay?.kind === 'event' ? { overlay } : { overlay, inlineTips: [] });
