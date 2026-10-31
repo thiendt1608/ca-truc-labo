@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type CSSProperties } from 'react';
 import { getContent } from '../../sim';
 import { t } from '../../i18n';
 import { useGame } from '../../store/game';
@@ -17,6 +17,11 @@ export function ToastList() {
       ))}
     </div>
   );
+}
+
+/** Thời gian đọc một mẹo (ms) trước khi nó tự đóng và đồng hồ chạy lại. */
+export function tipReadMs(text: string): number {
+  return Math.min(9000, Math.max(4000, 1500 + text.length * 60));
 }
 
 /** Mẹo của người hướng dẫn (≤ 2 câu) và thông báo ngắn khi làm đúng/sai. */
@@ -67,17 +72,40 @@ export function Notices() {
   }, []);
 
   const tip = busy ? undefined : tips[0];
+  const tipId = tip?.id;
+  const tipMs = tip ? tipReadMs(tip.text) : 0;
+  const overlayOpen = useGame((s) => s.overlay !== null);
+  const shown = useRef<number | undefined>(undefined);
+  // Mẹo giữ đồng hồ khi đang hiện, nên không được nằm chờ mãi: đọc xong tự đóng.
+  useEffect(() => {
+    if (tipId === undefined) return;
+    shown.current = tipId;
+    const h = window.setTimeout(() => dismissTip(tipId), tipMs);
+    return () => window.clearTimeout(h);
+  }, [tipId, tipMs, dismissTip]);
+  // Người chơi đã bắt tay làm (mở thẻ mẫu, máy...) thì mẹo vừa hiện coi như đã đọc.
+  useEffect(() => {
+    if (!overlayOpen || shown.current === undefined) return;
+    dismissTip(shown.current);
+    shown.current = undefined;
+  }, [overlayOpen, dismissTip]);
   // Mẹo và thông báo cùng nằm ở đáy (trên thanh lệnh) để không che HUD và khay mẫu.
   return (
     <div className={`floaters ${inMinigame ? 'in-mg' : ''}`}>
       {tip && (
-        <button className="tip" onClick={() => dismissTip(tip.id)}>
+        <button
+          key={tip.id}
+          className="tip"
+          onClick={() => dismissTip(tip.id)}
+          style={{ '--tip-ms': `${tipMs}ms` } as CSSProperties}
+        >
           <b>💬 {mentor ? t(`mentor.${mentor}`) : 'Người hướng dẫn'}</b>
           {tip.text}
           <span className="muted" aria-hidden>
             {' '}
             ✕
           </span>
+          <span className="tip-timer" aria-hidden />
         </button>
       )}
       {!sheetOpen && <ToastList />}

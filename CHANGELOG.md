@@ -18,4 +18,7 @@
 
 ### Fixed
 
+- Đồng hồ trông như đứng im: mẹo của người hướng dẫn giữ giờ tới khi được chạm, mà người chơi tưởng là lời thoại nên
+  không chạm. Giờ mẹo tự đóng sau thời gian đọc (4–9 giây, có thanh đếm ngược) và đóng luôn khi người chơi mở thẻ
+  mẫu hay máy.
 - Đồng hồ không còn cập nhật store mỗi khung hình (phần lẻ giây để ngoài store).

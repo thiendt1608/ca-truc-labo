@@ -235,3 +235,28 @@ test('thẻ mẫu nêu mức ưu tiên cho mọi phiếu; báo cáo không còn 
   await expect(page.getByRole('heading', { name: 'Báo cáo giao ca' })).toBeVisible();
   await expect(page.getByText(/Ngân sách/)).toHaveCount(0);
 });
+
+test('mẹo không giữ đồng hồ mãi: mở thẻ mẫu thì mẹo đang hiện đóng, để yên thì tự đóng sau khi đọc', async ({
+  page,
+}) => {
+  await page.goto('/?debug=1');
+  await page.waitForFunction(() => window.__game !== undefined);
+  await page.evaluate(() => {
+    const g = window.__game!.getState();
+    g.openDay('ch0-d1');
+    g.startShift('tip');
+  });
+  const tip = page.locator('.floaters .tip');
+  await expect(tip).toContainText('Chào em');
+  expect(await gameClock(page)).toBe(0);
+
+  // Bắt tay làm luôn: mẹo chào đang hiện coi như đã đọc, đóng thẻ mẫu không thấy lại nó.
+  await page.locator('.tray-item').first().click();
+  await page.keyboard.press('Escape');
+  await expect(tip).not.toContainText('Chào em');
+
+  // Mẹo kế tiếp (so nhãn) để yên thì tự đóng, rồi đồng hồ chạy tiếp.
+  await expect(tip).toHaveCount(0, { timeout: 12000 });
+  const before = await gameClock(page);
+  await expect.poll(() => gameClock(page), { timeout: 5000 }).toBeGreaterThan(before);
+});
