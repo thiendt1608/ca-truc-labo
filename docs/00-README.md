@@ -1,6 +1,6 @@
 # Bộ tài liệu dự án CA TRỰC LABO
 
-> Cập nhật: 2026-10-07 (bản mở rộng: 13+, 5 chuyên ngành) · Mốc hiện tại: **M0 – Tài liệu ✅**, tiếp theo là **M1 – Thử bằng giấy**
+> Cập nhật: 2026-10-07 (bản mở rộng: 13+, 5 chuyên ngành). **Tiến độ hiện tại và việc tiếp theo: [11-tien-do.md](11-tien-do.md).**
 
 ## Đọc theo thứ tự này
 
